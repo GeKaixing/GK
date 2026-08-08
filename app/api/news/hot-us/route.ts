@@ -1,7 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { NextResponse } from "next/server";
 
-import { getGeminiModelCandidates, normalizeGeminiModel } from "@/lib/gemini-model";
+import { getUserAiConfig } from "@/lib/ai/config";
+import { getModelCandidates } from "@/lib/ai/models";
 import { createClient } from "@/utils/supabase/server";
 
 interface HotNewsItem {
@@ -162,32 +163,39 @@ export async function GET(request: Request): Promise<Response> {
         : "us";
 
     const supabase = await createClient();
-    let userGeminiApiKey = "";
-    let geminiModel = normalizeGeminiModel(undefined);
+    let config = getUserAiConfig(null);
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      userGeminiApiKey =
-        typeof user?.user_metadata?.gemini_api_key === "string" ? user.user_metadata.gemini_api_key.trim() : "";
-      geminiModel = normalizeGeminiModel(user?.user_metadata?.gemini_model);
+      config = getUserAiConfig(user);
     } catch {
-      userGeminiApiKey = "";
+      config = getUserAiConfig(null);
     }
-    const geminiApiKey = userGeminiApiKey;
-    const modelCandidates = getGeminiModelCandidates(geminiModel);
 
-    if (!geminiApiKey) {
+    if (config.provider !== "google") {
       return NextResponse.json(
         {
-          error: "Gemini API key is not configured in your Settings (environment key is disabled)",
+          error: "News generation with Google Search grounding is only supported with the Gemini provider. Switch back to Gemini in Settings.",
+          success: false,
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!config.apiKey) {
+      return NextResponse.json(
+        {
+          error: "AI API key is not configured in your Settings",
           success: false,
         },
         { status: 503 }
       );
     }
 
-    const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+    const modelCandidates = getModelCandidates("google", config.model);
+
+    const ai = new GoogleGenAI({ apiKey: config.apiKey });
 
     try {
       let text = "";

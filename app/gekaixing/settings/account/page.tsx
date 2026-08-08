@@ -7,7 +7,7 @@ import { Mail, ShieldCheck } from 'lucide-react'
 import React from 'react'
 import SettingPassword from '@/components/gekaixing/SettingPassword'
 import SettingDeleteAccount from '@/components/gekaixing/SettingDeleteAccount'
-import SettingGeminiKey from '@/components/gekaixing/SettingGeminiKey'
+import SettingAI from '@/components/gekaixing/SettingAI'
 
 
 export default function page() {
@@ -18,7 +18,7 @@ export default function page() {
       <ul className='flex flex-col gap-6'>
         <SettingAccountLi icon={<Mail></Mail>} text={email} icon2={<ShieldCheck className="text-blue-400" ></ShieldCheck>}></SettingAccountLi>
         <SettingEmail></SettingEmail>
-        <SettingGeminiKey />
+        <SettingAI />
         <SettingPassword></SettingPassword>
         <SettingDeleteAccount></SettingDeleteAccount>
       </ul>

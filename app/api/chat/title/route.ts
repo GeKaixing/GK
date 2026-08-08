@@ -1,5 +1,6 @@
-import { generateGeminiText } from "@/lib/gemini";
-import { getGeminiModelCandidates, normalizeGeminiModel, type GeminiModel } from "@/lib/gemini-model";
+import { getUserAiConfig } from "@/lib/ai/config";
+import { generateAiText } from "@/lib/ai/text";
+import type { AiUserConfig } from "@/lib/ai/types";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
@@ -23,15 +24,13 @@ function normalizeTitle(title: string): string {
   return cleaned.slice(0, MAX_TITLE_LENGTH);
 }
 
-async function generateAiTitle(text: string, apiKey: string, model: GeminiModel): Promise<string | null> {
-  if (!apiKey.trim()) {
+async function generateAiTitle(config: AiUserConfig, text: string): Promise<string | null> {
+  if (!config.apiKey.trim()) {
     return null;
   }
 
   try {
-    const { text: title } = await generateGeminiText({
-      apiKey,
-      modelCandidates: getGeminiModelCandidates(model),
+    const { text: title } = await generateAiText(config, {
       temperature: 0.2,
       maxOutputTokens: 32,
       prompt: [
@@ -86,14 +85,9 @@ export async function POST(req: Request): Promise<Response> {
       return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
-    const geminiApiKey =
-      typeof user.user_metadata?.gemini_api_key === "string"
-        ? user.user_metadata.gemini_api_key.trim()
-        : "";
-    const geminiModel = normalizeGeminiModel(user.user_metadata?.gemini_model);
-
+    const config = getUserAiConfig(user);
     const fallbackTitle = buildFallbackTitle(text);
-    const aiTitle = await generateAiTitle(text, geminiApiKey, geminiModel);
+    const aiTitle = await generateAiTitle(config, text);
     const nextTitle = aiTitle ?? fallbackTitle;
 
     await prisma.chatAISession.update({

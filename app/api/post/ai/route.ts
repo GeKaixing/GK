@@ -1,5 +1,5 @@
-import { generateGeminiText } from "@/lib/gemini";
-import { getGeminiModelCandidates, normalizeGeminiModel } from "@/lib/gemini-model";
+import { getUserAiConfig } from "@/lib/ai/config";
+import { generateAiText } from "@/lib/ai/text";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -64,7 +64,7 @@ function buildPolishPromptText(content: string, locale: "zh-CN" | "en"): string 
   ].join("\n");
 }
 
-function mapGeminiErrorToHttp(errorMessage: string): { status: number; message: string } {
+function mapAiErrorToHttp(errorMessage: string): { status: number; message: string } {
   const text = errorMessage.toLowerCase();
 
   if (
@@ -76,34 +76,34 @@ function mapGeminiErrorToHttp(errorMessage: string): { status: number; message: 
   ) {
     return {
       status: 503,
-      message: "Cannot reach Gemini service from server network. Please retry later or check network/proxy.",
+      message: "Cannot reach the AI service from server network. Please retry later or check network/proxy.",
     };
   }
 
-  if (text.includes("api key") || text.includes("api_key") || text.includes("permission denied")) {
+  if (text.includes("api key") || text.includes("api_key") || text.includes("permission denied") || text.includes("401")) {
     return {
       status: 401,
-      message: "Gemini API key is invalid or unauthorized. Please update it in Settings.",
+      message: "AI API key is invalid or unauthorized. Please update it in Settings.",
     };
   }
 
-  if (text.includes("quota") || text.includes("rate limit") || text.includes("resource exhausted")) {
+  if (text.includes("quota") || text.includes("rate limit") || text.includes("resource exhausted") || text.includes("429")) {
     return {
       status: 429,
-      message: "Gemini quota exceeded or rate limited. Please try again later.",
+      message: "AI quota exceeded or rate limited. Please try again later.",
     };
   }
 
   if (text.includes("model") && text.includes("not found")) {
     return {
       status: 503,
-      message: "Gemini model is currently unavailable. Please try again later.",
+      message: "AI model is currently unavailable. Please try again later.",
     };
   }
 
   return {
     status: 502,
-    message: "Gemini request failed. Please retry in a moment.",
+    message: "AI request failed. Please retry in a moment.",
   };
 }
 
@@ -127,28 +127,20 @@ export async function POST(request: Request): Promise<Response> {
       mode === "polish"
         ? buildPolishPromptText(content || prompt, locale)
         : buildGeneratePromptText(prompt, locale);
-    const geminiApiKey =
-      typeof user.user_metadata?.gemini_api_key === "string"
-        ? user.user_metadata.gemini_api_key.trim()
-        : "";
-    const geminiModel = normalizeGeminiModel(user.user_metadata?.gemini_model);
-    const modelCandidates = getGeminiModelCandidates(geminiModel);
+    const config = getUserAiConfig(user);
 
-    if (!geminiApiKey) {
+    if (!config.apiKey) {
       return NextResponse.json(
         {
-          error: "Gemini API key is not configured in your Settings",
+          error: "AI API key is not configured in your Settings",
           success: false,
         },
         { status: 503 }
       );
     }
-    
+
     try {
-      const { text, model } = await generateGeminiText({
-        apiKey: geminiApiKey,
-        preferredModel: geminiModel,
-        modelCandidates,
+      const { text, model } = await generateAiText(config, {
         prompt: promptText,
         temperature: 0.85,
         maxOutputTokens: 220,
@@ -156,14 +148,13 @@ export async function POST(request: Request): Promise<Response> {
 
       const content = cleanOutput(text);
       if (!content) {
-        throw new Error("Gemini returned empty content");
+        throw new Error("AI returned empty content");
       }
 
-      return NextResponse.json({ content, success: true, source: `gemini:${model}` });
+      return NextResponse.json({ content, success: true, source: `${config.provider}:${model}` });
     } catch (error) {
-      const warning =
-        error instanceof Error ? error.message : "Gemini request failed";
-      const mapped = mapGeminiErrorToHttp(warning);
+      const warning = error instanceof Error ? error.message : "AI request failed";
+      const mapped = mapAiErrorToHttp(warning);
 
       return NextResponse.json(
         {
@@ -175,8 +166,7 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Failed to generate AI post";
+    const message = error instanceof Error ? error.message : "Failed to generate AI post";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

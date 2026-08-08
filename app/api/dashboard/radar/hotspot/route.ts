@@ -1,7 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
-import { getGeminiModelCandidates, normalizeGeminiModel } from "@/lib/gemini-model";
+import { getUserAiConfig } from "@/lib/ai/config";
+import { getModelCandidates } from "@/lib/ai/models";
 import { createClient } from "@/utils/supabase/server";
 
 interface RadarHotspot {
@@ -142,25 +143,32 @@ export async function POST(request: Request): Promise<Response> {
       return NextResponse.json({ error: "Unauthorized", success: false }, { status: 401 });
     }
 
-    const geminiApiKey =
-      typeof user.user_metadata?.gemini_api_key === "string"
-        ? user.user_metadata.gemini_api_key.trim()
-        : "";
-    const geminiModel = normalizeGeminiModel(user.user_metadata?.gemini_model);
-    const modelCandidates = getGeminiModelCandidates(geminiModel);
+    const config = getUserAiConfig(user);
 
-    if (!geminiApiKey) {
+    if (config.provider !== "google") {
       return NextResponse.json(
         {
-          error: "Gemini API key is not configured in your Settings",
+          error: "Trend analysis with Google Search grounding is only supported with the Gemini provider. Switch back to Gemini in Settings.",
+          success: false,
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!config.apiKey) {
+      return NextResponse.json(
+        {
+          error: "AI API key is not configured in your Settings",
           success: false,
         },
         { status: 503 }
       );
     }
 
+    const modelCandidates = getModelCandidates("google", config.model);
+
     const region = normalizeRegionFromHeaders(request);
-    const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+    const ai = new GoogleGenAI({ apiKey: config.apiKey });
 
     try {
       let text = "";

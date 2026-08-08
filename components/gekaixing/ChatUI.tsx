@@ -221,8 +221,8 @@ useEffect(() => {
       console.error(error)
 
       const errorMessage = error instanceof Error ? error.message : ""
-      const fallbackMessage = errorMessage.includes("Gemini API key is not configured")
-        ? "请先到 设置 > 账号 配置 Gemini API Key（/gekaixing/settings/account）"
+      const fallbackMessage = errorMessage.includes("AI API key is not configured")
+        ? "请先到 设置 > 账号 配置 AI API Key（/gekaixing/settings/account）"
         : t("errorRetry")
 
       setMessages((prev) =>

@@ -1,5 +1,5 @@
-import { GoogleGenAI } from "@google/genai";
-import { getGeminiModelCandidates, normalizeGeminiModel } from "@/lib/gemini-model";
+import { getUserAiConfig } from "@/lib/ai/config";
+import { streamAiText } from "@/lib/ai/text";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest } from "next/server";
@@ -11,18 +11,6 @@ type ChatMessage = {
   role: "system" | "user" | "assistant";
   content: string;
 };
-
-function mapMessagesForGemini(messages: ChatMessage[]): Array<{
-  role: "user" | "model";
-  parts: Array<{ text: string }>;
-}> {
-  return messages
-    .filter((message) => message.role !== "system" && message.content.trim().length > 0)
-    .map((message) => ({
-      role: message.role === "assistant" ? "model" : "user",
-      parts: [{ text: message.content }],
-    }));
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,6 +32,14 @@ export async function POST(req: NextRequest) {
 
     if (!messages?.length) {
       return new Response("messages required", { status: 400 });
+    }
+
+    const config = getUserAiConfig(user);
+    if (!config.apiKey) {
+      return new Response(
+        "AI API key is not configured. Please go to /gekaixing/settings/account to set it.",
+        { status: 503 }
+      );
     }
 
     let currentSessionId = sessionId;
@@ -80,22 +76,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const geminiApiKey =
-      typeof user.user_metadata?.gemini_api_key === "string"
-        ? user.user_metadata.gemini_api_key.trim()
-        : "";
-    const geminiModel = normalizeGeminiModel(user.user_metadata?.gemini_model);
-    const modelCandidates = getGeminiModelCandidates(geminiModel);
-
-    if (!geminiApiKey) {
-      return new Response(
-        "Gemini API key is not configured. Please go to /gekaixing/settings/account to set it.",
-        { status: 503 }
-      );
-    }
-
-    const geminiClient = new GoogleGenAI({ apiKey: geminiApiKey });
-    const geminiMessages = mapMessagesForGemini(messages);
+    const systemMessage = messages.find((message) => message.role === "system");
+    const modelMessages = messages
+      .filter((message) => message.role !== "system" && message.content.trim().length > 0)
+      .map((message) => ({
+        role: message.role === "assistant" ? "assistant" as const : "user" as const,
+        content: message.content,
+      }));
 
     const encoder = new TextEncoder();
     let fullText = "";
@@ -103,37 +90,14 @@ export async function POST(req: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          let streamWorked = false;
-          let lastStreamError: unknown = null;
-
-          for (const candidateModel of modelCandidates) {
-            try {
-              const result = await geminiClient.models.generateContentStream({
-                model: candidateModel,
-                contents: geminiMessages,
-                config: {
-                  systemInstruction: GKX_SYSTEM_PROMPT,
-                  temperature: 0.7,
-                  maxOutputTokens: 1024,
-                },
-              });
-
-              for await (const chunk of result) {
-                const chunkText = chunk.text ?? "";
-                if (chunkText.length > 0) {
-                  fullText += chunkText;
-                  controller.enqueue(encoder.encode(chunkText));
-                }
-              }
-              streamWorked = true;
-              break;
-            } catch (candidateError) {
-              lastStreamError = candidateError;
-            }
-          }
-
-          if (!streamWorked) {
-            throw lastStreamError instanceof Error ? lastStreamError : new Error("Gemini stream failed");
+          for await (const chunk of streamAiText(config, {
+            system: systemMessage?.content ?? GKX_SYSTEM_PROMPT,
+            messages: modelMessages,
+            temperature: 0.7,
+            maxOutputTokens: 1024,
+          })) {
+            fullText += chunk;
+            controller.enqueue(encoder.encode(chunk));
           }
 
           await prisma.chatAIMessage.create({
@@ -147,7 +111,7 @@ export async function POST(req: NextRequest) {
 
           controller.close();
         } catch (streamError) {
-          console.error("Gemini stream failed:", streamError);
+          console.error("AI stream failed:", streamError);
           controller.error(streamError);
         }
       },

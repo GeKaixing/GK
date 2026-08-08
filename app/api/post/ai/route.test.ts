@@ -10,8 +10,8 @@ vi.mock("@/utils/supabase/server", () => ({
   })),
 }));
 
-vi.mock("@/lib/gemini", () => ({
-  generateGeminiText: vi.fn(),
+vi.mock("@/lib/ai/text", () => ({
+  generateAiText: vi.fn(),
 }));
 
 import { POST } from "@/app/api/post/ai/route";
@@ -26,7 +26,7 @@ describe("POST /api/post/ai", () => {
     });
   });
 
-  it("returns 503 when Gemini API key is missing instead of local fallback content", async () => {
+  it("returns 503 when AI API key is missing instead of local fallback content", async () => {
     const request = new Request("http://localhost/api/post/ai", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -46,7 +46,7 @@ describe("POST /api/post/ai", () => {
 
     expect(response.status).toBe(503);
     expect(payload.success).toBe(false);
-    expect(payload.error).toBe("Gemini API key is not configured in your Settings");
+    expect(payload.error).toBe("AI API key is not configured in your Settings");
     expect(payload.content).toBeUndefined();
     expect(payload.source).toBeUndefined();
   });

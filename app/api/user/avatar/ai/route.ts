@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
+import { getUserAiConfig } from "@/lib/ai/config";
 import { createClient } from "@/utils/supabase/server";
 
 interface GenerateAvatarBody {
@@ -60,15 +61,22 @@ export async function POST(request: Request): Promise<Response> {
       return NextResponse.json({ error: "Unauthorized", success: false }, { status: 401 });
     }
 
-    const geminiApiKey =
-      typeof user.user_metadata?.gemini_api_key === "string"
-        ? user.user_metadata.gemini_api_key.trim()
-        : "";
+    const config = getUserAiConfig(user);
 
-    if (!geminiApiKey) {
+    if (config.provider !== "google") {
       return NextResponse.json(
         {
-          error: "Gemini API key is not configured in your Settings",
+          error: "Image generation is only supported with the Gemini provider. Switch back to Gemini in Settings.",
+          success: false,
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!config.apiKey) {
+      return NextResponse.json(
+        {
+          error: "AI API key is not configured in your Settings",
           success: false,
         },
         { status: 503 }
@@ -83,7 +91,7 @@ export async function POST(request: Request): Promise<Response> {
       return NextResponse.json({ error: "Prompt is required", success: false }, { status: 400 });
     }
 
-    const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+    const ai = new GoogleGenAI({ apiKey: config.apiKey });
     const finalPrompt =
       target === "background"
         ? [
