@@ -166,7 +166,7 @@ export type FollowGroupByOutputType = {
   _max: FollowMaxAggregateOutputType | null
 }
 
-type GetFollowGroupByPayload<T extends FollowGroupByArgs> = Prisma.PrismaPromise<
+export type GetFollowGroupByPayload<T extends FollowGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<FollowGroupByOutputType, T['by']> &
       {
@@ -1294,6 +1294,11 @@ export type FollowFindManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Skip the first `n` Follows.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Follows.
+   */
   distinct?: Prisma.FollowScalarFieldEnum | Prisma.FollowScalarFieldEnum[]
 }
 

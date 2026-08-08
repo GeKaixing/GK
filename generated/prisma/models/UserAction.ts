@@ -213,7 +213,7 @@ export type UserActionGroupByOutputType = {
   _max: UserActionMaxAggregateOutputType | null
 }
 
-type GetUserActionGroupByPayload<T extends UserActionGroupByArgs> = Prisma.PrismaPromise<
+export type GetUserActionGroupByPayload<T extends UserActionGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<UserActionGroupByOutputType, T['by']> &
       {
@@ -1421,6 +1421,11 @@ export type UserActionFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` UserActions.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of UserActions.
+   */
   distinct?: Prisma.UserActionScalarFieldEnum | Prisma.UserActionScalarFieldEnum[]
 }
 

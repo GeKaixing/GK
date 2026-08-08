@@ -193,7 +193,7 @@ export type JobPostingGroupByOutputType = {
   _max: JobPostingMaxAggregateOutputType | null
 }
 
-type GetJobPostingGroupByPayload<T extends JobPostingGroupByArgs> = Prisma.PrismaPromise<
+export type GetJobPostingGroupByPayload<T extends JobPostingGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<JobPostingGroupByOutputType, T['by']> &
       {
@@ -1297,6 +1297,11 @@ export type JobPostingFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` JobPostings.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of JobPostings.
+   */
   distinct?: Prisma.JobPostingScalarFieldEnum | Prisma.JobPostingScalarFieldEnum[]
 }
 

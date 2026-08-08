@@ -192,7 +192,7 @@ export type ConversationReadGroupByOutputType = {
   _max: ConversationReadMaxAggregateOutputType | null
 }
 
-type GetConversationReadGroupByPayload<T extends ConversationReadGroupByArgs> = Prisma.PrismaPromise<
+export type GetConversationReadGroupByPayload<T extends ConversationReadGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ConversationReadGroupByOutputType, T['by']> &
       {
@@ -1292,6 +1292,11 @@ export type ConversationReadFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Skip the first `n` ConversationReads.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ConversationReads.
+   */
   distinct?: Prisma.ConversationReadScalarFieldEnum | Prisma.ConversationReadScalarFieldEnum[]
 }
 

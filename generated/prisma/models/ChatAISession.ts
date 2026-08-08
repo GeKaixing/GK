@@ -199,7 +199,7 @@ export type ChatAISessionGroupByOutputType = {
   _max: ChatAISessionMaxAggregateOutputType | null
 }
 
-type GetChatAISessionGroupByPayload<T extends ChatAISessionGroupByArgs> = Prisma.PrismaPromise<
+export type GetChatAISessionGroupByPayload<T extends ChatAISessionGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ChatAISessionGroupByOutputType, T['by']> &
       {
@@ -1164,6 +1164,11 @@ export type ChatAISessionFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Skip the first `n` ChatAISessions.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ChatAISessions.
+   */
   distinct?: Prisma.ChatAISessionScalarFieldEnum | Prisma.ChatAISessionScalarFieldEnum[]
 }
 
