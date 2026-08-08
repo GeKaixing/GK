@@ -7,8 +7,8 @@ const connectionString = `${process.env.DATABASE_URL}`
 const adapter = new PrismaPg({
   connectionString,
   max: 20,
-  idle_timeout: 20,
-  connect_timeout: 10,
+  idleTimeoutMillis: 20_000,
+  connectionTimeoutMillis: 10_000,
 })
 
 const prisma = new PrismaClient({

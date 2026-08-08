@@ -1,7 +1,7 @@
 'use client'
 import { userStore } from "@/store/user";
 import { postModalStore } from "@/store/postModal";
-import { MessageSquare, House, LogIn, Settings, Users, Search, RailSymbol, CircleEllipsis, Heart, Bookmark, Feather, User as UserIcon, ShieldCheck, Bell, BriefcaseBusiness } from "lucide-react";
+import { MessageSquare, House, LogIn, Settings, Users, Search, Sparkles, CircleEllipsis, Heart, Bookmark, Feather, User as UserIcon, ShieldCheck, Bell, BriefcaseBusiness } from "lucide-react";
 import Link from "next/link";
 import {
     DropdownMenu,
@@ -76,7 +76,7 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
                     </li>
                     <li className="w-full">
                         <Link href="/gekaixing/gkx" className="flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full transition-colors">
-                            <RailSymbol className="w-7 h-7" />
+                            <Sparkles className="w-7 h-7" />
                             <span className="hidden lg:inline">GKX</span>
                         </Link>
                     </li>

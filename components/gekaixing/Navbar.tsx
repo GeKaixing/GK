@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Github } from 'lucide-react'
+import { IconBrandGithub } from '@tabler/icons-react'
 import { usePathname } from 'next/navigation'
 import { User } from '@supabase/supabase-js'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -76,7 +76,7 @@ export default function Navbar({ user }: NavbarProps) {
                         </div>
                     )}
                     <Link href={'https://github.com/GeKaixing/gekaixing'}>
-                        <Github className='text-foreground' />
+                        <IconBrandGithub className='text-foreground' />
                     </Link>
                 </div>
             </div>

@@ -64,7 +64,7 @@ export default function ChatPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const contactsScrollRef = useRef<HTMLDivElement>(null);
-  const supabase = useRef(createClient()).current;
+  const [supabase] = useState(() => createClient());
   const creatingConversationRef = useRef<Set<string>>(new Set());
 
   const selectedContact = contacts.find((c) => c.id === selectedContactId);

@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react'
 import { motion, useAnimation } from "motion/react"
 
-export default function page() {
+export default function Page() {
     const controlsA = useAnimation();
     const controlsB = useAnimation();
     useEffect(() => {
