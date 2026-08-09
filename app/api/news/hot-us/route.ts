@@ -1,33 +1,125 @@
-import { GoogleGenAI, Type } from "@google/genai";
 import { NextResponse } from "next/server";
 
-import { getUserAiConfig } from "@/lib/ai/config";
-import { getModelCandidates } from "@/lib/ai/models";
-import { createClient } from "@/utils/supabase/server";
+type NewsCategory = "us" | "tech" | "sports" | "entertainment";
 
-interface HotNewsItem {
+interface NewsItem {
   title: string;
   summary: string;
   source_name: string;
   url: string;
-  category: "us" | "tech" | "sports" | "entertainment";
 }
 
-interface GeminiNewsResult {
-  news: HotNewsItem[];
+interface FeedSource {
+  name: string;
+  url: string;
 }
 
-type NewsCategory = "us" | "tech" | "sports" | "entertainment";
-
-const CATEGORY_MAP: Record<NewsCategory, string> = {
-  us: "United States general headlines",
-  tech: "United States technology",
-  sports: "United States sports",
-  entertainment: "United States entertainment",
+/** Curated free RSS feeds per category. All verified reachable, no API key needed. */
+export const CATEGORY_FEEDS: Record<NewsCategory, FeedSource[]> = {
+  us: [
+    { name: "NPR", url: "https://feeds.npr.org/1001/rss.xml" },
+    { name: "CBS News", url: "https://www.cbsnews.com/latest/rss/main" },
+    { name: "WSJ", url: "https://feeds.a.dj.com/rss/RSSWorldNews.xml" },
+  ],
+  tech: [
+    { name: "TechCrunch", url: "https://techcrunch.com/feed/" },
+    { name: "The Verge", url: "https://www.theverge.com/rss/index.xml" },
+    { name: "Wired", url: "https://www.wired.com/feed/rss" },
+  ],
+  sports: [
+    { name: "ESPN", url: "https://www.espn.com/espn/rss/news" },
+    { name: "CBS Sports", url: "https://www.cbssports.com/rss/headlines/" },
+    { name: "Sky Sports", url: "https://www.skysports.com/rss/12040" },
+  ],
+  entertainment: [
+    { name: "Variety", url: "https://variety.com/feed/" },
+    { name: "Hollywood Reporter", url: "https://www.hollywoodreporter.com/feed/" },
+    { name: "Rolling Stone", url: "https://www.rollingstone.com/feed/" },
+  ],
 };
 
-function stripCodeFence(text: string): string {
-  return text.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+const MAX_ITEMS = 10;
+const FEED_TIMEOUT_MS = 8000;
+const FEED_REVALIDATE_SECONDS = 300;
+const FEED_USER_AGENT = "Mozilla/5.0 (compatible; GekaixingNews/1.0)";
+
+interface ParsedItem extends NewsItem {
+  pubDate: number;
+}
+
+/** Strip HTML tags and decode XML entities into plain text. */
+export function stripHtml(value: string): string {
+  // Decode entities BEFORE stripping tags so entity-encoded markup
+  // (&lt;p&gt;...) is removed too. &amp; goes last to avoid double-decoding.
+  return value
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&#x([0-9a-fA-F]{1,6});/g, (_match, hex: string) => {
+      const code = parseInt(hex, 16);
+      return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : _match;
+    })
+    .replace(/&#(\d{1,7});/g, (_match, dec: string) => {
+      const code = Number(dec);
+      return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : _match;
+    })
+    .replace(/&amp;/g, "&")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Extract the text content of `<tag>...</tag>` from an XML block,
+ * tolerating both plain content and `<![CDATA[...]]>` wrappers.
+ */
+export function extractTag(block: string, tag: string): string {
+  const re = new RegExp(
+    `<${tag}(?:\\s[^>]*)?>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`,
+    "i"
+  );
+  const match = block.match(re);
+  return match ? match[1].trim() : "";
+}
+
+/** Split an RSS 2.0 document into its `<item>` blocks. */
+export function getRssItems(xml: string): string[] {
+  const items: string[] = [];
+  const re = /<item\b[\s\S]*?<\/item>/gi;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(xml)) !== null) {
+    items.push(match[0]);
+  }
+  return items;
+}
+
+/** Parse the RFC-822 pubDate of an item into epoch ms (0 when missing/invalid). */
+export function parseRssPubDate(block: string): number {
+  const raw = extractTag(block, "pubDate");
+  const time = Date.parse(raw);
+  return Number.isNaN(time) ? 0 : time;
+}
+
+/** Parse one `<item>` block. Returns null when the title or link is unusable. */
+export function parseRssItem(block: string, sourceName: string): ParsedItem | null {
+  const title = stripHtml(extractTag(block, "title"));
+  const url = stripHtml(extractTag(block, "link"));
+  if (!title || !isValidUrl(url)) {
+    return null;
+  }
+
+  const description =
+    stripHtml(extractTag(block, "description")) || stripHtml(extractTag(block, "content:encoded"));
+
+  return {
+    title,
+    summary: description.slice(0, 300),
+    source_name: sourceName,
+    url,
+    pubDate: parseRssPubDate(block),
+  };
 }
 
 function isValidUrl(value: string): boolean {
@@ -39,223 +131,58 @@ function isValidUrl(value: string): boolean {
   }
 }
 
-function parseNewsResult(text: string, category: NewsCategory): HotNewsItem[] {
-  const cleaned = stripCodeFence(text);
-  const parsed = JSON.parse(cleaned) as Partial<GeminiNewsResult>;
-
-  const list = Array.isArray(parsed.news)
-    ? parsed.news
-        .map((item) => ({
-          title: String(item?.title ?? "").trim(),
-          summary: String(item?.summary ?? "").trim(),
-          source_name: String(item?.source_name ?? "").trim(),
-          url: String(item?.url ?? "").trim(),
-        }))
-        .filter((item) => item.title && item.summary && item.source_name && isValidUrl(item.url))
-        .slice(0, 10)
-    : [];
-
-  return list.map((item) => ({ ...item, category }));
-}
-
-function getNewsResponseSchema() {
-  return {
-    type: Type.OBJECT,
-    properties: {
-      news: {
-        type: Type.ARRAY,
-        items: {
-          type: Type.OBJECT,
-          properties: {
-            title: { type: Type.STRING },
-            summary: { type: Type.STRING },
-            source_name: { type: Type.STRING },
-            url: { type: Type.STRING },
-          },
-          required: ["title", "summary", "source_name", "url"],
-        },
-      },
-    },
-    required: ["news"],
-  };
-}
-
-function getUsDateText(): string {
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  return formatter.format(new Date());
-}
-
-function buildPrompt(category: NewsCategory): string {
-  const dateText = getUsDateText();
-  const scope = CATEGORY_MAP[category];
-
-  return [
-    "You are a real-time US news editor.",
-    "Use Google Search tool to find real news from credible media websites.",
-    `Date in the United States (America/New_York): ${dateText}`,
-    `News scope: ${scope}`,
-    "Return strict JSON only. Do not return markdown.",
-    "JSON shape:",
-    "{",
-    '  "news": [',
-    '    {"title":"string","summary":"string","source_name":"string","url":"https://..."}',
-    "  ]",
-    "}",
-    "Rules:",
-    "- exactly 10 items",
-    "- title: concise and factual",
-    "- summary: 1 to 2 sentences",
-    "- source_name: media brand only, e.g. Reuters, AP, CNN, ESPN, Variety",
-    "- url: direct article page URL",
-    "- prioritize freshness and relevance for the date shown above",
-    "- avoid duplicates",
-  ].join("\n");
-}
-
-function mapGeminiErrorToHttp(errorMessage: string): { status: number; message: string } {
-  const text = errorMessage.toLowerCase();
-
-  if (text.includes("api key") || text.includes("permission denied")) {
-    return {
-      status: 401,
-      message: "Gemini API key is invalid or unauthorized. Please update it in Settings.",
-    };
+/** Fetch and parse one feed; a single slow/broken feed never blocks the tab. */
+async function fetchFeed(source: FeedSource): Promise<ParsedItem[]> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FEED_TIMEOUT_MS);
+  try {
+    const res = await fetch(source.url, {
+      next: { revalidate: FEED_REVALIDATE_SECONDS },
+      headers: { "User-Agent": FEED_USER_AGENT },
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      return [];
+    }
+    const xml = await res.text();
+    return getRssItems(xml)
+      .map((block) => parseRssItem(block, source.name))
+      .filter((item): item is ParsedItem => item !== null);
+  } catch {
+    return [];
+  } finally {
+    clearTimeout(timer);
   }
+}
 
-  if (
-    text.includes("fetch failed") ||
-    text.includes("network error") ||
-    text.includes("timed out") ||
-    text.includes("econnrefused")
-  ) {
-    return {
-      status: 503,
-      message: "Cannot reach Gemini service from server network. Please retry later.",
-    };
-  }
-
-  if (text.includes("quota") || text.includes("rate limit") || text.includes("resource exhausted")) {
-    return {
-      status: 429,
-      message: "Gemini quota exceeded or rate limited. Please try again later.",
-    };
-  }
-
-  return {
-    status: 502,
-    message: "Gemini news generation failed. Please retry in a moment.",
-  };
+function parseCategory(value: string | null): NewsCategory {
+  const raw = (value ?? "us").trim().toLowerCase();
+  return raw === "tech" || raw === "sports" || raw === "entertainment" ? raw : "us";
 }
 
 export async function GET(request: Request): Promise<Response> {
-  try {
-    const requestUrl = new URL(request.url);
-    const rawCategory = (requestUrl.searchParams.get("category") ?? "us").trim().toLowerCase();
-    const category: NewsCategory =
-      rawCategory === "tech" || rawCategory === "sports" || rawCategory === "entertainment"
-        ? rawCategory
-        : "us";
+  const requestUrl = new URL(request.url);
+  const category = parseCategory(requestUrl.searchParams.get("category"));
 
-    const supabase = await createClient();
-    let config = getUserAiConfig(null);
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      config = getUserAiConfig(user);
-    } catch {
-      config = getUserAiConfig(null);
-    }
+  const sources = CATEGORY_FEEDS[category];
+  const results = await Promise.all(sources.map((source) => fetchFeed(source)));
 
-    if (config.provider !== "google") {
-      return NextResponse.json(
-        {
-          error: "News generation with Google Search grounding is only supported with the Gemini provider. Switch back to Gemini in Settings.",
-          success: false,
-        },
-        { status: 400 }
-      );
-    }
-
-    if (!config.apiKey) {
-      return NextResponse.json(
-        {
-          error: "AI API key is not configured in your Settings",
-          success: false,
-        },
-        { status: 503 }
-      );
-    }
-
-    const modelCandidates = getModelCandidates("google", config.model);
-
-    const ai = new GoogleGenAI({ apiKey: config.apiKey });
-
-    try {
-      let text = "";
-      let lastGenerateError: unknown = null;
-
-      for (const candidateModel of modelCandidates) {
-        try {
-          const result = await ai.models.generateContent({
-            model: candidateModel,
-            contents: buildPrompt(category),
-            config: {
-              temperature: 0.4,
-              maxOutputTokens: 2500,
-              tools: [{ googleSearch: {} }],
-              responseMimeType: "application/json",
-              responseSchema: getNewsResponseSchema(),
-            },
-          });
-
-          text = (result.text ?? "").trim();
-          if (text) {
-            break;
-          }
-        } catch (candidateError) {
-          lastGenerateError = candidateError;
-        }
+  // Deduplicate by normalized URL, then newest-first, capped at MAX_ITEMS.
+  const seen = new Set<string>();
+  const items = results
+    .flat()
+    .filter((item) => {
+      const key = item.url.replace(/\/+$/, "").toLowerCase();
+      if (seen.has(key)) {
+        return false;
       }
+      seen.add(key);
+      return true;
+    })
+    .sort((a, b) => b.pubDate - a.pubDate)
+    .slice(0, MAX_ITEMS);
 
-      if (!text) {
-        if (lastGenerateError instanceof Error) {
-          throw lastGenerateError;
-        }
-        throw new Error("Gemini returned empty content");
-      }
+  const data: NewsItem[] = items.map(({ pubDate: _pubDate, ...rest }) => rest);
 
-      const news = parseNewsResult(text, category);
-      if (news.length === 0) {
-        throw new Error("Gemini returned incomplete news result");
-      }
-
-      return NextResponse.json({
-        success: true,
-        category,
-        data: news,
-      });
-    } catch (error) {
-      const warning = error instanceof Error ? error.message : "Gemini request failed";
-      const mapped = mapGeminiErrorToHttp(warning);
-
-      return NextResponse.json(
-        {
-          error: mapped.message,
-          details: warning,
-          success: false,
-        },
-        { status: mapped.status }
-      );
-    }
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to load US hot news";
-    return NextResponse.json({ error: message, success: false }, { status: 500 });
-  }
+  return NextResponse.json({ success: true, category, data });
 }

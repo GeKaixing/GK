@@ -196,7 +196,10 @@
         "tech": "Tech",
         "sports": "Sports",
         "entertainment": "Entertainment"
-      }
+      },
+      "loading": "Loading news...",
+      "empty": "No news yet",
+      "error": "Failed to load news. Please try again later."
     },
     "Feed": {
       "loading": "Loading...",

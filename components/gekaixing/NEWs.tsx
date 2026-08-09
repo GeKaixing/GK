@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface NewsItem {
   url: string;
@@ -24,6 +25,7 @@ async function newsFetch(url: string): Promise<Response> {
 }
 
 export default function NEWs({ url }: { url: string }) {
+  const t = useTranslations("ImitationX.Explore");
   const [data, setData] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -65,15 +67,20 @@ export default function NEWs({ url }: { url: string }) {
   }, [url]);
 
   if (loading) {
-    return <div className="rounded-2xl border p-3 text-sm text-muted-foreground">正在加载新闻...</div>;
+    return <div className="rounded-2xl border p-3 text-sm text-muted-foreground">{t("loading")}</div>;
   }
 
   if (error) {
-    return <div className="rounded-2xl border p-3 text-sm text-muted-foreground">{error}</div>;
+    return (
+      <div className="rounded-2xl border p-3 text-sm text-muted-foreground">
+        <span>{t("error")}</span>
+        <span className="mt-1 block text-xs opacity-70">{error}</span>
+      </div>
+    );
   }
 
   if (data.length === 0) {
-    return <div className="rounded-2xl border p-3 text-sm text-muted-foreground">暂无新闻</div>;
+    return <div className="rounded-2xl border p-3 text-sm text-muted-foreground">{t("empty")}</div>;
   }
 
   return (

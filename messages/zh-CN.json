@@ -196,7 +196,10 @@
         "tech": "科技",
         "sports": "体育",
         "entertainment": "娱乐"
-      }
+      },
+      "loading": "正在加载新闻...",
+      "empty": "暂无新闻",
+      "error": "加载新闻失败，请稍后重试"
     },
     "Feed": {
       "loading": "加载中...",
