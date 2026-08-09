@@ -101,7 +101,67 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { targetUserId } = await request.json();
+    const { targetUserId, memberIds, isGroup, name } = await request.json();
+
+    // 群聊：多选成员创建真正的群会话
+    if (isGroup) {
+      const members = Array.isArray(memberIds)
+        ? [
+            ...new Set(
+              memberIds.filter(
+                (id): id is string => typeof id === "string" && id !== user.id
+              )
+            ),
+          ]
+        : [];
+
+      if (members.length === 0) {
+        return NextResponse.json(
+          { error: "At least one member is required" },
+          { status: 400 }
+        );
+      }
+
+      const participantUserIds = [user.id, ...members];
+
+      const groupConversation = await prisma.conversation.create({
+        data: {
+          isGroup: true,
+          name:
+            typeof name === "string" && name.trim() ? name.trim() : "Group",
+          participants: {
+            create: participantUserIds.map((userId) => ({ userId })),
+          },
+          readStates: {
+            create: participantUserIds.map((userId) => ({
+              userId,
+              lastReadMessageCount: 0,
+            })),
+          },
+        },
+        include: {
+          participants: {
+            include: {
+              user: {
+                select: { id: true, name: true, avatar: true, email: true },
+              },
+            },
+          },
+        },
+      });
+
+      return NextResponse.json({
+        data: {
+          id: groupConversation.id,
+          name: groupConversation.name || "Group",
+          avatar: groupConversation.avatar,
+          isGroup: true,
+          participantId: null,
+          isNew: true,
+        },
+        success: true,
+      });
+    }
 
     if (!targetUserId) {
       return NextResponse.json(

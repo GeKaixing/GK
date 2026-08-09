@@ -4,6 +4,13 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import {
   Send,
@@ -14,12 +21,15 @@ import {
   Users,
   Search,
   X,
+  Check,
+  UserPlus,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { User } from "@supabase/supabase-js";
 import { useLocale, useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 interface Contact {
   id: string;
@@ -29,6 +39,7 @@ interface Contact {
   participantId?: string;
   lastMessage?: string;
   lastMessageAt?: string;
+  isGroup?: boolean;
 }
 
 interface Message {
@@ -50,6 +61,7 @@ interface ConversationResponse {
   participantId?: string;
   lastMessage?: string;
   lastMessageAt?: string;
+  isGroup?: boolean;
 }
 
 interface RealtimeMessage {
@@ -58,6 +70,13 @@ interface RealtimeMessage {
   conversationId: string;
   content: string;
   createdAt: string;
+}
+
+interface UserSearchResult {
+  id: string;
+  userid: string;
+  name: string;
+  avatar: string | null;
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -140,6 +159,13 @@ export default function ChatPage() {
     ? contacts.filter((c) => c.name.toLowerCase().includes(trimmedQuery))
     : contacts;
 
+  const [pickerOpen, setPickerOpen] = useState<"new" | "add" | null>(null);
+  const [newMessageMode, setNewMessageMode] = useState<"dm" | "group">("dm");
+  const [userQuery, setUserQuery] = useState("");
+  const [userResults, setUserResults] = useState<UserSearchResult[]>([]);
+  const [userSearching, setUserSearching] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<UserSearchResult[]>([]);
+
   const myAvatarUrl =
     currentUser?.user_metadata?.user_avatar ||
     currentUser?.user_metadata?.avatar_url ||
@@ -177,6 +203,7 @@ export default function ChatPage() {
           avatar: result.data.avatar,
           unreadCount: 0,
           participantId: result.data.participantId,
+          isGroup: result.data.isGroup,
         };
 
         setContacts((prev) => {
@@ -210,6 +237,7 @@ export default function ChatPage() {
           participantId: conv.participantId,
           lastMessage: conv.lastMessage,
           lastMessageAt: conv.lastMessageAt,
+          isGroup: conv.isGroup,
         }));
 
         const uniqueContacts = formattedContacts.filter(
@@ -451,6 +479,128 @@ export default function ChatPage() {
     setContacts((prev) => prev.map((c) => (c.id === contactId ? { ...c, unreadCount: 0 } : c)));
   };
 
+  // 用户选择弹窗（New message / New people）：防抖搜索用户
+  useEffect(() => {
+    if (!pickerOpen) {
+      return;
+    }
+    const q = userQuery.trim();
+    if (!q) {
+      setUserResults([]);
+      setUserSearching(false);
+      return;
+    }
+    setUserSearching(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/user/search?query=${encodeURIComponent(q)}`);
+        const result = await res.json();
+        const users = (result.data ?? []) as UserSearchResult[];
+        setUserResults(users.filter((u) => u.id !== currentUser?.id));
+      } catch {
+        setUserResults([]);
+      } finally {
+        setUserSearching(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [userQuery, pickerOpen, currentUser?.id]);
+
+  const resetPicker = () => {
+    setNewMessageMode("dm");
+    setUserQuery("");
+    setUserResults([]);
+    setUserSearching(false);
+    setSelectedMembers([]);
+  };
+
+  const handleStartConversation = (userId: string) => {
+    setPickerOpen(null);
+    resetPicker();
+    void createConversation(userId);
+  };
+
+  const toggleMember = (user: UserSearchResult) => {
+    setSelectedMembers((prev) =>
+      prev.some((m) => m.id === user.id)
+        ? prev.filter((m) => m.id !== user.id)
+        : [...prev, user]
+    );
+  };
+
+  const handleCreateGroup = async () => {
+    if (selectedMembers.length === 0) {
+      return;
+    }
+    try {
+      const memberIds = selectedMembers.map((m) => m.id);
+      const groupName = selectedMembers
+        .map((m) => m.name || m.userid || "User")
+        .join(", ");
+      const res = await fetch("/api/chat/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isGroup: true, memberIds, name: groupName }),
+      });
+      const result = await res.json();
+      if (result.success && result.data) {
+        const conv = result.data as ConversationResponse;
+        setContacts((prev) =>
+          prev.some((c) => c.id === conv.id)
+            ? prev
+            : [
+                {
+                  id: conv.id,
+                  name: conv.name,
+                  avatar: conv.avatar,
+                  unreadCount: 0,
+                  participantId: undefined,
+                  isGroup: true,
+                },
+                ...prev,
+              ]
+        );
+        setSelectedContactId(conv.id);
+        setMessages([]);
+        setPickerOpen(null);
+        resetPicker();
+      } else {
+        toast.error(result.error || t("createGroupFailed"));
+      }
+    } catch (error) {
+      console.error("Failed to create group:", error);
+      toast.error(t("createGroupFailed"));
+    }
+  };
+
+  const handleAddMembers = async () => {
+    if (selectedMembers.length === 0 || !selectedContact?.id) {
+      return;
+    }
+    try {
+      const memberIds = selectedMembers.map((m) => m.id);
+      const res = await fetch(
+        `/api/chat/conversations/${selectedContact.id}/members`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ memberIds }),
+        }
+      );
+      const result = await res.json();
+      if (result.success) {
+        toast.success(t("addedToGroup"));
+        setPickerOpen(null);
+        resetPicker();
+      } else {
+        toast.error(result.error || t("addMembersFailed"));
+      }
+    } catch (error) {
+      console.error("Failed to add members:", error);
+      toast.error(t("addMembersFailed"));
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex h-[calc(100dvh-3.5rem)] flex-col items-center justify-center gap-3 bg-background sm:h-[100dvh]">
@@ -477,10 +627,12 @@ export default function ChatPage() {
           onNewMessage={() => router.push("/gekaixing/connect_people")}
         />
         {contacts.length > 0 && (
-          <ConversationSearch
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder={t("searchPlaceholder")}
+          <ConversationListToolbar
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder={t("searchPlaceholder")}
+            onNewConversation={() => setPickerOpen("new")}
+            newConversationLabel={t("newConversation")}
           />
         )}
         <nav className="min-h-0 flex-1 overflow-y-auto">
@@ -605,6 +757,17 @@ export default function ChatPage() {
                   </h2>
                 )}
               </div>
+              {selectedContact.isGroup && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setPickerOpen("add")}
+                  aria-label={t("addPeopleToGroup")}
+                  className="size-9 shrink-0 rounded-full text-primary hover:bg-primary/10"
+                >
+                  <UserPlus className="size-5" />
+                </Button>
+              )}
             </header>
 
             <div className="flex-1 space-y-1 overflow-y-auto bg-[linear-gradient(180deg,hsl(var(--background))_0%,hsl(var(--muted)/0.3)_100%)] px-4 py-4">
@@ -665,6 +828,43 @@ export default function ChatPage() {
           </div>
         )}
       </section>
+
+      <NewMessageDialog
+        open={pickerOpen === "new"}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPickerOpen(null);
+            resetPicker();
+          }
+        }}
+        mode={newMessageMode}
+        onModeChange={setNewMessageMode}
+        query={userQuery}
+        onQueryChange={setUserQuery}
+        results={userResults}
+        searching={userSearching}
+        selectedMembers={selectedMembers}
+        onToggleMember={toggleMember}
+        onStartConversation={handleStartConversation}
+        onCreateGroup={handleCreateGroup}
+      />
+
+      <AddMembersDialog
+        open={pickerOpen === "add"}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPickerOpen(null);
+            resetPicker();
+          }
+        }}
+        query={userQuery}
+        onQueryChange={setUserQuery}
+        results={userResults}
+        searching={userSearching}
+        selectedMembers={selectedMembers}
+        onToggleMember={toggleMember}
+        onAddMembers={handleAddMembers}
+      />
     </div>
   );
 }
@@ -690,6 +890,39 @@ function ListHeader({
         aria-label={newLabel}
       >
         <SquarePen className="size-5" />
+      </Button>
+    </div>
+  );
+}
+
+/** 会话列表工具栏：搜索框 + 发起新会话按钮 */
+function ConversationListToolbar({
+  searchValue,
+  onSearchChange,
+  searchPlaceholder,
+  onNewConversation,
+  newConversationLabel,
+}: {
+  searchValue: string;
+  onSearchChange: (v: string) => void;
+  searchPlaceholder: string;
+  onNewConversation: () => void;
+  newConversationLabel: string;
+}) {
+  return (
+    <div>
+      <ConversationSearch
+        value={searchValue}
+        onChange={onSearchChange}
+        placeholder={searchPlaceholder}
+      />
+      <Button
+        variant="ghost"
+        onClick={onNewConversation}
+        className="mx-3 mb-2 flex h-9 w-[calc(100%-1.5rem)] items-center justify-center gap-2 rounded-full border border-border/60 text-sm font-medium text-primary hover:bg-primary/10"
+      >
+        <SquarePen className="size-4" />
+        {newConversationLabel}
       </Button>
     </div>
   );
@@ -941,6 +1174,330 @@ function ChatEmptyState({
         </Button>
       ) : null}
     </div>
+  );
+}
+
+/** 用户搜索输入框：放大镜 + 一键清空 */
+function UserSearchBox({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}) {
+  const t = useTranslations("ImitationX.ChatPage");
+  return (
+    <div className="relative">
+      <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        autoFocus
+        className="h-9 rounded-full border-border/60 bg-muted/30 pl-9 pr-8 text-sm focus-visible:ring-primary/20"
+      />
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          aria-label={t("clearSearch")}
+          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:text-foreground"
+        >
+          <X className="size-4" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** 用户搜索结果列表：加载 / 提示 / 无结果 / 结果（可多选勾选） */
+function UserPickerList({
+  query,
+  results,
+  searching,
+  selectable,
+  selectedIds,
+  onSelect,
+}: {
+  query: string;
+  results: UserSearchResult[];
+  searching: boolean;
+  selectable: boolean;
+  selectedIds: string[];
+  onSelect: (user: UserSearchResult) => void;
+}) {
+  const t = useTranslations("ImitationX.ChatPage");
+
+  if (searching) {
+    return (
+      <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+        <Loader2 className="size-4 animate-spin" />
+        {t("loading")}
+      </div>
+    );
+  }
+  if (query.trim() === "") {
+    return (
+      <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+        {t("searchUsersHint")}
+      </p>
+    );
+  }
+  if (results.length === 0) {
+    return (
+      <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+        {t("noUsersFound")}
+      </p>
+    );
+  }
+
+  return (
+    <>
+      {results.map((user) => {
+        const selected = selectable && selectedIds.includes(user.id);
+        return (
+          <button
+            key={user.id}
+            type="button"
+            onClick={() => onSelect(user)}
+            className={cn(
+              "flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted/50",
+              selected && "bg-muted/40"
+            )}
+          >
+            <Avatar className="size-9 shrink-0 ring-1 ring-border/40">
+              <AvatarImage src={user.avatar || "/default-avatar.png"} alt={user.name} />
+              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-xs font-medium text-primary">
+                {user.name.slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">{user.name}</p>
+              <p className="truncate text-xs text-muted-foreground">@{user.userid}</p>
+            </div>
+            {selected && (
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <Check className="size-3" />
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </>
+  );
+}
+
+/** 已选成员 chips：头像 + 名字 + 移除按钮 */
+function SelectedMemberChips({
+  members,
+  onRemove,
+}: {
+  members: UserSearchResult[];
+  onRemove: (user: UserSearchResult) => void;
+}) {
+  const t = useTranslations("ImitationX.ChatPage");
+  return (
+    <div className="mt-2 flex flex-wrap gap-1.5">
+      {members.map((m) => (
+        <div
+          key={m.id}
+          className="flex items-center gap-1 rounded-full bg-muted py-1 pl-1 pr-2 text-xs"
+        >
+          <Avatar className="size-5">
+            <AvatarImage src={m.avatar || "/default-avatar.png"} alt={m.name} />
+            <AvatarFallback className="text-[10px]">{m.name.slice(0, 1)}</AvatarFallback>
+          </Avatar>
+          <span className="max-w-[120px] truncate">{m.name}</span>
+          <button
+            type="button"
+            onClick={() => onRemove(m)}
+            aria-label={t("removeMember")}
+            className="rounded-full p-0.5 text-muted-foreground hover:text-foreground"
+          >
+            <X className="size-3" />
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** New message 弹窗：搜索用户开启私信，或切换建群模式多选成员创建群聊 */
+function NewMessageDialog({
+  open,
+  onOpenChange,
+  mode,
+  onModeChange,
+  query,
+  onQueryChange,
+  results,
+  searching,
+  selectedMembers,
+  onToggleMember,
+  onStartConversation,
+  onCreateGroup,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  mode: "dm" | "group";
+  onModeChange: (mode: "dm" | "group") => void;
+  query: string;
+  onQueryChange: (q: string) => void;
+  results: UserSearchResult[];
+  searching: boolean;
+  selectedMembers: UserSearchResult[];
+  onToggleMember: (u: UserSearchResult) => void;
+  onStartConversation: (userId: string) => void;
+  onCreateGroup: () => void;
+}) {
+  const t = useTranslations("ImitationX.ChatPage");
+  const group = mode === "group";
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="gap-0 p-0">
+        <DialogHeader className="border-b border-border/60 px-4 py-3">
+          <div className="flex items-center gap-2">
+            {group && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-8 shrink-0 rounded-full text-muted-foreground"
+                onClick={() => onModeChange("dm")}
+                aria-label={t("back")}
+              >
+                <ChevronLeft className="size-5" />
+              </Button>
+            )}
+            <DialogTitle className="text-base font-bold tracking-tight">
+              {group ? t("createGroup") : t("newMessage")}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {group ? t("createGroup") : t("newMessage")}
+            </DialogDescription>
+          </div>
+        </DialogHeader>
+
+        <div className="px-4 py-3">
+          <UserSearchBox
+            value={query}
+            onChange={onQueryChange}
+            placeholder={t("searchUsersPlaceholder")}
+          />
+
+          {!group && (
+            <Button
+              variant="outline"
+              onClick={() => onModeChange("group")}
+              className="mt-2 flex h-9 w-full items-center justify-center gap-2 rounded-full text-sm"
+            >
+              <Users className="size-4" />
+              {t("createGroup")}
+            </Button>
+          )}
+
+          {group && selectedMembers.length > 0 && (
+            <SelectedMemberChips members={selectedMembers} onRemove={onToggleMember} />
+          )}
+
+          {group && (
+            <Button
+              onClick={onCreateGroup}
+              disabled={selectedMembers.length === 0}
+              className="mt-2 h-9 w-full rounded-full text-sm"
+            >
+              {t("createGroupWith", { count: selectedMembers.length })}
+            </Button>
+          )}
+        </div>
+
+        <div className="max-h-[50vh] min-h-[220px] overflow-y-auto border-t border-border/60">
+          <UserPickerList
+            query={query}
+            results={results}
+            searching={searching}
+            selectable={group}
+            selectedIds={selectedMembers.map((m) => m.id)}
+            onSelect={(user) =>
+              group ? onToggleMember(user) : onStartConversation(user.id)
+            }
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** New people 弹窗：搜索用户多选，把新成员加入当前群聊 */
+function AddMembersDialog({
+  open,
+  onOpenChange,
+  query,
+  onQueryChange,
+  results,
+  searching,
+  selectedMembers,
+  onToggleMember,
+  onAddMembers,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  query: string;
+  onQueryChange: (q: string) => void;
+  results: UserSearchResult[];
+  searching: boolean;
+  selectedMembers: UserSearchResult[];
+  onToggleMember: (u: UserSearchResult) => void;
+  onAddMembers: () => void;
+}) {
+  const t = useTranslations("ImitationX.ChatPage");
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="gap-0 p-0">
+        <DialogHeader className="border-b border-border/60 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <DialogTitle className="text-base font-bold tracking-tight">
+              {t("newPeople")}
+            </DialogTitle>
+            <DialogDescription className="sr-only">{t("newPeople")}</DialogDescription>
+          </div>
+        </DialogHeader>
+
+        <div className="px-4 py-3">
+          <UserSearchBox
+            value={query}
+            onChange={onQueryChange}
+            placeholder={t("searchUsersPlaceholder")}
+          />
+
+          {selectedMembers.length > 0 && (
+            <SelectedMemberChips members={selectedMembers} onRemove={onToggleMember} />
+          )}
+
+          <Button
+            onClick={onAddMembers}
+            disabled={selectedMembers.length === 0}
+            className="mt-2 h-9 w-full rounded-full text-sm"
+          >
+            {t("addToGroupWith", { count: selectedMembers.length })}
+          </Button>
+        </div>
+
+        <div className="max-h-[50vh] min-h-[220px] overflow-y-auto border-t border-border/60">
+          <UserPickerList
+            query={query}
+            results={results}
+            searching={searching}
+            selectable
+            selectedIds={selectedMembers.map((m) => m.id)}
+            onSelect={onToggleMember}
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
