@@ -8,11 +8,7 @@ import { useAiSessions } from "@/store/AiSessions"
 import { useTranslations } from "next-intl"
 import {
   ArrowUp,
-  Atom,
   ChevronDown,
-  Code2,
-  Feather,
-  Hash,
   Paperclip,
   Sparkles,
   SquarePen,
@@ -26,8 +22,6 @@ type Message = {
   content: string
   sessionId?: string
 }
-
-const PROMPT_ICONS = [Feather, Atom, Code2, Hash]
 
 export default function ChatUI({
   sessionId: initialSessionId,
@@ -345,21 +339,6 @@ useEffect(() => {
     sendMessage(text)
   }
 
-  /** 点击建议提示词 */
-  function handleSelectPrompt(prompt: string) {
-    if (!initialSessionId) {
-      const newSessionId = crypto.randomUUID()
-      router.push(
-        `/gekaixing/gkx/${newSessionId}?input=${encodeURIComponent(prompt)}`
-      )
-      return
-    }
-
-    sendMessage(prompt)
-  }
-
-  const prompts = (t.raw("suggestedPrompts") as string[]) ?? []
-
   return (
     <div className="flex h-[calc(100dvh-3.5rem)] w-full flex-col">
       {/* 顶栏 */}
@@ -388,11 +367,7 @@ useEffect(() => {
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[760px] px-4 py-8">
           {messages.length === 0 ? (
-            <GrokEmptyState
-              t={t}
-              prompts={prompts}
-              onSelect={handleSelectPrompt}
-            />
+            <GrokEmptyState t={t} />
           ) : (
             messages.map((msg) => (
               <MessageBubble
@@ -454,40 +429,14 @@ useEffect(() => {
 }
 
 /**
- * Grok 风格空状态：大号品牌字 + 建议提示词卡片（2 列网格）
+ * Grok 风格空状态：大号品牌字
  */
-function GrokEmptyState({
-  t,
-  prompts,
-  onSelect,
-}: {
-  t: ReturnType<typeof useTranslations>
-  prompts: string[]
-  onSelect: (prompt: string) => void
-}) {
+function GrokEmptyState({ t }: { t: ReturnType<typeof useTranslations> }) {
   return (
-    <div className="flex min-h-[55vh] flex-col items-center justify-center gap-10 text-center">
+    <div className="flex min-h-[55vh] flex-col items-center justify-center text-center">
       <h1 className="text-5xl font-bold tracking-tight">
         {t("assistantTitle")}
       </h1>
-      {prompts.length > 0 && (
-        <div className="grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
-          {prompts.map((prompt, index) => {
-            const Icon = PROMPT_ICONS[index % PROMPT_ICONS.length]
-            return (
-              <button
-                key={prompt}
-                type="button"
-                onClick={() => onSelect(prompt)}
-                className="flex items-center gap-3 rounded-2xl border border-border p-4 text-left text-sm transition-colors hover:bg-muted/60"
-              >
-                <Icon className="h-4 w-4 shrink-0 text-primary" />
-                <span className="text-foreground">{prompt}</span>
-              </button>
-            )
-          })}
-        </div>
-      )}
     </div>
   )
 }

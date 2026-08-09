@@ -7,11 +7,18 @@ export async function POST(request: Request) {
     const supabase = await createClient();
     const { email, password, name, avatar } = await request.json();
 
+    // Use the app's own origin so the confirmation link points here in dev and
+    // prod (must be allowlisted in Supabase -> Authentication -> URL Configuration).
+    const origin =
+      request.headers.get("origin") ||
+      process.env.NEXT_PUBLIC_URL ||
+      "http://localhost:3000";
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_URL}/auth/confirm`,
+        emailRedirectTo: `${origin}/auth/confirm`,
       },
     });
 

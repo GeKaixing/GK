@@ -134,12 +134,6 @@
       "send": "Send",
       "emptyState": "Start chatting with GKX 🚀",
   "tagline": "Your AI assistant, ready when you are",
-  "suggestedPrompts": [
-    "Write a poem about summer",
-    "Explain black holes in simple terms",
-    "Help me write a React component",
-    "Suggest a title for this tweet"
-  ],
   "searchPlaceholder": "Search conversations",
   "disclaimer": "GKX can make mistakes. Verify important information.",
   "dateToday": "Today",

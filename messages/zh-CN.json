@@ -134,12 +134,6 @@
       "send": "发送",
       "emptyState": "开始和 GKX 对话吧 🚀",
   "tagline": "你的 AI 助手，随时为你服务",
-  "suggestedPrompts": [
-    "写一首关于夏天的诗",
-    "用简单的语言解释什么是黑洞",
-    "帮我写一段 React 组件代码",
-    "给这条推文起个标题"
-  ],
   "searchPlaceholder": "搜索会话",
   "disclaimer": "GKX 可能会犯错，请核对重要信息。",
   "dateToday": "今天",
