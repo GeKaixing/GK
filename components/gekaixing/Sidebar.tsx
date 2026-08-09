@@ -28,11 +28,12 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
     const displayMentionCount = pathname === "/gekaixing/notifications" ? 0 : mentionCount
     const isActivePath = (href: string) => pathname === href || pathname.startsWith(href + "/")
     const homeActive = pathname === "/gekaixing"
-    const moreActive = ["/gekaixing/likes", "/gekaixing/bookmarks", "/gekaixing/notifications", "/gekaixing/jobs"].some(
-      (href) => isActivePath(href)
-    )
-    const settingsActive = user?.id ? isActivePath("/gekaixing/settings") : false
     const profileActive = user?.id ? isActivePath(`/gekaixing/user/${user.id}`) : false
+    const moreActive =
+      ["/gekaixing/likes", "/gekaixing/bookmarks", "/gekaixing/notifications", "/gekaixing/jobs"].some(
+        (href) => isActivePath(href)
+      ) || profileActive
+    const settingsActive = user?.id ? isActivePath("/gekaixing/settings") : false
 
     const navItems = [
       { href: "/gekaixing", icon: House, label: t("home"), active: homeActive },
@@ -140,6 +141,15 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
                                     <BriefcaseBusiness className="h-5 w-5" fill={isActivePath("/gekaixing/jobs") ? "currentColor" : "none"} />
                                     <span>{t("jobs")}</span>
                                 </DropdownMenuItem>
+                                {user?.id && (
+                                    <DropdownMenuItem
+                                        onSelect={handleMoreMenuSelect(`/gekaixing/user/${user.id}`)}
+                                        className={`flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] ${profileActive ? "font-bold" : "font-normal"}`}
+                                    >
+                                        <UserIcon className="h-5 w-5" fill={profileActive ? "currentColor" : "none"} />
+                                        <span>{t("profile")}</span>
+                                    </DropdownMenuItem>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </li>
@@ -163,19 +173,6 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
                             </Link>
                         </li>
                     )}
-                    {user?.id && (
-                        <li className="w-full">
-                            <Link
-                                href={`/gekaixing/user/${user?.id}`}
-                                aria-current={profileActive ? "page" : undefined}
-                                className={`flex items-center justify-center xl:justify-start gap-0 xl:gap-3 text-xl rounded-full p-3 w-full transition-colors hover:bg-muted/70 ${profileActive ? "font-bold" : "font-normal"}`}
-                            >
-                                <UserIcon className="w-7 h-7" fill={profileActive ? "currentColor" : "none"} />
-                                <span className="hidden xl:inline">{t("profile")}</span>
-                            </Link>
-                        </li>
-                    )}
-
                     {user?.id && (
                         <li className="w-full mt-4 flex justify-center items-center">
                             <button
