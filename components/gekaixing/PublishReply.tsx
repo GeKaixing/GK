@@ -2,16 +2,17 @@
 
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Input } from "../ui/input"
-import { useEffect, useState } from "react"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { useEffect } from "react"
 import { userStore } from "@/store/user"
 import Link from "next/link"
 import { replyStore } from "@/store/reply"
 import { postStore } from "@/store/post"
-import clsx from "clsx"
-import { Loader2 } from "lucide-react"
+import { Loader2, Music2, Video } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { extractYouTubeEmbedUrl } from "@/utils/function/extractYouTubeEmbedUrl"
+import { MinimalTiptapEditor } from "../ui/minimal-tiptap"
+import { ToolbarButton } from "../ui/minimal-tiptap/components/toolbar-button"
+import { useRichPostEditor } from "./useRichPostEditor"
 
 async function publishReply(payload: {
     user_id: string
@@ -19,6 +20,8 @@ async function publishReply(payload: {
     user_email: string
     post_id: string
     content: string
+    videoUrl: string | null
+    audioUrl: string | null
     user_avatar: string | null
     reply_id?: string | null
 }) {
@@ -38,50 +41,6 @@ type Props = {
     type?: 'post' | 'reply'
 }
 
-type MentionUser = {
-    id: string
-    userid: string
-    name: string | null
-    avatar: string | null
-}
-
-type MentionToken = {
-    query: string
-    from: number
-    to: number
-}
-
-function getInputMentionToken(text: string): MentionToken | null {
-    const match = /(?:^|[\s(（])@([^\s@]{0,36})$/u.exec(text)
-    if (!match) {
-        return null
-    }
-
-    const raw = match[0]
-    const mentionText = raw.startsWith('@') ? raw : raw.slice(1)
-    const from = text.length - mentionText.length
-
-    return {
-        query: match[1] || "",
-        from,
-        to: text.length,
-    }
-}
-
-async function searchUsers(query: string): Promise<MentionUser[]> {
-    try {
-        const response = await fetch(`/api/user/search?query=${encodeURIComponent(query)}`)
-        const data = await response.json()
-        if (!data?.success || !Array.isArray(data?.data)) {
-            return []
-        }
-        return data.data as MentionUser[]
-    } catch (error) {
-        console.error("Failed to search users:", error)
-        return []
-    }
-}
-
 export default function PublishReply({
     postId,
     replyId,
@@ -89,11 +48,29 @@ export default function PublishReply({
     type = 'post',
 }: Props) {
     const t = useTranslations("PublishReply")
+    // 媒体上传按钮文案沿用 EditPost 命名空间（编辑器本身也用它）
+    const tMedia = useTranslations("EditPost")
 
-    const [replyInput, setReplyInput] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
-    const [mentionToken, setMentionToken] = useState<MentionToken | null>(null)
-    const [mentionUsers, setMentionUsers] = useState<MentionUser[]>([])
+    const {
+        value,
+        setValue,
+        setEditor,
+        mentionToken,
+        mentionUsers,
+        videoUploading,
+        audioUploading,
+        aiGenerating,
+        videoInputRef,
+        audioInputRef,
+        handleVideoChange,
+        handleAudioChange,
+        handleSelectMention,
+        handleAiPolish,
+        hasPublishableContent,
+        extractEmbeddedMediaUrls,
+        cleanupMedia,
+        reset,
+    } = useRichPostEditor()
 
     const { addReply, replaceReply, removeReply } = replyStore()
     const { addReplyCount, subReplyCount } = postStore()
@@ -105,16 +82,26 @@ export default function PublishReply({
         isPremium,
     } = userStore()
 
+    // 组件卸载（离开页面）时清理废弃的视频/音频
+    useEffect(() => {
+        return () => {
+            cleanupMedia([])
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     async function handleReply() {
-        if (!replyInput.trim() || isLoading || !userId) return
+        if (!hasPublishableContent(value) || !userId) return
 
         const tempId = 'temp-' + Date.now()
+        const content = value as string
+        const { videoUrl, audioUrl, allUrls } = extractEmbeddedMediaUrls(content)
 
         const optimisticReply = {
             id: tempId,
-            content: replyInput,
-            videoUrl: extractYouTubeEmbedUrl(replyInput),
-            audioUrl: null,
+            content,
+            videoUrl,
+            audioUrl,
             createdAt: new Date(),
 
             user_id: userId,
@@ -139,11 +126,6 @@ export default function PublishReply({
         // 🔥 post 归 postStore 管
         addReplyCount(postId)
 
-        setReplyInput('')
-        setMentionUsers([])
-        setMentionToken(null)
-        setIsLoading(true)
-
         try {
             const data = await publishReply({
                 user_id: userId,
@@ -151,7 +133,9 @@ export default function PublishReply({
                 user_name: name || email,
                 user_email: email,
                 post_id: postId,
-                content: optimisticReply.content,
+                content,
+                videoUrl,
+                audioUrl,
                 reply_id: type === 'reply' ? replyId ?? null : null,
             })
 
@@ -165,114 +149,121 @@ export default function PublishReply({
                     audioUrl: real.audioUrl ?? null,
                     createdAt: new Date(real.createdAt),
                 })
+
+                // 发布成功后清理未用媒体，再清空编辑器
+                cleanupMedia(allUrls)
+                reset()
             } else {
                 throw new Error('Publish failed')
             }
-
         } catch (error) {
-            // 回滚
+            // 回滚：保留编辑器内容和已传媒体，方便用户重试
             removeReply(tempId)
             subReplyCount(postId)
-        } finally {
-            setIsLoading(false)
         }
     }
-
-    function handleReplyInput(value: string): void {
-        setReplyInput(value)
-        const token = getInputMentionToken(value)
-        setMentionToken(token)
-    }
-
-    function handleSelectMention(user: MentionUser): void {
-        if (!mentionToken) {
-            return
-        }
-
-        const before = replyInput.slice(0, mentionToken.from)
-        const after = replyInput.slice(mentionToken.to)
-        setReplyInput(`${before}@${user.userid} ${after}`)
-        setMentionUsers([])
-        setMentionToken(null)
-    }
-
-    useEffect(() => {
-        if (!mentionToken) {
-            setMentionUsers([])
-            return
-        }
-
-        const timer = setTimeout(() => {
-            void searchUsers(mentionToken.query).then((users) => {
-                setMentionUsers(users)
-            })
-        }, 150)
-
-        return () => {
-            clearTimeout(timer)
-        }
-    }, [mentionToken])
 
     return (
-        <Card className="relative flex w-full flex-row gap-2 p-2 hover:bg-muted/60 transition-colors">
-            {userId ? (
-                <>
-                    <Avatar>
-                        <AvatarImage src={user_avatar ?? undefined} />
-                        <AvatarFallback>
-                            {name?.charAt(0)?.toUpperCase()
-                                || email?.charAt(0)?.toUpperCase()
-                                || 'U'}
-                        </AvatarFallback>
-                    </Avatar>
-
-                    <Input
-                        value={replyInput}
-                        onChange={(e) => handleReplyInput(e.target.value)}
-                        className="flex-1"
-                        placeholder={t("placeholder")}
-                    />
-
-                    <button
-                        onClick={handleReply}
-                        disabled={!replyInput.trim() || isLoading}
-                        className={clsx(
-                            'rounded-2xl font-bold h-8 w-[60px] text-primary-foreground bg-muted-foreground/60 flex justify-center items-center transition-colors',
-                            { '!bg-primary': replyInput.trim() && !isLoading }
-                        )}
-                    >
-                        {isLoading
-                            ? <Loader2 className="h-4 w-4 animate-spin" />
-                            : t("submit")}
-                    </button>
-                </>
-            ) : (
-                <Link
-                    href="/account"
-                    className="rounded-2xl font-bold bg-muted-foreground text-primary-foreground h-8 flex justify-center items-center w-full"
-                >
-                    {t("loginToReply")}
-                </Link>
-            )}
-            {mentionUsers.length > 0 && mentionToken ? (
-                <div className="absolute mt-14 ml-12 max-h-56 w-[320px] overflow-y-auto rounded-md border border-border bg-background shadow-md">
-                    {mentionUsers.map((user) => (
-                        <button
-                            key={user.id}
-                            type="button"
-                            onClick={() => handleSelectMention(user)}
-                            className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-muted/60"
-                        >
-                            <Avatar className="h-7 w-7">
-                                <AvatarImage src={user.avatar ?? undefined} />
-                                <AvatarFallback>{(user.name || user.userid).slice(0, 1).toUpperCase()}</AvatarFallback>
+        <Card className="relative w-full p-2">
+            <TooltipProvider>
+                {userId ? (
+                    <>
+                        <div className="flex items-start gap-2">
+                            <Avatar className="mt-1 shrink-0">
+                                <AvatarImage src={user_avatar ?? undefined} />
+                                <AvatarFallback>
+                                    {name?.charAt(0)?.toUpperCase()
+                                        || email?.charAt(0)?.toUpperCase()
+                                        || 'U'}
+                                </AvatarFallback>
                             </Avatar>
-                            <span className="truncate text-sm font-medium">{user.name || user.userid}</span>
-                            <span className="text-xs text-muted-foreground">@{user.userid}</span>
-                        </button>
-                    ))}
-                </div>
-            ) : null}
+
+                            <div className="min-w-0 flex-1">
+                                <MinimalTiptapEditor
+                                    value={value}
+                                    onChange={setValue}
+                                    onEditorReady={setEditor}
+                                    publish={handleReply}
+                                    canPublish={hasPublishableContent(value)}
+                                    status={false}
+                                    onAiGenerate={handleAiPolish}
+                                    aiGenerating={aiGenerating}
+                                    className="w-full"
+                                    editorContentClassName="px-3 py-2"
+                                    output="html"
+                                    placeholder={t("placeholder")}
+                                    editable
+                                    editorClassName="focus:outline-hidden"
+                                    toolbarLeftContent={
+                                        <div className="ml-2 flex items-center gap-1 overflow-x-auto whitespace-nowrap">
+                                            <input
+                                                ref={videoInputRef}
+                                                type="file"
+                                                accept="video/*"
+                                                className="hidden"
+                                                onChange={(event) => void handleVideoChange(event)}
+                                            />
+                                            <input
+                                                ref={audioInputRef}
+                                                type="file"
+                                                accept="audio/*"
+                                                className="hidden"
+                                                onChange={(event) => void handleAudioChange(event)}
+                                            />
+                                            <ToolbarButton
+                                                type="button"
+                                                size="sm"
+                                                onClick={() => videoInputRef.current?.click()}
+                                                disabled={videoUploading}
+                                                tooltip={tMedia("uploadVideo")}
+                                                aria-label={tMedia("uploadVideo")}
+                                            >
+                                                {videoUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Video className="h-4 w-4" />}
+                                            </ToolbarButton>
+                                            <ToolbarButton
+                                                type="button"
+                                                size="sm"
+                                                onClick={() => audioInputRef.current?.click()}
+                                                disabled={audioUploading}
+                                                tooltip={tMedia("uploadAudio")}
+                                                aria-label={tMedia("uploadAudio")}
+                                            >
+                                                {audioUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Music2 className="h-4 w-4" />}
+                                            </ToolbarButton>
+                                        </div>
+                                    }
+                                />
+                                {mentionUsers.length > 0 && mentionToken ? (
+                                    <div className="mt-2 max-h-56 overflow-y-auto rounded-md border border-border bg-background">
+                                        {mentionUsers.map((user) => (
+                                            <button
+                                                key={user.id}
+                                                type="button"
+                                                onClick={() => handleSelectMention(user)}
+                                                className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-muted/60"
+                                            >
+                                                <Avatar className="h-7 w-7">
+                                                    <AvatarImage src={user.avatar ?? undefined} />
+                                                    <AvatarFallback>{(user.name || user.userid).slice(0, 1).toUpperCase()}</AvatarFallback>
+                                                </Avatar>
+                                                <span className="text-sm font-medium">{user.name || user.userid}</span>
+                                                <span className="text-xs text-muted-foreground">@{user.userid}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : null}
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <Link
+                        href="/account"
+                        className="rounded-2xl font-bold bg-muted-foreground text-primary-foreground h-8 flex justify-center items-center w-full"
+                    >
+                        {t("loginToReply")}
+                    </Link>
+                )}
+            </TooltipProvider>
         </Card>
     )
 }

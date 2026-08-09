@@ -13,7 +13,7 @@ import type { Metadata } from 'next'
 import type { Post } from '../../page'
 import PostRetreatServer from '@/components/gekaixing/PostRetreatServer'
 import { getLocale, getTranslations } from 'next-intl/server'
-import { Prisma } from '@/generated/prisma/client'
+import { getPostReplies } from "@/lib/feed/replies"
 
 /* =======================
    类型定义
@@ -21,14 +21,6 @@ import { Prisma } from '@/generated/prisma/client'
 
 export type FeedPost = Post & {
     replies?: Post[]
-}
-
-type FeedPage = {
-    data: Post[]
-    page: {
-        nextCursor: string | null
-        hasMore: boolean
-    }
 }
 
 function toRate(numerator: number, denominator: number): number {
@@ -260,79 +252,6 @@ const getPost = async (id: string): Promise<FeedPost | null> => {
     return result
 }
 
-async function getStatusReplies(postId: string, viewerId: string | undefined): Promise<FeedPage> {
-    try {
-        const rows = await prisma.post.findMany({
-            where: {
-                parentId: postId,
-            } satisfies Prisma.PostWhereInput,
-            orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-            take: 21,
-            include: {
-                author: {
-                    select: {
-                        id: true,
-                        userid: true,
-                        name: true,
-                        avatar: true,
-                        isPremium: true,
-                    },
-                },
-                _count: {
-                    select: {
-                        likes: true,
-                        bookmarks: true,
-                        shares: true,
-                        replies: true,
-                    },
-                },
-                likes: viewerId ? { where: { userId: viewerId }, select: { id: true } } : false,
-                bookmarks: viewerId ? { where: { userId: viewerId }, select: { id: true } } : false,
-                shares: viewerId ? { where: { userId: viewerId }, select: { id: true } } : false,
-            },
-        })
-
-        const hasMore = rows.length > 20
-        const replies = hasMore ? rows.slice(0, 20) : rows
-        const nextCursor = hasMore ? replies[replies.length - 1]?.id ?? null : null
-
-        return {
-            data: replies.map((reply) => ({
-                id: reply.id,
-                content: reply.content,
-                videoUrl: reply.videoUrl ?? null,
-                audioUrl: reply.audioUrl ?? null,
-                createdAt: reply.createdAt,
-                user_id: reply.author.id,
-                user_name: reply.author.name,
-                user_avatar: reply.author.avatar,
-                user_userid: reply.author.userid,
-                isPremium: reply.author.isPremium,
-                like: reply._count.likes,
-                star: reply._count.bookmarks,
-                share: reply._count.shares,
-                reply: reply._count.replies,
-                likedByMe: reply.likes?.length > 0,
-                bookmarkedByMe: reply.bookmarks?.length > 0,
-                sharedByMe: reply.shares?.length > 0,
-            })),
-            page: {
-                nextCursor,
-                hasMore,
-            },
-        }
-    } catch (error) {
-        console.error("getStatusReplies failed:", error)
-        return {
-            data: [],
-            page: {
-                nextCursor: null,
-                hasMore: false,
-            },
-        }
-    }
-}
-
 /* =======================
    页面组件
 ======================= */
@@ -355,7 +274,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
     }
 
     const data = await getPost(id)
-    const replyPage = await getStatusReplies(id, userId)
+    const replyPage = await getPostReplies(id, userId)
 
     if (!data) {
         notFound()
