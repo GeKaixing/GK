@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Check, Copy } from "lucide-react"
+import { Check, Copy, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 import ReactMarkdown from "react-markdown"
 import rehypeHighlight from "rehype-highlight"
@@ -47,35 +47,44 @@ export function MessageBubble({
         isUser ? "justify-end" : "justify-start"
       )}
     >
-      <div
-        className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed break-words",
-          "relative",
-          "transition-all duration-200",
-          isUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-foreground"
+      <div className={cn("flex flex-col", isUser ? "items-end" : "items-start")}>
+        {/* AI 消息显示模型标签 */}
+        {!isUser && (
+          <div className="mb-1 flex items-center gap-1.5 px-1 text-xs font-semibold text-muted-foreground">
+            <Sparkles className="h-3 w-3 text-primary" />
+            <span>{t("assistantTitle")}</span>
+          </div>
         )}
-      >
-        {/* loading 状态 */}
-        {loading ? <TypingIndicator /> : <MarkdownContent content={content} />}
+        <div
+          className={cn(
+            "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed break-words",
+            "relative",
+            "transition-all duration-200",
+            isUser
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-foreground"
+          )}
+        >
+          {/* loading 状态 */}
+          {loading ? <TypingIndicator /> : <MarkdownContent content={content} />}
 
-        {!loading && content.trim() && (
-          <button
-            type="button"
-            onClick={handleCopy}
-            aria-label={t("copyMessage")}
-            className={cn(
-              "absolute -bottom-3 right-2 inline-flex h-6 w-6 items-center justify-center rounded-full border shadow-sm",
-              "opacity-0 group-hover:opacity-100 transition-opacity",
-              isUser
-                ? "bg-primary text-primary-foreground border-primary-foreground/30"
-                : "bg-background text-foreground border-border"
-            )}
-          >
-            {copied ? <Check size={14} /> : <Copy size={14} />}
-          </button>
-        )}
+          {!loading && content.trim() && (
+            <button
+              type="button"
+              onClick={handleCopy}
+              aria-label={t("copyMessage")}
+              className={cn(
+                "absolute -bottom-3 right-2 inline-flex h-6 w-6 items-center justify-center rounded-full border shadow-sm",
+                "opacity-0 group-hover:opacity-100 transition-opacity",
+                isUser
+                  ? "bg-primary text-primary-foreground border-primary-foreground/30"
+                  : "bg-background text-foreground border-border"
+              )}
+            >
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

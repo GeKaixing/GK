@@ -6,6 +6,19 @@ import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { useAiSessions } from "@/store/AiSessions"
 import { useTranslations } from "next-intl"
+import {
+  ArrowUp,
+  Atom,
+  ChevronDown,
+  Code2,
+  Feather,
+  Hash,
+  Paperclip,
+  Sparkles,
+  SquarePen,
+} from "lucide-react"
+import { getUserAiConfig } from "@/lib/ai/config"
+import { createClient } from "@/utils/supabase/client"
 
 type Message = {
   id: string
@@ -13,6 +26,8 @@ type Message = {
   content: string
   sessionId?: string
 }
+
+const PROMPT_ICONS = [Feather, Atom, Code2, Hash]
 
 export default function ChatUI({
   sessionId: initialSessionId,
@@ -25,6 +40,7 @@ export default function ChatUI({
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
+  const [aiModelLabel, setAiModelLabel] = useState("")
 
   const { addSession, updateSessionTitle } = useAiSessions()
 
@@ -39,6 +55,42 @@ export default function ChatUI({
     if (!normalized) return t("newChat")
     return normalized.slice(0, 20)
   }, [t])
+
+  /**
+   * 显示当前 AI 提供商 / 模型（读取用户配置）
+   */
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadConfig() {
+      try {
+        const supabase = createClient()
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
+        if (cancelled || !user) return
+
+        const config = getUserAiConfig(user)
+        const providerLabel =
+          config.provider === "google"
+            ? "Gemini"
+            : config.provider === "openai"
+              ? "OpenAI"
+              : "AI"
+        setAiModelLabel(
+          config.model ? `${providerLabel} · ${config.model}` : providerLabel
+        )
+      } catch {
+        // 读取失败不阻塞聊天
+      }
+    }
+
+    void loadConfig()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   function mergeMessages(
     historyMessages: Message[],
@@ -293,58 +345,149 @@ useEffect(() => {
     sendMessage(text)
   }
 
+  /** 点击建议提示词 */
+  function handleSelectPrompt(prompt: string) {
+    if (!initialSessionId) {
+      const newSessionId = crypto.randomUUID()
+      router.push(
+        `/gekaixing/gkx/${newSessionId}?input=${encodeURIComponent(prompt)}`
+      )
+      return
+    }
+
+    sendMessage(prompt)
+  }
+
+  const prompts = (t.raw("suggestedPrompts") as string[]) ?? []
+
   return (
-    <div className="flex min-h-[calc(100dvh-3.5rem)] w-full flex-col">
-      <div className="border-b px-6 py-4 font-semibold">
-        {t("assistantTitle")}
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-4 py-6 pb-28 sm:pb-6">
-        {messages.length === 0 && <EmptyState text={t("emptyState")} />}
-
-        {messages.map((msg) => (
-          <MessageBubble
-            key={msg.id}
-            role={msg.role}
-            content={msg.content}
-            loading={loading && msg.role === "assistant" && !msg.content}
-          />
-        ))}
-
-        <div ref={bottomRef} />
-      </div>
-
-      <div className="fixed bottom-[57px] left-0 right-0 z-30 border-t bg-background/95 p-4 backdrop-blur sm:static sm:z-auto sm:bg-background sm:p-4">
-        <div className="flex gap-2">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={t("inputPlaceholder")}
-            rows={1}
-            className={cn(
-              "flex-1 resize-none rounded-xl border px-4 py-3 text-sm",
-              "focus:outline-none focus:ring-2 focus:ring-primary"
-            )}
-          />
-
+    <div className="flex h-[calc(100dvh-3.5rem)] w-full flex-col">
+      {/* 顶栏 */}
+      <header className="flex items-center justify-between border-b px-4 py-2">
+        <button
+          type="button"
+          className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold hover:bg-muted/60"
+        >
+          <Sparkles className="h-4 w-4 text-primary" />
+          <span className="truncate">{aiModelLabel || t("assistantTitle")}</span>
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        </button>
+        <div className="flex items-center gap-1">
           <button
-            onClick={handleSend}
-            disabled={loading}
-            className="px-5 rounded-xl bg-primary text-primary-foreground disabled:opacity-50"
+            type="button"
+            onClick={() => router.push("/gekaixing/gkx")}
+            aria-label={t("newChat")}
+            className="rounded-full p-2 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
           >
-            {t("send")}
+            <SquarePen className="h-4 w-4" />
           </button>
+        </div>
+      </header>
+
+      {/* 消息区 */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-[760px] px-4 py-8">
+          {messages.length === 0 ? (
+            <GrokEmptyState
+              t={t}
+              prompts={prompts}
+              onSelect={handleSelectPrompt}
+            />
+          ) : (
+            messages.map((msg) => (
+              <MessageBubble
+                key={msg.id}
+                role={msg.role}
+                content={msg.content}
+                loading={loading && msg.role === "assistant" && !msg.content}
+              />
+            ))
+          )}
+          <div ref={bottomRef} />
+        </div>
+      </div>
+
+      {/* 输入区 */}
+      <div className="px-4 pb-5 pt-2">
+        <div className="mx-auto w-full max-w-[760px]">
+          <div
+            className={cn(
+              "flex items-end gap-2 rounded-2xl border border-border bg-background p-2 shadow-sm",
+              "transition-shadow focus-within:ring-2 focus-within:ring-primary/40"
+            )}
+          >
+            <button
+              type="button"
+              aria-label="Attach"
+              className="p-1.5 text-muted-foreground hover:text-foreground"
+            >
+              <Paperclip className="h-5 w-5" />
+            </button>
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask anything"
+              rows={1}
+              className={cn(
+                "flex-1 resize-none bg-transparent px-1 py-1.5 text-sm",
+                "focus:outline-none"
+              )}
+            />
+            <button
+              type="button"
+              onClick={handleSend}
+              disabled={loading || !input.trim()}
+              aria-label={t("send")}
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
+            >
+              <ArrowUp className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            {t("disclaimer")}
+          </p>
         </div>
       </div>
     </div>
   )
 }
 
-function EmptyState({ text }: { text: string }) {
+/**
+ * Grok 风格空状态：大号品牌字 + 建议提示词卡片（2 列网格）
+ */
+function GrokEmptyState({
+  t,
+  prompts,
+  onSelect,
+}: {
+  t: ReturnType<typeof useTranslations>
+  prompts: string[]
+  onSelect: (prompt: string) => void
+}) {
   return (
-    <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
-      {text}
+    <div className="flex min-h-[55vh] flex-col items-center justify-center gap-10 text-center">
+      <h1 className="text-5xl font-bold tracking-tight">
+        {t("assistantTitle")}
+      </h1>
+      {prompts.length > 0 && (
+        <div className="grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
+          {prompts.map((prompt, index) => {
+            const Icon = PROMPT_ICONS[index % PROMPT_ICONS.length]
+            return (
+              <button
+                key={prompt}
+                type="button"
+                onClick={() => onSelect(prompt)}
+                className="flex items-center gap-3 rounded-2xl border border-border p-4 text-left text-sm transition-colors hover:bg-muted/60"
+              >
+                <Icon className="h-4 w-4 shrink-0 text-primary" />
+                <span className="text-foreground">{prompt}</span>
+              </button>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
