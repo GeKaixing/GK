@@ -141,7 +141,9 @@
     "Suggest a title for this tweet"
   ],
   "searchPlaceholder": "Search conversations",
+  "disclaimer": "GKX can make mistakes. Verify important information.",
   "dateToday": "Today",
+  "dateYesterday": "Yesterday",
   "datePrev7": "Previous 7 days",
   "datePrev30": "Previous 30 days",
   "dateOlder": "Older",
@@ -701,6 +703,8 @@
       "emailPlaceholder": "Enter your email",
       "passwordLabel": "Password",
       "passwordPlaceholder": "Enter your password",
+      "hidePassword": "Hide password",
+      "showPassword": "Show password",
       "submit": "Submit",
       "dialog": {
         "title": "Verification email has been sent",

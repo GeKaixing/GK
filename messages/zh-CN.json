@@ -141,7 +141,9 @@
     "给这条推文起个标题"
   ],
   "searchPlaceholder": "搜索会话",
+  "disclaimer": "GKX 可能会犯错，请核对重要信息。",
   "dateToday": "今天",
+  "dateYesterday": "昨天",
   "datePrev7": "近 7 天",
   "datePrev30": "近 30 天",
   "dateOlder": "更早",
@@ -701,6 +703,8 @@
       "emailPlaceholder": "请输入邮箱",
       "passwordLabel": "密码",
       "passwordPlaceholder": "请输入密码",
+      "hidePassword": "隐藏密码",
+      "showPassword": "显示密码",
       "submit": "提交",
       "dialog": {
         "title": "确认邮件已经发送到你的邮箱",
