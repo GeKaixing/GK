@@ -20,7 +20,7 @@ export default function RightRail({ children }: { children: ReactNode }) {
   if (isFullWidthChat) return null
 
   return (
-    <footer className="hidden lg:flex w-[290px] xl:w-[350px] shrink-0 pl-4 sticky top-0 h-screen overflow-y-auto">
+    <footer className="hidden lg:flex lg:flex-col w-[290px] xl:w-[350px] shrink-0 pl-4 sticky top-0 h-screen overflow-y-auto">
       {children}
     </footer>
   )
