@@ -39,6 +39,7 @@ model User {
   createdWorkTasks         WorkTask[]   @relation("CreatedWorkTasks")
   liveStreams              LiveStream[]
   liveChatMessages         LiveChatMessage[]
+  liveFeedback             LiveFeedback[]
 }
 
 /// ///////////////////////////////////////////////////
@@ -309,6 +310,7 @@ model LiveStream {
 
   author       User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
   chatMessages LiveChatMessage[]
+  feedback     LiveFeedback[]
 
   @@index([authorId])
   @@index([status, startedAt])
@@ -323,6 +325,20 @@ model LiveChatMessage {
 
   stream LiveStream @relation(fields: [streamId], references: [id], onDelete: Cascade)
   author User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([streamId, createdAt])
+}
+
+model LiveFeedback {
+  id        String   @id @default(cuid())
+  userId    String
+  streamId  String
+  issueType String
+  message   String
+  createdAt DateTime @default(now())
+
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stream LiveStream @relation(fields: [streamId], references: [id], onDelete: Cascade)
 
   @@index([streamId, createdAt])
 }

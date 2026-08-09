@@ -285,6 +285,7 @@ export type UserWhereInput = {
   createdWorkTasks?: Prisma.WorkTaskListRelationFilter
   liveStreams?: Prisma.LiveStreamListRelationFilter
   liveChatMessages?: Prisma.LiveChatMessageListRelationFilter
+  liveFeedback?: Prisma.LiveFeedbackListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -319,6 +320,7 @@ export type UserOrderByWithRelationInput = {
   createdWorkTasks?: Prisma.WorkTaskOrderByRelationAggregateInput
   liveStreams?: Prisma.LiveStreamOrderByRelationAggregateInput
   liveChatMessages?: Prisma.LiveChatMessageOrderByRelationAggregateInput
+  liveFeedback?: Prisma.LiveFeedbackOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -356,6 +358,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdWorkTasks?: Prisma.WorkTaskListRelationFilter
   liveStreams?: Prisma.LiveStreamListRelationFilter
   liveChatMessages?: Prisma.LiveChatMessageListRelationFilter
+  liveFeedback?: Prisma.LiveFeedbackListRelationFilter
 }, "id" | "email" | "userid" | "stripeCustomerId" | "stripeSubId">
 
 export type UserOrderByWithAggregationInput = {
@@ -434,6 +437,7 @@ export type UserCreateInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -468,6 +472,7 @@ export type UserUncheckedCreateInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -502,6 +507,7 @@ export type UserUpdateInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -536,6 +542,7 @@ export type UserUncheckedUpdateInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -898,6 +905,20 @@ export type UserUpdateOneRequiredWithoutLiveChatMessagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLiveChatMessagesInput, Prisma.UserUpdateWithoutLiveChatMessagesInput>, Prisma.UserUncheckedUpdateWithoutLiveChatMessagesInput>
 }
 
+export type UserCreateNestedOneWithoutLiveFeedbackInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLiveFeedbackInput, Prisma.UserUncheckedCreateWithoutLiveFeedbackInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLiveFeedbackInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutLiveFeedbackNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLiveFeedbackInput, Prisma.UserUncheckedCreateWithoutLiveFeedbackInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLiveFeedbackInput
+  upsert?: Prisma.UserUpsertWithoutLiveFeedbackInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLiveFeedbackInput, Prisma.UserUpdateWithoutLiveFeedbackInput>, Prisma.UserUncheckedUpdateWithoutLiveFeedbackInput>
+}
+
 export type UserCreateWithoutFollowingInput = {
   id?: string
   email: string
@@ -929,6 +950,7 @@ export type UserCreateWithoutFollowingInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFollowingInput = {
@@ -962,6 +984,7 @@ export type UserUncheckedCreateWithoutFollowingInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFollowingInput = {
@@ -1000,6 +1023,7 @@ export type UserCreateWithoutFollowersInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFollowersInput = {
@@ -1033,6 +1057,7 @@ export type UserUncheckedCreateWithoutFollowersInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFollowersInput = {
@@ -1082,6 +1107,7 @@ export type UserUpdateWithoutFollowingInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFollowingInput = {
@@ -1115,6 +1141,7 @@ export type UserUncheckedUpdateWithoutFollowingInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutFollowersInput = {
@@ -1159,6 +1186,7 @@ export type UserUpdateWithoutFollowersInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFollowersInput = {
@@ -1192,6 +1220,7 @@ export type UserUncheckedUpdateWithoutFollowersInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPostsInput = {
@@ -1225,6 +1254,7 @@ export type UserCreateWithoutPostsInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPostsInput = {
@@ -1258,6 +1288,7 @@ export type UserUncheckedCreateWithoutPostsInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPostsInput = {
@@ -1307,6 +1338,7 @@ export type UserUpdateWithoutPostsInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostsInput = {
@@ -1340,6 +1372,7 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLikesInput = {
@@ -1373,6 +1406,7 @@ export type UserCreateWithoutLikesInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLikesInput = {
@@ -1406,6 +1440,7 @@ export type UserUncheckedCreateWithoutLikesInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLikesInput = {
@@ -1455,6 +1490,7 @@ export type UserUpdateWithoutLikesInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLikesInput = {
@@ -1488,6 +1524,7 @@ export type UserUncheckedUpdateWithoutLikesInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBookmarksInput = {
@@ -1521,6 +1558,7 @@ export type UserCreateWithoutBookmarksInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBookmarksInput = {
@@ -1554,6 +1592,7 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBookmarksInput = {
@@ -1603,6 +1642,7 @@ export type UserUpdateWithoutBookmarksInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBookmarksInput = {
@@ -1636,6 +1676,7 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSharesInput = {
@@ -1669,6 +1710,7 @@ export type UserCreateWithoutSharesInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSharesInput = {
@@ -1702,6 +1744,7 @@ export type UserUncheckedCreateWithoutSharesInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSharesInput = {
@@ -1751,6 +1794,7 @@ export type UserUpdateWithoutSharesInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSharesInput = {
@@ -1784,6 +1828,7 @@ export type UserUncheckedUpdateWithoutSharesInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationParticipantsInput = {
@@ -1817,6 +1862,7 @@ export type UserCreateWithoutConversationParticipantsInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationParticipantsInput = {
@@ -1850,6 +1896,7 @@ export type UserUncheckedCreateWithoutConversationParticipantsInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationParticipantsInput = {
@@ -1899,6 +1946,7 @@ export type UserUpdateWithoutConversationParticipantsInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationParticipantsInput = {
@@ -1932,6 +1980,7 @@ export type UserUncheckedUpdateWithoutConversationParticipantsInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesInput = {
@@ -1965,6 +2014,7 @@ export type UserCreateWithoutMessagesInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesInput = {
@@ -1998,6 +2048,7 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesInput = {
@@ -2047,6 +2098,7 @@ export type UserUpdateWithoutMessagesInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -2080,6 +2132,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationReadsInput = {
@@ -2113,6 +2166,7 @@ export type UserCreateWithoutConversationReadsInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationReadsInput = {
@@ -2146,6 +2200,7 @@ export type UserUncheckedCreateWithoutConversationReadsInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationReadsInput = {
@@ -2195,6 +2250,7 @@ export type UserUpdateWithoutConversationReadsInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationReadsInput = {
@@ -2228,6 +2284,7 @@ export type UserUncheckedUpdateWithoutConversationReadsInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAssignedWorkTasksInput = {
@@ -2261,6 +2318,7 @@ export type UserCreateWithoutAssignedWorkTasksInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedWorkTasksInput = {
@@ -2294,6 +2352,7 @@ export type UserUncheckedCreateWithoutAssignedWorkTasksInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedWorkTasksInput = {
@@ -2332,6 +2391,7 @@ export type UserCreateWithoutCreatedWorkTasksInput = {
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedWorkTasksInput = {
@@ -2365,6 +2425,7 @@ export type UserUncheckedCreateWithoutCreatedWorkTasksInput = {
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedWorkTasksInput = {
@@ -2414,6 +2475,7 @@ export type UserUpdateWithoutAssignedWorkTasksInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedWorkTasksInput = {
@@ -2447,6 +2509,7 @@ export type UserUncheckedUpdateWithoutAssignedWorkTasksInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutCreatedWorkTasksInput = {
@@ -2491,6 +2554,7 @@ export type UserUpdateWithoutCreatedWorkTasksInput = {
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedWorkTasksInput = {
@@ -2524,6 +2588,7 @@ export type UserUncheckedUpdateWithoutCreatedWorkTasksInput = {
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutJobPostsInput = {
@@ -2557,6 +2622,7 @@ export type UserCreateWithoutJobPostsInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutJobPostsInput = {
@@ -2590,6 +2656,7 @@ export type UserUncheckedCreateWithoutJobPostsInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutJobPostsInput = {
@@ -2639,6 +2706,7 @@ export type UserUpdateWithoutJobPostsInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutJobPostsInput = {
@@ -2672,6 +2740,7 @@ export type UserUncheckedUpdateWithoutJobPostsInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutActionsInput = {
@@ -2705,6 +2774,7 @@ export type UserCreateWithoutActionsInput = {
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutActionsInput = {
@@ -2738,6 +2808,7 @@ export type UserUncheckedCreateWithoutActionsInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutActionsInput = {
@@ -2787,6 +2858,7 @@ export type UserUpdateWithoutActionsInput = {
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutActionsInput = {
@@ -2820,6 +2892,7 @@ export type UserUncheckedUpdateWithoutActionsInput = {
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLiveStreamsInput = {
@@ -2853,6 +2926,7 @@ export type UserCreateWithoutLiveStreamsInput = {
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLiveStreamsInput = {
@@ -2886,6 +2960,7 @@ export type UserUncheckedCreateWithoutLiveStreamsInput = {
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLiveStreamsInput = {
@@ -2935,6 +3010,7 @@ export type UserUpdateWithoutLiveStreamsInput = {
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLiveStreamsInput = {
@@ -2968,6 +3044,7 @@ export type UserUncheckedUpdateWithoutLiveStreamsInput = {
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLiveChatMessagesInput = {
@@ -3001,6 +3078,7 @@ export type UserCreateWithoutLiveChatMessagesInput = {
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLiveChatMessagesInput = {
@@ -3034,6 +3112,7 @@ export type UserUncheckedCreateWithoutLiveChatMessagesInput = {
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLiveChatMessagesInput = {
@@ -3083,6 +3162,7 @@ export type UserUpdateWithoutLiveChatMessagesInput = {
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLiveChatMessagesInput = {
@@ -3116,6 +3196,159 @@ export type UserUncheckedUpdateWithoutLiveChatMessagesInput = {
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutLiveFeedbackInput = {
+  id?: string
+  email: string
+  name?: string | null
+  avatar?: string | null
+  backgroundImage?: string | null
+  briefIntroduction?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userid?: string
+  isPremium?: boolean
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  premiumExpiresAt?: Date | string | null
+  premiumGraceEndsAt?: Date | string | null
+  stripePriceId?: string | null
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
+  conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
+  following?: Prisma.FollowCreateNestedManyWithoutFollowerInput
+  followers?: Prisma.FollowCreateNestedManyWithoutFollowingInput
+  likes?: Prisma.LikeCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
+  shares?: Prisma.ShareCreateNestedManyWithoutUserInput
+  actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
+  jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
+  createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
+  liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
+  liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutLiveFeedbackInput = {
+  id?: string
+  email: string
+  name?: string | null
+  avatar?: string | null
+  backgroundImage?: string | null
+  briefIntroduction?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userid?: string
+  isPremium?: boolean
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  premiumExpiresAt?: Date | string | null
+  premiumGraceEndsAt?: Date | string | null
+  stripePriceId?: string | null
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
+  following?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowerInput
+  followers?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowingInput
+  likes?: Prisma.LikeUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
+  shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
+  actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
+  jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
+  createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
+  liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
+  liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutLiveFeedbackInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutLiveFeedbackInput, Prisma.UserUncheckedCreateWithoutLiveFeedbackInput>
+}
+
+export type UserUpsertWithoutLiveFeedbackInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutLiveFeedbackInput, Prisma.UserUncheckedUpdateWithoutLiveFeedbackInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutLiveFeedbackInput, Prisma.UserUncheckedCreateWithoutLiveFeedbackInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutLiveFeedbackInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutLiveFeedbackInput, Prisma.UserUncheckedUpdateWithoutLiveFeedbackInput>
+}
+
+export type UserUpdateWithoutLiveFeedbackInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  backgroundImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  briefIntroduction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userid?: Prisma.StringFieldUpdateOperationsInput | string
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
+  conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
+  following?: Prisma.FollowUpdateManyWithoutFollowerNestedInput
+  followers?: Prisma.FollowUpdateManyWithoutFollowingNestedInput
+  likes?: Prisma.LikeUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
+  shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
+  actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
+  jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
+  createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
+  liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
+  liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutLiveFeedbackInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  backgroundImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  briefIntroduction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userid?: Prisma.StringFieldUpdateOperationsInput | string
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
+  following?: Prisma.FollowUncheckedUpdateManyWithoutFollowerNestedInput
+  followers?: Prisma.FollowUncheckedUpdateManyWithoutFollowingNestedInput
+  likes?: Prisma.LikeUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
+  shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
+  actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
+  jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
+  liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
+  liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 
@@ -3139,6 +3372,7 @@ export type UserCountOutputType = {
   createdWorkTasks: number
   liveStreams: number
   liveChatMessages: number
+  liveFeedback: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3157,6 +3391,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   createdWorkTasks?: boolean | UserCountOutputTypeCountCreatedWorkTasksArgs
   liveStreams?: boolean | UserCountOutputTypeCountLiveStreamsArgs
   liveChatMessages?: boolean | UserCountOutputTypeCountLiveChatMessagesArgs
+  liveFeedback?: boolean | UserCountOutputTypeCountLiveFeedbackArgs
 }
 
 /**
@@ -3274,6 +3509,13 @@ export type UserCountOutputTypeCountLiveChatMessagesArgs<ExtArgs extends runtime
   where?: Prisma.LiveChatMessageWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountLiveFeedbackArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LiveFeedbackWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3307,6 +3549,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdWorkTasks?: boolean | Prisma.User$createdWorkTasksArgs<ExtArgs>
   liveStreams?: boolean | Prisma.User$liveStreamsArgs<ExtArgs>
   liveChatMessages?: boolean | Prisma.User$liveChatMessagesArgs<ExtArgs>
+  liveFeedback?: boolean | Prisma.User$liveFeedbackArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3384,6 +3627,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdWorkTasks?: boolean | Prisma.User$createdWorkTasksArgs<ExtArgs>
   liveStreams?: boolean | Prisma.User$liveStreamsArgs<ExtArgs>
   liveChatMessages?: boolean | Prisma.User$liveChatMessagesArgs<ExtArgs>
+  liveFeedback?: boolean | Prisma.User$liveFeedbackArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3407,6 +3651,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdWorkTasks: Prisma.$WorkTaskPayload<ExtArgs>[]
     liveStreams: Prisma.$LiveStreamPayload<ExtArgs>[]
     liveChatMessages: Prisma.$LiveChatMessagePayload<ExtArgs>[]
+    liveFeedback: Prisma.$LiveFeedbackPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3834,6 +4079,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   createdWorkTasks<T extends Prisma.User$createdWorkTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdWorkTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   liveStreams<T extends Prisma.User$liveStreamsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$liveStreamsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LiveStreamPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   liveChatMessages<T extends Prisma.User$liveChatMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$liveChatMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LiveChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  liveFeedback<T extends Prisma.User$liveFeedbackArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$liveFeedbackArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LiveFeedbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4629,6 +4875,30 @@ export type User$liveChatMessagesArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.LiveChatMessageScalarFieldEnum | Prisma.LiveChatMessageScalarFieldEnum[]
+}
+
+/**
+ * User.liveFeedback
+ */
+export type User$liveFeedbackArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LiveFeedback
+   */
+  select?: Prisma.LiveFeedbackSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LiveFeedback
+   */
+  omit?: Prisma.LiveFeedbackOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LiveFeedbackInclude<ExtArgs> | null
+  where?: Prisma.LiveFeedbackWhereInput
+  orderBy?: Prisma.LiveFeedbackOrderByWithRelationInput | Prisma.LiveFeedbackOrderByWithRelationInput[]
+  cursor?: Prisma.LiveFeedbackWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LiveFeedbackScalarFieldEnum | Prisma.LiveFeedbackScalarFieldEnum[]
 }
 
 /**

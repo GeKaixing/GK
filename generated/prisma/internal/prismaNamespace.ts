@@ -413,7 +413,8 @@ export const ModelName = {
   JobPosting: 'JobPosting',
   UserAction: 'UserAction',
   LiveStream: 'LiveStream',
-  LiveChatMessage: 'LiveChatMessage'
+  LiveChatMessage: 'LiveChatMessage',
+  LiveFeedback: 'LiveFeedback'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -429,7 +430,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "follow" | "post" | "like" | "bookmark" | "share" | "conversation" | "conversationParticipant" | "message" | "conversationRead" | "workTask" | "chatAISession" | "chatAIMessage" | "jobPosting" | "userAction" | "liveStream" | "liveChatMessage"
+    modelProps: "user" | "follow" | "post" | "like" | "bookmark" | "share" | "conversation" | "conversationParticipant" | "message" | "conversationRead" | "workTask" | "chatAISession" | "chatAIMessage" | "jobPosting" | "userAction" | "liveStream" | "liveChatMessage" | "liveFeedback"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1691,6 +1692,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LiveFeedback: {
+      payload: Prisma.$LiveFeedbackPayload<ExtArgs>
+      fields: Prisma.LiveFeedbackFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LiveFeedbackFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveFeedbackPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LiveFeedbackFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveFeedbackPayload>
+        }
+        findFirst: {
+          args: Prisma.LiveFeedbackFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveFeedbackPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LiveFeedbackFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveFeedbackPayload>
+        }
+        findMany: {
+          args: Prisma.LiveFeedbackFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveFeedbackPayload>[]
+        }
+        create: {
+          args: Prisma.LiveFeedbackCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveFeedbackPayload>
+        }
+        createMany: {
+          args: Prisma.LiveFeedbackCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LiveFeedbackCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveFeedbackPayload>[]
+        }
+        delete: {
+          args: Prisma.LiveFeedbackDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveFeedbackPayload>
+        }
+        update: {
+          args: Prisma.LiveFeedbackUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveFeedbackPayload>
+        }
+        deleteMany: {
+          args: Prisma.LiveFeedbackDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LiveFeedbackUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LiveFeedbackUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveFeedbackPayload>[]
+        }
+        upsert: {
+          args: Prisma.LiveFeedbackUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveFeedbackPayload>
+        }
+        aggregate: {
+          args: Prisma.LiveFeedbackAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLiveFeedback>
+        }
+        groupBy: {
+          args: Prisma.LiveFeedbackGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LiveFeedbackGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LiveFeedbackCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LiveFeedbackCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1963,6 +2038,18 @@ export const LiveChatMessageScalarFieldEnum = {
 } as const
 
 export type LiveChatMessageScalarFieldEnum = (typeof LiveChatMessageScalarFieldEnum)[keyof typeof LiveChatMessageScalarFieldEnum]
+
+
+export const LiveFeedbackScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  streamId: 'streamId',
+  issueType: 'issueType',
+  message: 'message',
+  createdAt: 'createdAt'
+} as const
+
+export type LiveFeedbackScalarFieldEnum = (typeof LiveFeedbackScalarFieldEnum)[keyof typeof LiveFeedbackScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2267,6 +2354,7 @@ export type GlobalOmitConfig = {
   userAction?: Prisma.UserActionOmit
   liveStream?: Prisma.LiveStreamOmit
   liveChatMessage?: Prisma.LiveChatMessageOmit
+  liveFeedback?: Prisma.LiveFeedbackOmit
 }
 
 /* Types for Logging */

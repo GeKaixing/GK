@@ -8,8 +8,8 @@ import { createClient } from "@/utils/supabase/server";
 import LiveWatchRoom from "@/components/gekaixing/LiveWatchRoom";
 import LivePlayer from "@/components/gekaixing/LivePlayer";
 import LiveChat from "@/components/gekaixing/LiveChat";
+import LiveStreamerInfo from "@/components/gekaixing/LiveStreamerInfo";
 import LiveEndStreamButton from "@/components/gekaixing/LiveEndStreamButton";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +24,7 @@ async function queryStream(id: string) {
           name: true,
           avatar: true,
           userid: true,
+          briefIntroduction: true,
         },
       },
     },
@@ -64,6 +65,25 @@ export default async function LiveWatchPage({
 
   const isLive = stream.status === "LIVE";
   const isHost = currentUserId === stream.authorId;
+
+  // 当前用户是否已关注主播
+  let isFollowing = false;
+  if (currentUserId && currentUserId !== stream.authorId) {
+    try {
+      const follow = await prisma.follow.findUnique({
+        where: {
+          followerId_followingId: {
+            followerId: currentUserId,
+            followingId: stream.authorId,
+          },
+        },
+        select: { id: true },
+      });
+      isFollowing = Boolean(follow);
+    } catch {
+      isFollowing = false;
+    }
+  }
 
   const formattedStartTime = new Intl.DateTimeFormat("default", {
     dateStyle: "medium",
@@ -120,7 +140,7 @@ export default async function LiveWatchPage({
               stream.streamUrl ? (
                 <LivePlayer streamUrl={stream.streamUrl} title={stream.title} poster={stream.thumbnailUrl} />
               ) : (
-                <LiveWatchRoom streamId={stream.id} isHost={isHost} />
+                <LiveWatchRoom streamId={stream.id} isHost={isHost} title={stream.title} />
               )
             ) : (
               <div className="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-muted to-background">
@@ -142,37 +162,39 @@ export default async function LiveWatchPage({
               </div>
             )}
 
-            {/* 直播信息 */}
-            <div className="mt-4 space-y-3">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-11 w-11">
-                  <AvatarImage src={stream.author.avatar ?? undefined} />
-                  <AvatarFallback>
-                    {(stream.author.name || stream.author.userid || "U").slice(0, 1).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0">
-                  <p className="truncate font-semibold">
-                    {stream.author.name || `@${stream.author.userid}`}
-                  </p>
-                  <p className="truncate text-sm text-muted-foreground">@{stream.author.userid}</p>
-                </div>
-                {stream.category ? (
-                  <Badge variant="secondary" className="ml-auto shrink-0 rounded-full">
-                    {t(`category.${stream.category}`)}
-                  </Badge>
-                ) : null}
-              </div>
+            {/* 主播信息（个人主页简化版：头像 + 名字 + id + 简介 + 关注，一行） */}
+            <div className="mt-4 border-b border-border pb-4">
+              <LiveStreamerInfo
+                author={{
+                  id: stream.author.id,
+                  name: stream.author.name,
+                  userid: stream.author.userid,
+                  avatar: stream.author.avatar,
+                  briefIntroduction: stream.author.briefIntroduction,
+                }}
+                currentUserId={currentUserId}
+                initialIsFollowing={isFollowing}
+              />
+            </div>
 
+            {/* 简介 + 时间 + 分类 */}
+            <div className="mt-3 space-y-3">
               {stream.description ? (
                 <p className="whitespace-pre-line text-sm leading-6 text-muted-foreground">
                   {stream.description}
                 </p>
               ) : null}
 
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <CalendarClock className="h-4 w-4" />
-                <span>{formattedStartTime}</span>
+              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <CalendarClock className="h-4 w-4" />
+                  <span>{formattedStartTime}</span>
+                </div>
+                {stream.category ? (
+                  <Badge variant="secondary" className="rounded-full">
+                    {t(`category.${stream.category}`)}
+                  </Badge>
+                ) : null}
               </div>
             </div>
           </div>

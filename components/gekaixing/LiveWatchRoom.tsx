@@ -1,31 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   LiveKitRoom,
-  TrackLoop,
-  ParticipantTile,
   RoomAudioRenderer,
   ControlBar,
   useTracks,
 } from "@livekit/components-react";
-import { Track } from "livekit-client";
+import { Track, VideoQuality } from "livekit-client";
 import { useTranslations } from "next-intl";
 import { Loader2, Radio } from "lucide-react";
 import "@livekit/components-styles";
 
+import PlayerControls, { type QualityOption } from "./PlayerControls";
+
 /**
  * LiveKit 直播房间：
- * - 主播：连接后自动开启摄像头/麦克风推流（video/audio = true）
- * - 观众：仅订阅，看到主播画面
+ * - 主播：连接后自动开启摄像头/麦克风推流，自带 LiveKit ControlBar（麦克风/摄像头）
+ * - 观众：仅订阅，自定义播放器控制栏（暂停/音量/影院/全屏/画质/迷你播放器/反馈）
  * - 直播聊天仍由 Supabase Realtime 提供（LiveChat 组件）
  */
 export default function LiveWatchRoom({
   streamId,
   isHost,
+  title,
 }: {
   streamId: string;
   isHost: boolean;
+  title: string;
 }) {
   const t = useTranslations("ImitationX.Live");
   const [token, setToken] = useState<string | null>(null);
@@ -105,40 +107,114 @@ export default function LiveWatchRoom({
       options={{ adaptiveStream: true, dynacast: true }}
       data-lk-theme="default"
     >
-      <RoomContent isHost={isHost} />
+      <RoomContent isHost={isHost} streamId={streamId} title={title} />
     </LiveKitRoom>
   );
 }
 
-function RoomContent({ isHost }: { isHost: boolean }) {
+function RoomContent({
+  isHost,
+  streamId,
+  title,
+}: {
+  isHost: boolean;
+  streamId: string;
+  title: string;
+}) {
   const t = useTranslations("ImitationX.Live");
-  // 摄像头 track（含主播自己）；未推流时为空数组 → 显示等待遮罩
   const tracks = useTracks([Track.Source.Camera]);
+  const mainTrack = tracks[0];
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [activeQuality, setActiveQuality] = useState("high");
 
-  const showWaiting = !isHost && tracks.length === 0;
+  // 将摄像头 track attach 到自有的 <video> 元素
+  useEffect(() => {
+    const track = mainTrack?.publication?.track;
+    const videoEl = videoRef.current;
+    if (!track || !videoEl) {
+      return;
+    }
+
+    const element = track.attach(videoEl);
+    return () => {
+      track.detach(element);
+    };
+  }, [mainTrack?.publication?.track]);
+
+  // 等待主播开播：观众且还没有摄像头 track
+  const showWaiting = !isHost && !mainTrack;
+
+  // 画质选择：仅观众观看远端摄像头 track 时可用（LiveKit simulcast 分层）
+  const isRemoteCamera = !!mainTrack && !mainTrack.participant.isLocal;
+  const qualityOptions: QualityOption[] = isRemoteCamera
+    ? [
+        { label: "1080p", value: "high" },
+        { label: "720p", value: "medium" },
+        { label: "480p", value: "low" },
+      ]
+    : [];
+
+  const handleQualityChange = (value: string) => {
+    setActiveQuality(value);
+    const publication = mainTrack?.publication as unknown as {
+      setVideoQuality?: (quality: VideoQuality) => void;
+    };
+    if (!publication?.setVideoQuality) {
+      return;
+    }
+    if (value === "high") {
+      publication.setVideoQuality(VideoQuality.HIGH);
+    } else if (value === "medium") {
+      publication.setVideoQuality(VideoQuality.MEDIUM);
+    } else {
+      publication.setVideoQuality(VideoQuality.LOW);
+    }
+  };
+
+  const videoElement = (
+    <video
+      ref={videoRef}
+      className="h-full w-full object-cover"
+      autoPlay
+      muted={isHost}
+      playsInline
+    />
+  );
 
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
-      <TrackLoop tracks={tracks}>
-        <ParticipantTile className="h-full w-full" />
-      </TrackLoop>
-      <RoomAudioRenderer />
-
-      {showWaiting ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/80 text-center backdrop-blur-sm">
-          <Radio className="h-12 w-12 animate-pulse text-muted-foreground/60" />
-          <p className="text-sm font-medium text-muted-foreground">
-            {t("waitingForHost")}
-          </p>
-        </div>
-      ) : null}
-
+    <div className="relative">
       {isHost ? (
-        <ControlBar
-          className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-border/50 bg-background/90 shadow-lg backdrop-blur"
-          controls={{ leave: false }}
-          variation="minimal"
-        />
+        /* 主播：自见 + LiveKit ControlBar（麦克风/摄像头开关） */
+        <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
+          {videoElement}
+          <RoomAudioRenderer />
+          <ControlBar
+            className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full border border-border/50 bg-background/90 shadow-lg backdrop-blur"
+            controls={{ leave: false }}
+            variation="minimal"
+          />
+        </div>
+      ) : (
+        /* 观众：自定义播放器控制栏 */
+        <PlayerControls
+          videoRef={videoRef}
+          title={title}
+          streamId={streamId}
+          qualityOptions={qualityOptions}
+          activeQuality={activeQuality}
+          onQualityChange={handleQualityChange}
+        >
+          {videoElement}
+          <RoomAudioRenderer />
+        </PlayerControls>
+      )}
+
+      {/* 等待主播开播 */}
+      {showWaiting ? (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 rounded-2xl bg-background/85 text-center backdrop-blur-sm">
+          <Radio className="h-12 w-12 animate-pulse text-muted-foreground/60" />
+          <p className="text-sm font-medium text-muted-foreground">{t("waitingForHost")}</p>
+        </div>
       ) : null}
     </div>
   );

@@ -290,6 +290,7 @@ export type LiveStreamWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"LiveStream"> | Date | string
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   chatMessages?: Prisma.LiveChatMessageListRelationFilter
+  feedback?: Prisma.LiveFeedbackListRelationFilter
 }
 
 export type LiveStreamOrderByWithRelationInput = {
@@ -309,6 +310,7 @@ export type LiveStreamOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   author?: Prisma.UserOrderByWithRelationInput
   chatMessages?: Prisma.LiveChatMessageOrderByRelationAggregateInput
+  feedback?: Prisma.LiveFeedbackOrderByRelationAggregateInput
 }
 
 export type LiveStreamWhereUniqueInput = Prisma.AtLeast<{
@@ -331,6 +333,7 @@ export type LiveStreamWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"LiveStream"> | Date | string
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   chatMessages?: Prisma.LiveChatMessageListRelationFilter
+  feedback?: Prisma.LiveFeedbackListRelationFilter
 }, "id">
 
 export type LiveStreamOrderByWithAggregationInput = {
@@ -391,6 +394,7 @@ export type LiveStreamCreateInput = {
   updatedAt?: Date | string
   author: Prisma.UserCreateNestedOneWithoutLiveStreamsInput
   chatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutStreamInput
+  feedback?: Prisma.LiveFeedbackCreateNestedManyWithoutStreamInput
 }
 
 export type LiveStreamUncheckedCreateInput = {
@@ -409,6 +413,7 @@ export type LiveStreamUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   chatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutStreamInput
+  feedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutStreamInput
 }
 
 export type LiveStreamUpdateInput = {
@@ -427,6 +432,7 @@ export type LiveStreamUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.UserUpdateOneRequiredWithoutLiveStreamsNestedInput
   chatMessages?: Prisma.LiveChatMessageUpdateManyWithoutStreamNestedInput
+  feedback?: Prisma.LiveFeedbackUpdateManyWithoutStreamNestedInput
 }
 
 export type LiveStreamUncheckedUpdateInput = {
@@ -445,6 +451,7 @@ export type LiveStreamUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   chatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutStreamNestedInput
+  feedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutStreamNestedInput
 }
 
 export type LiveStreamCreateManyInput = {
@@ -627,6 +634,20 @@ export type LiveStreamUpdateOneRequiredWithoutChatMessagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.LiveStreamUpdateToOneWithWhereWithoutChatMessagesInput, Prisma.LiveStreamUpdateWithoutChatMessagesInput>, Prisma.LiveStreamUncheckedUpdateWithoutChatMessagesInput>
 }
 
+export type LiveStreamCreateNestedOneWithoutFeedbackInput = {
+  create?: Prisma.XOR<Prisma.LiveStreamCreateWithoutFeedbackInput, Prisma.LiveStreamUncheckedCreateWithoutFeedbackInput>
+  connectOrCreate?: Prisma.LiveStreamCreateOrConnectWithoutFeedbackInput
+  connect?: Prisma.LiveStreamWhereUniqueInput
+}
+
+export type LiveStreamUpdateOneRequiredWithoutFeedbackNestedInput = {
+  create?: Prisma.XOR<Prisma.LiveStreamCreateWithoutFeedbackInput, Prisma.LiveStreamUncheckedCreateWithoutFeedbackInput>
+  connectOrCreate?: Prisma.LiveStreamCreateOrConnectWithoutFeedbackInput
+  upsert?: Prisma.LiveStreamUpsertWithoutFeedbackInput
+  connect?: Prisma.LiveStreamWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LiveStreamUpdateToOneWithWhereWithoutFeedbackInput, Prisma.LiveStreamUpdateWithoutFeedbackInput>, Prisma.LiveStreamUncheckedUpdateWithoutFeedbackInput>
+}
+
 export type LiveStreamCreateWithoutAuthorInput = {
   id?: string
   title: string
@@ -642,6 +663,7 @@ export type LiveStreamCreateWithoutAuthorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   chatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutStreamInput
+  feedback?: Prisma.LiveFeedbackCreateNestedManyWithoutStreamInput
 }
 
 export type LiveStreamUncheckedCreateWithoutAuthorInput = {
@@ -659,6 +681,7 @@ export type LiveStreamUncheckedCreateWithoutAuthorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   chatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutStreamInput
+  feedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutStreamInput
 }
 
 export type LiveStreamCreateOrConnectWithoutAuthorInput = {
@@ -722,6 +745,7 @@ export type LiveStreamCreateWithoutChatMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   author: Prisma.UserCreateNestedOneWithoutLiveStreamsInput
+  feedback?: Prisma.LiveFeedbackCreateNestedManyWithoutStreamInput
 }
 
 export type LiveStreamUncheckedCreateWithoutChatMessagesInput = {
@@ -739,6 +763,7 @@ export type LiveStreamUncheckedCreateWithoutChatMessagesInput = {
   endedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  feedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutStreamInput
 }
 
 export type LiveStreamCreateOrConnectWithoutChatMessagesInput = {
@@ -772,6 +797,7 @@ export type LiveStreamUpdateWithoutChatMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.UserUpdateOneRequiredWithoutLiveStreamsNestedInput
+  feedback?: Prisma.LiveFeedbackUpdateManyWithoutStreamNestedInput
 }
 
 export type LiveStreamUncheckedUpdateWithoutChatMessagesInput = {
@@ -789,6 +815,95 @@ export type LiveStreamUncheckedUpdateWithoutChatMessagesInput = {
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  feedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutStreamNestedInput
+}
+
+export type LiveStreamCreateWithoutFeedbackInput = {
+  id?: string
+  title: string
+  description?: string | null
+  category?: string | null
+  status?: string
+  streamUrl?: string | null
+  thumbnailUrl?: string | null
+  viewerCount?: number
+  startedAt?: Date | string
+  scheduledAt?: Date | string | null
+  endedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  author: Prisma.UserCreateNestedOneWithoutLiveStreamsInput
+  chatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutStreamInput
+}
+
+export type LiveStreamUncheckedCreateWithoutFeedbackInput = {
+  id?: string
+  authorId: string
+  title: string
+  description?: string | null
+  category?: string | null
+  status?: string
+  streamUrl?: string | null
+  thumbnailUrl?: string | null
+  viewerCount?: number
+  startedAt?: Date | string
+  scheduledAt?: Date | string | null
+  endedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  chatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutStreamInput
+}
+
+export type LiveStreamCreateOrConnectWithoutFeedbackInput = {
+  where: Prisma.LiveStreamWhereUniqueInput
+  create: Prisma.XOR<Prisma.LiveStreamCreateWithoutFeedbackInput, Prisma.LiveStreamUncheckedCreateWithoutFeedbackInput>
+}
+
+export type LiveStreamUpsertWithoutFeedbackInput = {
+  update: Prisma.XOR<Prisma.LiveStreamUpdateWithoutFeedbackInput, Prisma.LiveStreamUncheckedUpdateWithoutFeedbackInput>
+  create: Prisma.XOR<Prisma.LiveStreamCreateWithoutFeedbackInput, Prisma.LiveStreamUncheckedCreateWithoutFeedbackInput>
+  where?: Prisma.LiveStreamWhereInput
+}
+
+export type LiveStreamUpdateToOneWithWhereWithoutFeedbackInput = {
+  where?: Prisma.LiveStreamWhereInput
+  data: Prisma.XOR<Prisma.LiveStreamUpdateWithoutFeedbackInput, Prisma.LiveStreamUncheckedUpdateWithoutFeedbackInput>
+}
+
+export type LiveStreamUpdateWithoutFeedbackInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  streamUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  viewerCount?: Prisma.IntFieldUpdateOperationsInput | number
+  startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  author?: Prisma.UserUpdateOneRequiredWithoutLiveStreamsNestedInput
+  chatMessages?: Prisma.LiveChatMessageUpdateManyWithoutStreamNestedInput
+}
+
+export type LiveStreamUncheckedUpdateWithoutFeedbackInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  streamUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  viewerCount?: Prisma.IntFieldUpdateOperationsInput | number
+  startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  scheduledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  chatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutStreamNestedInput
 }
 
 export type LiveStreamCreateManyAuthorInput = {
@@ -822,6 +937,7 @@ export type LiveStreamUpdateWithoutAuthorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   chatMessages?: Prisma.LiveChatMessageUpdateManyWithoutStreamNestedInput
+  feedback?: Prisma.LiveFeedbackUpdateManyWithoutStreamNestedInput
 }
 
 export type LiveStreamUncheckedUpdateWithoutAuthorInput = {
@@ -839,6 +955,7 @@ export type LiveStreamUncheckedUpdateWithoutAuthorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   chatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutStreamNestedInput
+  feedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutStreamNestedInput
 }
 
 export type LiveStreamUncheckedUpdateManyWithoutAuthorInput = {
@@ -864,10 +981,12 @@ export type LiveStreamUncheckedUpdateManyWithoutAuthorInput = {
 
 export type LiveStreamCountOutputType = {
   chatMessages: number
+  feedback: number
 }
 
 export type LiveStreamCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   chatMessages?: boolean | LiveStreamCountOutputTypeCountChatMessagesArgs
+  feedback?: boolean | LiveStreamCountOutputTypeCountFeedbackArgs
 }
 
 /**
@@ -885,6 +1004,13 @@ export type LiveStreamCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.E
  */
 export type LiveStreamCountOutputTypeCountChatMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.LiveChatMessageWhereInput
+}
+
+/**
+ * LiveStreamCountOutputType without action
+ */
+export type LiveStreamCountOutputTypeCountFeedbackArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LiveFeedbackWhereInput
 }
 
 
@@ -905,6 +1031,7 @@ export type LiveStreamSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   updatedAt?: boolean
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   chatMessages?: boolean | Prisma.LiveStream$chatMessagesArgs<ExtArgs>
+  feedback?: boolean | Prisma.LiveStream$feedbackArgs<ExtArgs>
   _count?: boolean | Prisma.LiveStreamCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["liveStream"]>
 
@@ -965,6 +1092,7 @@ export type LiveStreamOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type LiveStreamInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   chatMessages?: boolean | Prisma.LiveStream$chatMessagesArgs<ExtArgs>
+  feedback?: boolean | Prisma.LiveStream$feedbackArgs<ExtArgs>
   _count?: boolean | Prisma.LiveStreamCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type LiveStreamIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -979,6 +1107,7 @@ export type $LiveStreamPayload<ExtArgs extends runtime.Types.Extensions.Internal
   objects: {
     author: Prisma.$UserPayload<ExtArgs>
     chatMessages: Prisma.$LiveChatMessagePayload<ExtArgs>[]
+    feedback: Prisma.$LiveFeedbackPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1391,6 +1520,7 @@ export interface Prisma__LiveStreamClient<T, Null = never, ExtArgs extends runti
   readonly [Symbol.toStringTag]: "PrismaPromise"
   author<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   chatMessages<T extends Prisma.LiveStream$chatMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LiveStream$chatMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LiveChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  feedback<T extends Prisma.LiveStream$feedbackArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LiveStream$feedbackArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LiveFeedbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1856,6 +1986,30 @@ export type LiveStream$chatMessagesArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.LiveChatMessageScalarFieldEnum | Prisma.LiveChatMessageScalarFieldEnum[]
+}
+
+/**
+ * LiveStream.feedback
+ */
+export type LiveStream$feedbackArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LiveFeedback
+   */
+  select?: Prisma.LiveFeedbackSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LiveFeedback
+   */
+  omit?: Prisma.LiveFeedbackOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LiveFeedbackInclude<ExtArgs> | null
+  where?: Prisma.LiveFeedbackWhereInput
+  orderBy?: Prisma.LiveFeedbackOrderByWithRelationInput | Prisma.LiveFeedbackOrderByWithRelationInput[]
+  cursor?: Prisma.LiveFeedbackWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LiveFeedbackScalarFieldEnum | Prisma.LiveFeedbackScalarFieldEnum[]
 }
 
 /**

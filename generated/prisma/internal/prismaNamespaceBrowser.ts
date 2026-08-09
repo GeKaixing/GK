@@ -67,7 +67,8 @@ export const ModelName = {
   JobPosting: 'JobPosting',
   UserAction: 'UserAction',
   LiveStream: 'LiveStream',
-  LiveChatMessage: 'LiveChatMessage'
+  LiveChatMessage: 'LiveChatMessage',
+  LiveFeedback: 'LiveFeedback'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -319,6 +320,18 @@ export const LiveChatMessageScalarFieldEnum = {
 } as const
 
 export type LiveChatMessageScalarFieldEnum = (typeof LiveChatMessageScalarFieldEnum)[keyof typeof LiveChatMessageScalarFieldEnum]
+
+
+export const LiveFeedbackScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  streamId: 'streamId',
+  issueType: 'issueType',
+  message: 'message',
+  createdAt: 'createdAt'
+} as const
+
+export type LiveFeedbackScalarFieldEnum = (typeof LiveFeedbackScalarFieldEnum)[keyof typeof LiveFeedbackScalarFieldEnum]
 
 
 export const SortOrder = {

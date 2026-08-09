@@ -103,3 +103,8 @@ export type LiveStream = Prisma.LiveStreamModel
  * 
  */
 export type LiveChatMessage = Prisma.LiveChatMessageModel
+/**
+ * Model LiveFeedback
+ * 
+ */
+export type LiveFeedback = Prisma.LiveFeedbackModel
