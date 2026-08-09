@@ -22,11 +22,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // ✅ 用 id 做 upsert（最安全）
+    // ✅ 邮箱有唯一约束，按 email 关联档案：
+    // - 已存在（旧 auth id 残留）→ 把 id 同步为当前 auth id，避免"同一邮箱两账号"撞唯一约束
+    // - 不存在 → 创建新档案
     await prisma.user.upsert({
-      where: { id: data.user.id },
+      where: { email },
       update: {
-        // 如果未来想更新 name / avatar 可以写这里
+        id: data.user.id,
       },
       create: {
         id: data.user.id,
