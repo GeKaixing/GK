@@ -568,13 +568,13 @@
       "selectContact": "Select a contact to start chatting",
       "emptyTitle": "No chats yet",
       "emptySub": "Follow people you like and start a conversation",
-      "pickContact": "Pick a conversation above to start chatting",
+      "pickContact": "Select a conversation from the left to start chatting",
       "findChats": "Find people to chat with",
+      "newMessage": "New message",
+      "back": "Back",
       "dateToday": "Today",
       "dateYesterday": "Yesterday",
-      "send": "Send",
-      "scrollLeft": "Scroll left",
-      "scrollRight": "Scroll right"
+      "send": "Send"
     },
     "UserPageMeta": {
       "defaultDescription": "View this user's posts, replies and bookmarks.",

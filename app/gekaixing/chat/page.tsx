@@ -8,13 +8,12 @@ import { cn } from "@/lib/utils";
 import {
   Send,
   ChevronLeft,
-  ChevronRight,
   Loader2,
   MessageCircle,
+  SquarePen,
   Users,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
-import ArrowLeftBack from "@/components/gekaixing/ArrowLeftBack";
 import { useRouter, useSearchParams } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import { useLocale, useTranslations } from "next-intl";
@@ -26,6 +25,7 @@ interface Contact {
   unreadCount: number;
   participantId?: string;
   lastMessage?: string;
+  lastMessageAt?: string;
 }
 
 interface Message {
@@ -46,6 +46,7 @@ interface ConversationResponse {
   unreadCount: number;
   participantId?: string;
   lastMessage?: string;
+  lastMessageAt?: string;
 }
 
 interface RealtimeMessage {
@@ -125,7 +126,6 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const contactsScrollRef = useRef<HTMLDivElement>(null);
   const [supabase] = useState(() => createClient());
   const creatingConversationRef = useRef<Set<string>>(new Set());
 
@@ -200,6 +200,7 @@ export default function ChatPage() {
           unreadCount: conv.unreadCount,
           participantId: conv.participantId,
           lastMessage: conv.lastMessage,
+          lastMessageAt: conv.lastMessageAt,
         }));
 
         const uniqueContacts = formattedContacts.filter(
@@ -290,7 +291,12 @@ export default function ChatPage() {
           setContacts((prev) =>
             prev.map((c) =>
               c.id === newMessage.conversationId
-                ? { ...c, unreadCount: c.unreadCount + 1, lastMessage: newMessage.content }
+                ? {
+                    ...c,
+                    unreadCount: c.unreadCount + 1,
+                    lastMessage: newMessage.content,
+                    lastMessageAt: newMessage.createdAt,
+                  }
                 : c
             )
           );
@@ -343,7 +349,9 @@ export default function ChatPage() {
         setMessages((prev) => prev.map((m) => (m.id === tempId ? savedMessage : m)));
         setContacts((prev) =>
           prev.map((c) =>
-            c.id === selectedContactId ? { ...c, lastMessage: tempMessage.content } : c
+            c.id === selectedContactId
+              ? { ...c, lastMessage: tempMessage.content, lastMessageAt: new Date().toISOString() }
+              : c
           )
         );
 
@@ -374,17 +382,6 @@ export default function ChatPage() {
     }
   };
 
-  const scrollContacts = (direction: "left" | "right") => {
-    if (!contactsScrollRef.current) {
-      return;
-    }
-
-    contactsScrollRef.current.scrollBy({
-      left: direction === "left" ? -200 : 200,
-      behavior: "smooth",
-    });
-  };
-
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString(locale, {
@@ -412,14 +409,42 @@ export default function ChatPage() {
     }).format(date);
   };
 
+  const formatListTime = (timestamp?: string): string => {
+    if (!timestamp) {
+      return "";
+    }
+    const date = new Date(timestamp);
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const diffDays = Math.round((todayStart - startOfDayOf(date)) / DAY_MS);
+
+    if (diffDays <= 0) {
+      return date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+    }
+    if (diffDays === 1) {
+      return t("dateYesterday");
+    }
+    if (diffDays < 7) {
+      return new Intl.DateTimeFormat(locale === "zh-CN" ? "zh-CN" : locale, {
+        weekday: "short",
+      }).format(date);
+    }
+    return new Intl.DateTimeFormat(locale === "zh-CN" ? "zh-CN" : locale, {
+      month: "numeric",
+      day: "numeric",
+    }).format(date);
+  };
+
   const handleContactSelect = (contactId: string) => {
     setSelectedContactId(contactId);
+    // 清空旧会话消息，避免新会话加载期间闪现上一条会话的内容
+    setMessages([]);
     setContacts((prev) => prev.map((c) => (c.id === contactId ? { ...c, unreadCount: 0 } : c)));
   };
 
   if (isLoading) {
     return (
-      <div className="flex h-full min-h-[calc(100dvh-3.5rem)] flex-col items-center justify-center gap-3 bg-background">
+      <div className="flex h-[calc(100dvh-3.5rem)] flex-col items-center justify-center gap-3 bg-background sm:h-[100dvh]">
         <div className="flex size-11 animate-pulse items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-border/50">
           <MessageCircle className="size-5 text-primary" />
         </div>
@@ -434,107 +459,111 @@ export default function ChatPage() {
   const renderItems = buildRenderItems(messages);
 
   return (
-    <div className="flex min-h-[calc(100dvh-3.5rem)] flex-col bg-background">
-      <ArrowLeftBack name={t("title")} />
+    <div className="flex h-[calc(100dvh-3.5rem)] bg-background sm:h-[100dvh]">
+      {/* 桌面端：会话列表 */}
+      <aside className="hidden w-[240px] shrink-0 flex-col border-r border-border/60 sm:flex lg:w-[300px]">
+        <ListHeader
+          title={t("title")}
+          newLabel={t("newMessage")}
+          onNewMessage={() => router.push("/gekaixing/connect_people")}
+        />
+        <nav className="min-h-0 flex-1 overflow-y-auto">
+          {contacts.map((contact) => (
+            <ConversationRow
+              key={contact.id}
+              contact={contact}
+              active={contact.id === selectedContactId}
+              timeLabel={formatListTime(contact.lastMessageAt)}
+              onSelect={() => handleContactSelect(contact.id)}
+            />
+          ))}
+        </nav>
+      </aside>
 
-      {/* 联系人横条 */}
-      <div className="relative border-b border-border/60 bg-background/95 backdrop-blur">
-        <div className="flex items-center px-2 py-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
-            onClick={() => scrollContacts("left")}
-            aria-label={t("scrollLeft")}
-          >
-            <ChevronLeft className="size-4" />
-          </Button>
-
-          <div
-            ref={contactsScrollRef}
-            className="mx-2 flex-1 overflow-x-auto scrollbar-hide"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            <div className="flex gap-2 px-1">
-              {contacts.map((contact) => {
-                const active = selectedContactId === contact.id;
-                return (
-                  <button
-                    key={contact.id}
-                    onClick={() => handleContactSelect(contact.id)}
-                    className={cn(
-                      "group relative flex min-w-[68px] shrink-0 flex-col items-center gap-1.5 rounded-xl border px-2 py-2 transition-all duration-200",
-                      active
-                        ? "border-primary/30 bg-primary/10 shadow-sm"
-                        : "border-transparent hover:border-border hover:bg-muted/70"
-                    )}
-                  >
-                    <div className="relative">
-                      <Avatar
-                        className={cn(
-                          "size-11 ring-1 transition-all duration-200",
-                          active
-                            ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
-                            : "ring-border/50 group-hover:ring-border"
-                        )}
-                      >
-                        <AvatarImage src={contact.avatar || "/default-avatar.png"} alt={contact.name} />
-                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-sm font-medium text-primary">
-                          {contact.name.slice(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
-                      {contact.unreadCount > 0 && (
-                        <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-medium leading-none text-white shadow-sm">
-                          {contact.unreadCount > 99 ? "99+" : contact.unreadCount}
-                        </span>
-                      )}
-                    </div>
-                    <span
-                      className={cn(
-                        "max-w-[60px] truncate text-xs transition-colors",
-                        active
-                          ? "font-medium text-primary"
-                          : "text-muted-foreground group-hover:text-foreground"
-                      )}
-                    >
-                      {contact.name}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
-            onClick={() => scrollContacts("right")}
-            aria-label={t("scrollRight")}
-          >
-            <ChevronRight className="size-4" />
-          </Button>
+      {/* 主区域 */}
+      <section className="flex min-w-0 flex-1 flex-col">
+        {/* 手机端：会话列表（选中会话后隐藏） */}
+        <div
+          className={cn(
+            "flex min-h-0 flex-1 flex-col sm:hidden",
+            selectedContactId && "hidden"
+          )}
+        >
+          <ListHeader
+            title={t("title")}
+            newLabel={t("newMessage")}
+            onNewMessage={() => router.push("/gekaixing/connect_people")}
+          />
+          <nav className="min-h-0 flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+5.5rem)]">
+            {contacts.length === 0 ? (
+              <div className="flex min-h-full items-center justify-center">
+                <ChatEmptyState
+                  hasContacts={false}
+                  title={t("emptyTitle")}
+                  sub={t("emptySub")}
+                  buttonLabel={t("findChats")}
+                  onFindChats={() => router.push("/gekaixing/connect_people")}
+                />
+              </div>
+            ) : (
+              contacts.map((contact) => (
+                <ConversationRow
+                  key={contact.id}
+                  contact={contact}
+                  active={contact.id === selectedContactId}
+                  timeLabel={formatListTime(contact.lastMessageAt)}
+                  onSelect={() => handleContactSelect(contact.id)}
+                />
+              ))
+            )}
+          </nav>
         </div>
-      </div>
 
-      <div className="flex min-h-0 flex-1 flex-col">
-        {selectedContact ? (
-          <>
-            {/* 会话头部 */}
-            <div className="flex h-14 shrink-0 items-center gap-3 border-b border-border/60 bg-background/95 px-4 backdrop-blur">
-              <Avatar className="size-9 ring-1 ring-border/40">
-                <AvatarImage src={selectedContact.avatar || "/default-avatar.png"} alt={selectedContact.name} />
+        {/* 桌面端：未选会话时的空状态 */}
+        {!selectedContact && (
+          <div className="hidden flex-1 items-center justify-center sm:flex">
+            <ChatEmptyState
+              hasContacts={contacts.length > 0}
+              title={contacts.length === 0 ? t("emptyTitle") : t("pickContact")}
+              sub={t("emptySub")}
+              buttonLabel={contacts.length === 0 ? t("findChats") : undefined}
+              onFindChats={
+                contacts.length === 0 ? () => router.push("/gekaixing/connect_people") : undefined
+              }
+            />
+          </div>
+        )}
+
+        {/* 会话线程 */}
+        {selectedContact && (
+          <div className="flex min-h-0 flex-1 flex-col">
+            <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border/60 bg-background/95 px-3 backdrop-blur sm:px-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-9 shrink-0 rounded-full text-muted-foreground sm:hidden"
+                onClick={() => setSelectedContactId("")}
+                aria-label={t("back")}
+              >
+                <ChevronLeft className="size-5" />
+              </Button>
+              <Avatar className="size-9 shrink-0 ring-1 ring-border/40">
+                <AvatarImage
+                  src={selectedContact.avatar || "/default-avatar.png"}
+                  alt={selectedContact.name}
+                />
                 <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-sm font-medium text-primary">
                   {selectedContact.name.slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <h2 className="truncate text-sm font-semibold tracking-tight">{selectedContact.name}</h2>
+                <h2 className="truncate text-[15px] font-semibold tracking-tight">
+                  {selectedContact.name}
+                </h2>
               </div>
-            </div>
+            </header>
 
-            {/* 消息区 */}
-            <div className="flex-1 space-y-1 overflow-y-auto bg-[linear-gradient(180deg,hsl(var(--background))_0%,hsl(var(--muted)/0.3)_100%)] px-4 py-4 pb-36 sm:pb-4">
+            <div className="flex-1 space-y-1 overflow-y-auto bg-[linear-gradient(180deg,hsl(var(--background))_0%,hsl(var(--muted)/0.3)_100%)] px-4 py-4">
               {messages.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <ChatEmptyState
@@ -568,8 +597,8 @@ export default function ChatPage() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* 输入区 */}
-            <div className="fixed bottom-[57px] left-0 right-0 z-30 shrink-0 border-t border-border/60 bg-background/95 p-3 backdrop-blur sm:static sm:z-auto sm:border-t-0 sm:bg-background sm:p-3">
+            {/* 输入区：手机端悬浮在底部导航上方，桌面端自然排布 */}
+            <div className="shrink-0 px-4 pb-[calc(env(safe-area-inset-bottom)+3.5rem)] pt-2 sm:pb-4 sm:pt-3">
               <div className="flex items-center gap-1.5 rounded-full border border-border bg-muted/30 p-1.5 transition-all duration-200 focus-within:border-primary/40 focus-within:bg-background focus-within:ring-2 focus-within:ring-primary/15">
                 <Input
                   placeholder={t("sendTo", { name: selectedContact.name })}
@@ -589,18 +618,104 @@ export default function ChatPage() {
                 </Button>
               </div>
             </div>
-          </>
-        ) : (
-          <ChatEmptyState
-            hasContacts={contacts.length > 0}
-            title={contacts.length === 0 ? t("emptyTitle") : t("selectContact")}
-            sub={contacts.length === 0 ? t("emptySub") : t("pickContact")}
-            buttonLabel={t("findChats")}
-            onFindChats={() => router.push("/gekaixing/connect_people")}
-          />
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+/** 会话列表头部：标题 + 发起新会话按钮 */
+function ListHeader({
+  title,
+  newLabel,
+  onNewMessage,
+}: {
+  title: string;
+  newLabel: string;
+  onNewMessage: () => void;
+}) {
+  return (
+    <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/60 px-4">
+      <h1 className="text-xl font-bold tracking-tight">{title}</h1>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="rounded-full text-primary hover:bg-primary/10"
+        onClick={onNewMessage}
+        aria-label={newLabel}
+      >
+        <SquarePen className="size-5" />
+      </Button>
+    </div>
+  );
+}
+
+/** X 风格的会话列表行：头像 + 名字 + 时间 + 消息预览 + 未读 */
+function ConversationRow({
+  contact,
+  active,
+  timeLabel,
+  onSelect,
+}: {
+  contact: Contact;
+  active: boolean;
+  timeLabel: string;
+  onSelect: () => void;
+}) {
+  const unread = contact.unreadCount > 0;
+
+  return (
+    <button
+      onClick={onSelect}
+      className={cn(
+        "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors",
+        active ? "bg-muted/80" : "hover:bg-muted/50"
+      )}
+    >
+      <div className="relative shrink-0">
+        <Avatar className="size-12 ring-1 ring-border/50">
+          <AvatarImage src={contact.avatar || "/default-avatar.png"} alt={contact.name} />
+          <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-base font-medium text-primary">
+            {contact.name.slice(0, 2)}
+          </AvatarFallback>
+        </Avatar>
+        {unread && (
+          <span className="absolute -right-0.5 -top-0.5 size-3.5 rounded-full bg-primary ring-2 ring-background" />
         )}
       </div>
-    </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline justify-between gap-2">
+          <span
+            className={cn(
+              "truncate text-[15px] leading-5",
+              unread ? "font-bold text-foreground" : "font-semibold text-foreground/90"
+            )}
+          >
+            {contact.name}
+          </span>
+          {timeLabel && (
+            <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{timeLabel}</span>
+          )}
+        </div>
+        <div className="mt-0.5 flex items-center justify-between gap-2">
+          <span
+            className={cn(
+              "truncate text-sm leading-5",
+              unread ? "font-medium text-foreground" : "text-muted-foreground"
+            )}
+          >
+            {contact.lastMessage || ""}
+          </span>
+          {unread && (
+            <span className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-semibold leading-none text-primary-foreground">
+              {contact.unreadCount > 99 ? "99+" : contact.unreadCount}
+            </span>
+          )}
+        </div>
+      </div>
+    </button>
   );
 }
 
@@ -633,7 +748,11 @@ function MessageGroup({
     <div className={cn("flex items-end gap-2", isMe && "flex-row-reverse")}>
       <Avatar className="mb-0.5 size-7 shrink-0 ring-1 ring-border/40">
         <AvatarImage
-          src={isMe ? myAvatarUrl || "/default-avatar.png" : messages[0].senderAvatar || contactAvatar || "/default-avatar.png"}
+          src={
+            isMe
+              ? myAvatarUrl || "/default-avatar.png"
+              : messages[0].senderAvatar || contactAvatar || "/default-avatar.png"
+          }
           alt={isMe ? myLabel : firstSenderName}
         />
         <AvatarFallback
@@ -694,7 +813,7 @@ function ChatEmptyState({
   onFindChats?: () => void;
 }) {
   return (
-    <div className="flex h-full min-h-[50vh] flex-col items-center justify-center gap-5 px-6 text-center">
+    <div className="flex flex-col items-center justify-center gap-5 px-6 py-10 text-center">
       <div className="relative">
         <div className="flex size-20 items-center justify-center rounded-[1.75rem] bg-gradient-to-br from-primary/15 via-primary/5 to-transparent shadow-inner ring-1 ring-border/50">
           <MessageCircle className="size-9 text-primary/80" />
@@ -719,4 +838,9 @@ function ChatEmptyState({
       ) : null}
     </div>
   );
+}
+
+/** 取某日 0 点的时间戳（用于会话列表的相对日期计算） */
+function startOfDayOf(date: Date): number {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 }

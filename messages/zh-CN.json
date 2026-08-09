@@ -568,13 +568,13 @@
       "selectContact": "选择一个联系人开始聊天",
       "emptyTitle": "暂无聊天",
       "emptySub": "关注感兴趣的人，然后来聊两句吧",
-      "pickContact": "从上方选择一个会话开始聊天",
+      "pickContact": "从左侧选择一个会话开始聊天",
       "findChats": "去找人聊天",
+      "newMessage": "新私信",
+      "back": "返回",
       "dateToday": "今天",
       "dateYesterday": "昨天",
-      "send": "发送",
-      "scrollLeft": "向左滚动",
-      "scrollRight": "向右滚动"
+      "send": "发送"
     },
     "UserPageMeta": {
       "defaultDescription": "查看该用户的帖子、回复与收藏内容。",
