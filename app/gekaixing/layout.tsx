@@ -7,6 +7,7 @@ import { withTimeoutOrNull } from "@/lib/with-timeout";
 import { createClient } from "@/utils/supabase/server";
 import { Prisma } from "@/generated/prisma/client";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import type { ReactElement, ReactNode } from "react";
 import "highlight.js/styles/github-dark.css";
@@ -54,6 +55,12 @@ export default async function RootLayout({
     userId = user?.id ?? null;
   } catch {
     userId = null;
+  }
+
+  // Cloudflare 构建不包含 proxy（Node 中间件不被 OpenNext 支持），
+  // 此处在布局层承担未登录重定向，保证两平台行为一致。
+  if (!userId) {
+    redirect("/account");
   }
 
   let userInfo: userResult | null = null;
@@ -119,11 +126,11 @@ export default async function RootLayout({
         }}
       />
       <div className="flex justify-center w-full mx-auto min-h-screen">
-        <header className="hidden sm:flex w-[88px] lg:w-[275px] shrink-0 sticky top-0 h-screen transition-all duration-200">
+        <header className="hidden sm:flex w-[88px] xl:w-[275px] shrink-0 sticky top-0 h-screen transition-all duration-200">
           <Sidebar user={userInfo} mentionCount={mentionCount} />
         </header>
-        <main className="flex-1 w-full max-w-[600px] border-x border-border sm:border-x">{children}</main>
-        <footer className="hidden xl:flex w-[350px] shrink-0 pl-8 py-4 sticky top-0 h-screen overflow-y-auto">
+        <main className="flex-1 w-full max-w-[600px] border-x border-border">{children}</main>
+        <footer className="hidden lg:flex w-[290px] xl:w-[350px] shrink-0 pl-4 py-4 sticky top-0 h-screen overflow-y-auto">
           <Footer />
         </footer>
       </div>
