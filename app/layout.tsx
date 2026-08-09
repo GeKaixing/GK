@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server'; 
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import AuthCodeHandler from "@/components/gekaixing/AuthCodeHandler";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default async function RootLayout({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             {children}
+            <AuthCodeHandler />
             <Analytics></Analytics>
             <Toaster position="top-center" richColors />
           </ThemeProvider>
