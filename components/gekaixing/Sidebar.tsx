@@ -40,7 +40,7 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
       { href: "/gekaixing/connect_people", icon: Users, label: t("connect"), active: isActivePath("/gekaixing/connect_people") },
       { href: "/gekaixing/explore", icon: Search, label: t("explore"), active: isActivePath("/gekaixing/explore") },
       { href: "/gekaixing/gkx", icon: Sparkles, label: "GKX", active: isActivePath("/gekaixing/gkx") },
-      { href: "/gekaixing/premium", icon: ShieldCheck, label: t("premium"), active: isActivePath("/gekaixing/premium") },
+      { href: "/premium", icon: ShieldCheck, label: t("premium"), active: isActivePath("/premium") },
     ]
 
     useEffect(() => {
@@ -93,21 +93,39 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
                         <DropdownMenu open={isMoreOpen} onOpenChange={setIsMoreOpen}>
                             <DropdownMenuTrigger asChild>
                                 <button className={`flex items-center justify-center xl:justify-start gap-0 xl:gap-3 text-xl rounded-full p-3 w-full cursor-pointer transition-colors hover:bg-muted/70 ${moreActive ? "font-bold" : "font-normal"}`}>
-                                    <CircleEllipsis className="w-7 h-7" fill={moreActive ? "currentColor" : "none"} />
+                                    {moreActive ? (
+                                        <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <circle cx="17" cy="12" r="1.5" fill="var(--color-background)" />
+                                            <circle cx="12" cy="12" r="1.5" fill="var(--color-background)" />
+                                            <circle cx="7" cy="12" r="1.5" fill="var(--color-background)" />
+                                        </svg>
+                                    ) : (
+                                        <CircleEllipsis className="w-7 h-7" />
+                                    )}
                                     <span className="hidden xl:inline">{t("more")}</span>
                                 </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent side="right" align="start" className="w-48">
-                                <DropdownMenuItem onSelect={handleMoreMenuSelect("/gekaixing/likes")} className="flex items-center gap-2 cursor-pointer">
-                                    <Heart className="w-4 h-4" />
+                            <DropdownMenuContent side="right" align="start" className="w-60 rounded-xl border-border/70 p-1.5 shadow-xl">
+                                <DropdownMenuItem
+                                    onSelect={handleMoreMenuSelect("/gekaixing/likes")}
+                                    className={`flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] ${isActivePath("/gekaixing/likes") ? "font-bold" : "font-normal"}`}
+                                >
+                                    <Heart className="h-5 w-5" fill={isActivePath("/gekaixing/likes") ? "currentColor" : "none"} />
                                     <span>{t("likes")}</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onSelect={handleMoreMenuSelect("/gekaixing/bookmarks")} className="flex items-center gap-2 cursor-pointer">
-                                    <Bookmark className="w-4 h-4" />
+                                <DropdownMenuItem
+                                    onSelect={handleMoreMenuSelect("/gekaixing/bookmarks")}
+                                    className={`flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] ${isActivePath("/gekaixing/bookmarks") ? "font-bold" : "font-normal"}`}
+                                >
+                                    <Bookmark className="h-5 w-5" fill={isActivePath("/gekaixing/bookmarks") ? "currentColor" : "none"} />
                                     <span>{t("bookmarks")}</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onSelect={handleMoreMenuSelect("/gekaixing/notifications")} className="flex items-center gap-2 cursor-pointer">
-                                    <Bell className="w-4 h-4" />
+                                <DropdownMenuItem
+                                    onSelect={handleMoreMenuSelect("/gekaixing/notifications")}
+                                    className={`flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] ${isActivePath("/gekaixing/notifications") ? "font-bold" : "font-normal"}`}
+                                >
+                                    <Bell className="h-5 w-5" fill={isActivePath("/gekaixing/notifications") ? "currentColor" : "none"} />
                                     <span>{t("notifications")}</span>
                                     {displayMentionCount > 0 ? (
                                         <span className="ml-auto min-w-5 rounded-full bg-primary px-1.5 py-0.5 text-center text-xs font-semibold text-primary-foreground">
@@ -115,8 +133,11 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
                                         </span>
                                     ) : null}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onSelect={handleMoreMenuSelect("/gekaixing/jobs")} className="flex items-center gap-2 cursor-pointer">
-                                    <BriefcaseBusiness className="w-4 h-4" />
+                                <DropdownMenuItem
+                                    onSelect={handleMoreMenuSelect("/gekaixing/jobs")}
+                                    className={`flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] ${isActivePath("/gekaixing/jobs") ? "font-bold" : "font-normal"}`}
+                                >
+                                    <BriefcaseBusiness className="h-5 w-5" fill={isActivePath("/gekaixing/jobs") ? "currentColor" : "none"} />
                                     <span>{t("jobs")}</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -130,7 +151,14 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
                                 aria-current={settingsActive ? "page" : undefined}
                                 className={`flex items-center justify-center xl:justify-start gap-0 xl:gap-3 text-xl rounded-full p-3 w-full transition-colors hover:bg-muted/70 ${settingsActive ? "font-bold" : "font-normal"}`}
                             >
-                                <Settings className="w-7 h-7" fill={settingsActive ? "currentColor" : "none"} />
+                                {settingsActive ? (
+                                    <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor" aria-hidden="true">
+                                        <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+                                        <circle cx="12" cy="12" r="3" fill="var(--color-background)" />
+                                    </svg>
+                                ) : (
+                                    <Settings className="w-7 h-7" />
+                                )}
                                 <span className="hidden xl:inline">{t("settings")}</span>
                             </Link>
                         </li>
