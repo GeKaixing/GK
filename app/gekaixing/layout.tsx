@@ -130,13 +130,12 @@ export default async function RootLayout({
         </RightRail>
       </div>
       <MobileFooter
-        id={userId ?? undefined}
         labels={{
           home: mobileT("home"),
           search: mobileT("search"),
           notifications: mobileT("notifications"),
           chat: mobileT("chat"),
-          mine: mobileT("mine"),
+          gkx: mobileT("gkx"),
         }}
       />
     </div>

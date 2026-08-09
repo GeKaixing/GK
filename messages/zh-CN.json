@@ -115,7 +115,8 @@
       "publish": "发布",
       "login": "登录",
       "notifications": "通知",
-      "chat": "聊天"
+      "chat": "聊天",
+      "gkx": "GKX"
     },
     "Gkx": {
       "newChat": "新对话",

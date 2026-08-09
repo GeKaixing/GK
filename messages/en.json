@@ -115,7 +115,8 @@
       "publish": "Post",
       "login": "Login",
       "notifications": "Notifications",
-      "chat": "Chat"
+      "chat": "Chat",
+      "gkx": "GKX"
     },
     "Gkx": {
       "newChat": "New Chat",
