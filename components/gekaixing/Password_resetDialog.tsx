@@ -74,19 +74,25 @@ export default function Password_resetDialog() {
                     <DialogTitle>{t('title')}</DialogTitle>
                     <DialogDescription>{t('description')}</DialogDescription>
                 </DialogHeader>
-                <div className='mx-auto flex w-full max-w-sm flex-col items-stretch gap-4'>
-                    <Input type='email' placeholder={t('emailPlaceholder')} value={email} onChange={(e) => { setEmail(e.target.value) }} ></Input>
+                <form
+                    className='mx-auto flex w-full max-w-sm flex-col items-stretch gap-4'
+                    onSubmit={(e) => {
+                        e.preventDefault()
+                        void password_reset()
+                    }}
+                >
+                    <Input type='email' placeholder={t('emailPlaceholder')} value={email} onChange={(e) => { setEmail(e.target.value) }} required ></Input>
                     <Button
+                        type='submit'
                         className='w-full'
-                        onClick={password_reset}
                     >{t('sendCode')}</Button>
                     {errorMsg && (
                         <p className="text-center text-sm text-red-500" role="alert">
                             {errorMsg}
                         </p>
                     )}
-                    <EnterMsmAlertDialog open={openAlertDialog} setOpen={setOpenAlertDialog} t={t} />
-                </div>
+                </form>
+                <EnterMsmAlertDialog open={openAlertDialog} setOpen={setOpenAlertDialog} t={t} />
             </DialogContent>
         </Dialog>
     )

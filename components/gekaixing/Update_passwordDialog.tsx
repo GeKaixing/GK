@@ -61,7 +61,13 @@ export default function Update_passwordDialog() {
                     <DialogTitle>{t('title')}</DialogTitle>
                     <DialogDescription>{t('description')}</DialogDescription>
                 </DialogHeader>
-                <div className='mx-auto flex w-full max-w-sm flex-col items-stretch gap-4'>
+                <form
+                    className='mx-auto flex w-full max-w-sm flex-col items-stretch gap-4'
+                    onSubmit={(e) => {
+                        e.preventDefault()
+                        void update_password()
+                    }}
+                >
                     <div className="relative">
                         <Input
                             type={showPassword ? 'text' : 'password'}
@@ -79,15 +85,13 @@ export default function Update_passwordDialog() {
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                     </div>
-                    <Button className='w-full'
-                        onClick={ update_password}
-                    >{t('confirm')}</Button>
+                    <Button type='submit' className='w-full'>{t('confirm')}</Button>
                     {errorMsg && (
                         <p className="text-center text-sm text-red-500" role="alert">
                             {errorMsg}
                         </p>
                     )}
-                </div>
+                </form>
             </DialogContent>
         </Dialog>
     )
