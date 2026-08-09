@@ -7,6 +7,7 @@ interface NewsItem {
   summary: string;
   source_name: string;
   url: string;
+  image_url: string;
 }
 
 interface FeedSource {
@@ -20,6 +21,7 @@ export const CATEGORY_FEEDS: Record<NewsCategory, FeedSource[]> = {
     { name: "NPR", url: "https://feeds.npr.org/1001/rss.xml" },
     { name: "CBS News", url: "https://www.cbsnews.com/latest/rss/main" },
     { name: "WSJ", url: "https://feeds.a.dj.com/rss/RSSWorldNews.xml" },
+    { name: "Fox News", url: "https://moxie.foxnews.com/google-publisher/world.xml" },
   ],
   tech: [
     { name: "TechCrunch", url: "https://techcrunch.com/feed/" },
@@ -102,6 +104,53 @@ export function parseRssPubDate(block: string): number {
   return Number.isNaN(time) ? 0 : time;
 }
 
+/** Collect the `attr` values of every `<tag ...>` (self-closing or not) in a block. */
+function collectAttr(block: string, tag: string, attr: string, requireContains: string): string[] {
+  const escaped = tag.replace(":", "\\:");
+  const re = new RegExp(`<${escaped}\\b[^>]*?>`, "gi");
+  const out: string[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(block)) !== null) {
+    const tagText = match[0];
+    if (requireContains && !tagText.includes(requireContains)) {
+      continue;
+    }
+    const attrMatch = tagText.match(new RegExp(`${attr}\\s*=\\s*"([^"]+)"`, "i"));
+    if (attrMatch) {
+      out.push(attrMatch[1]);
+    }
+  }
+  return out;
+}
+
+/**
+ * Extract the first usable image URL for an item, or "" when the feed
+ * publishes none. Priority: media:thumbnail, image media:content,
+ * image enclosure, then an <img> embedded in the description.
+ */
+export function extractImageUrl(block: string): string {
+  const candidates = [
+    ...collectAttr(block, "media:thumbnail", "url", ""),
+    // Some feeds tag media:content with medium="image", others with type="image/*".
+    ...collectAttr(block, "media:content", "url", 'medium="image"'),
+    ...collectAttr(block, "media:content", "url", 'type="image'),
+    ...collectAttr(block, "enclosure", "url", 'type="image'),
+  ];
+
+  const imgMatch = block.match(/<img[^>]+src="([^"]+)"/i);
+  if (imgMatch) {
+    candidates.push(imgMatch[1]);
+  }
+
+  for (const candidate of candidates) {
+    const url = candidate.replace(/&amp;/g, "&");
+    if (isValidUrl(url)) {
+      return url;
+    }
+  }
+  return "";
+}
+
 /** Parse one `<item>` block. Returns null when the title or link is unusable. */
 export function parseRssItem(block: string, sourceName: string): ParsedItem | null {
   const title = stripHtml(extractTag(block, "title"));
@@ -118,6 +167,7 @@ export function parseRssItem(block: string, sourceName: string): ParsedItem | nu
     summary: description.slice(0, 300),
     source_name: sourceName,
     url,
+    image_url: extractImageUrl(block),
     pubDate: parseRssPubDate(block),
   };
 }
@@ -165,24 +215,36 @@ export async function GET(request: Request): Promise<Response> {
   const category = parseCategory(requestUrl.searchParams.get("category"));
 
   const sources = CATEGORY_FEEDS[category];
-  const results = await Promise.all(sources.map((source) => fetchFeed(source)));
+  const feeds = await Promise.all(sources.map((source) => fetchFeed(source)));
 
-  // Deduplicate by normalized URL, then newest-first, capped at MAX_ITEMS.
+  // Round-robin across sources so no single feed can crowd out the list
+  // (each feed keeps its own newest-first order). Capped at MAX_ITEMS.
   const seen = new Set<string>();
-  const items = results
-    .flat()
-    .filter((item) => {
-      const key = item.url.replace(/\/+$/, "").toLowerCase();
-      if (seen.has(key)) {
-        return false;
+  const selected: ParsedItem[] = [];
+  const cursor = feeds.map(() => 0);
+  let progressed = true;
+  while (selected.length < MAX_ITEMS && progressed) {
+    progressed = false;
+    for (let s = 0; s < feeds.length; s++) {
+      const items = feeds[s];
+      while (cursor[s] < items.length) {
+        const item = items[cursor[s]++];
+        const key = item.url.replace(/\/+$/, "").toLowerCase();
+        if (seen.has(key)) {
+          continue;
+        }
+        seen.add(key);
+        selected.push(item);
+        progressed = true;
+        break;
       }
-      seen.add(key);
-      return true;
-    })
-    .sort((a, b) => b.pubDate - a.pubDate)
-    .slice(0, MAX_ITEMS);
+      if (selected.length >= MAX_ITEMS) {
+        break;
+      }
+    }
+  }
 
-  const data: NewsItem[] = items.map(({ pubDate: _pubDate, ...rest }) => rest);
+  const data: NewsItem[] = selected.map(({ pubDate: _pubDate, ...rest }) => rest);
 
   return NextResponse.json({ success: true, category, data });
 }

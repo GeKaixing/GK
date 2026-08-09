@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   CATEGORY_FEEDS,
   GET,
+  extractImageUrl,
   extractTag,
   getRssItems,
   parseRssItem,
@@ -64,6 +65,44 @@ describe("parseRssPubDate", () => {
   });
 });
 
+describe("extractImageUrl", () => {
+  it("prefers media:thumbnail", () => {
+    const block =
+      '<item><media:thumbnail url="https://cdn.example/thumb.jpg" width="800"/><enclosure url="https://cdn.example/encl.jpg" type="image/jpeg"/></item>';
+    expect(extractImageUrl(block)).toBe("https://cdn.example/thumb.jpg");
+  });
+
+  it("falls back to an image medium:content", () => {
+    const block =
+      '<item><media:content url="https://cdn.example/hero.jpg" medium="image"><media:title>Pic</media:title></media:content></item>';
+    expect(extractImageUrl(block)).toBe("https://cdn.example/hero.jpg");
+  });
+
+  it("accepts media:content tagged with type=\"image instead of medium", () => {
+    const block =
+      '<item><media:content url="https://cdn.example/fox.jpg?ve=1&amp;tl=1" type="image/jpeg" expression="full"/></item>';
+    expect(extractImageUrl(block)).toBe("https://cdn.example/fox.jpg?ve=1&tl=1");
+  });
+
+  it("falls back to an image enclosure", () => {
+    const block = '<item><enclosure url="https://cdn.example/shot.jpg" type="image/jpg"/></item>';
+    expect(extractImageUrl(block)).toBe("https://cdn.example/shot.jpg");
+  });
+
+  it("falls back to an embedded <img>", () => {
+    const block = '<item><content:encoded><![CDATA[<p><img src="https://cdn.example/inline.png"/></p>]]></content:encoded></item>';
+    expect(extractImageUrl(block)).toBe("https://cdn.example/inline.png");
+  });
+
+  it("ignores non-image media:content/enclosure and returns empty when nothing usable", () => {
+    const block =
+      '<item><media:content/>' +
+      '<enclosure url="https://cdn.example/video.mp4" type="video/mp4"/>' +
+      '<media:content url="https://cdn.example/audio.mp3" type="audio/mpeg"/></item>';
+    expect(extractImageUrl(block)).toBe("");
+  });
+});
+
 describe("parseRssItem", () => {
   const block = [
     "<item>",
@@ -80,8 +119,17 @@ describe("parseRssItem", () => {
       summary: "It will be visible in parts of the U.S.",
       source_name: "NPR",
       url: "https://www.npr.org/2026/08/08/solar-eclipse",
+      image_url: "",
       pubDate: Date.parse("Sat, 08 Aug 2026 20:56:21 -0400"),
     });
+  });
+
+  it("carries the extracted image_url through", () => {
+    const withImage = block.replace(
+      "</description>",
+      "</description><media:thumbnail url=\"https://cdn.example/thumb.jpg\"/>"
+    );
+    expect(parseRssItem(withImage, "NPR")?.image_url).toBe("https://cdn.example/thumb.jpg");
   });
 
   it("returns null for an unusable link", () => {
@@ -110,7 +158,7 @@ describe("GET /api/news/hot-us", () => {
     vi.unstubAllGlobals();
   });
 
-  it("returns deduped, newest-first, capped items in the expected shape", async () => {
+  it("round-robins across sources, dedupes URLs, and returns capped items in the expected shape", async () => {
     const responses = new Map<string, Response>([
       [
         CATEGORY_FEEDS.us[0].url,
@@ -130,6 +178,7 @@ describe("GET /api/news/hot-us", () => {
         CATEGORY_FEEDS.us[2].url,
         new Response(feedXml("Newest", "https://feed.example/c", "Tue, 04 Aug 2026 10:00:00 GMT")),
       ],
+      // us[3] (Fox) is not stubbed → returns 404 → contributes nothing.
     ]);
 
     vi.stubGlobal(
@@ -156,15 +205,12 @@ describe("GET /api/news/hot-us", () => {
     expect(response.status).toBe(200);
     expect(payload.success).toBe(true);
     expect(payload.category).toBe("us");
-    expect(payload.data).toEqual([
-      expect.objectContaining({ title: "Newest" }),
-      expect.objectContaining({ title: "Duplicate" }),
-      expect.objectContaining({ title: "Old" }),
-    ]);
+    // Round-robin: one item per source per pass, in source order.
+    expect(payload.data.map((item) => item.title)).toEqual(["Old", "Duplicate", "Newest"]);
     expect(payload.data.map((item) => item.url)).toEqual([
-      "https://feed.example/c",
-      "https://feed.example/b",
       "https://feed.example/a",
+      "https://feed.example/b/",
+      "https://feed.example/c",
     ]);
     expect(payload.data[0]).not.toHaveProperty("pubDate");
   });

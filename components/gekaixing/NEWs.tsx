@@ -10,6 +10,7 @@ interface NewsItem {
   title: string;
   summary?: string;
   author?: string;
+  image_url?: string;
 }
 
 interface NewsResponse {
@@ -91,14 +92,25 @@ export default function NEWs({ url }: { url: string }) {
           key={`${item.url}-${index}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex min-h-24 flex-col justify-start rounded-2xl border border-transparent p-3 transition-colors hover:border-border hover:bg-muted/60"
+          className="flex min-h-24 items-start justify-start gap-3 rounded-2xl border border-transparent p-3 transition-colors hover:border-border hover:bg-muted/60"
         >
-          <div className="mb-1 flex items-center justify-between gap-2">
-            <span className="line-clamp-1 text-sm font-semibold text-foreground sm:text-base">{item.source_name}</span>
-            <span className="shrink-0 text-xs text-muted-foreground">#{index + 1}</span>
+          <div className="min-w-0 flex-1">
+            <div className="mb-1 flex items-center justify-between gap-2">
+              <span className="line-clamp-1 text-sm font-semibold text-foreground sm:text-base">{item.source_name}</span>
+              <span className="shrink-0 text-xs text-muted-foreground">#{index + 1}</span>
+            </div>
+            <span className="line-clamp-2 text-sm text-foreground sm:text-base">{item.title}</span>
+            <span className="mt-1 line-clamp-2 text-xs text-muted-foreground sm:text-sm">{item.summary ?? item.author ?? ""}</span>
           </div>
-          <span className="line-clamp-2 text-sm text-foreground sm:text-base">{item.title}</span>
-          <span className="mt-1 line-clamp-2 text-xs text-muted-foreground sm:text-sm">{item.summary ?? item.author ?? ""}</span>
+          {item.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={item.image_url}
+              alt=""
+              loading="lazy"
+              className="h-16 w-16 shrink-0 rounded-xl object-cover sm:h-20 sm:w-20"
+            />
+          ) : null}
         </Link>
       ))}
     </div>

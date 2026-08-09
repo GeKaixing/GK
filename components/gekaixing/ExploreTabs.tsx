@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ChartNoAxesColumn } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,9 +28,15 @@ export async function ToutiaoHotGTE() {
 export default
 function ExploreTabs() {
   const t = useTranslations("ImitationX.Explore");
+  const locale = useLocale();
+  const isChinese = locale === "zh-CN";
   const [data, setData] = useState<ToutiaoHotItem[]>([]);
 
   useEffect(() => {
+    // 头条热榜仅对中文环境有意义；其他语言用 RSS 新闻（见下方 TabsContent）。
+    if (!isChinese) {
+      return;
+    }
     async function fetchf(): Promise<void> {
       try {
         const result = await ToutiaoHotGTE();
@@ -44,7 +50,7 @@ function ExploreTabs() {
       }
     }
     void fetchf();
-  }, []);
+  }, [isChinese]);
 
   return (
     <Tabs defaultValue="ToutiaoHot" className="mt-2 w-full">
@@ -66,7 +72,8 @@ function ExploreTabs() {
         </TabsTrigger>
       </TabsList>
       <TabsContent value="ToutiaoHot" className="mt-3">
-        {data.length !== 0 &&
+        {isChinese ? (
+          data.length !== 0 &&
           data.map((item, idx) => (
             <Link
               href={item.url}
@@ -80,7 +87,10 @@ function ExploreTabs() {
                 <ChartNoAxesColumn className="h-4 w-4" /> <span>{item.hot_value}</span>
               </div>
             </Link>
-          ))}
+          ))
+        ) : (
+          <NEWs url="/api/news/hot-us?category=us" />
+        )}
       </TabsContent>
       <TabsContent value="us">
         <NEWs url="/api/news/hot-us?category=us" />
