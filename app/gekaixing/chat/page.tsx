@@ -12,6 +12,8 @@ import {
   MessageCircle,
   SquarePen,
   Users,
+  Search,
+  X,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -131,6 +133,12 @@ export default function ChatPage() {
   const creatingConversationRef = useRef<Set<string>>(new Set());
 
   const selectedContact = contacts.find((c) => c.id === selectedContactId);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const trimmedQuery = searchQuery.trim().toLowerCase();
+  const filteredContacts = trimmedQuery
+    ? contacts.filter((c) => c.name.toLowerCase().includes(trimmedQuery))
+    : contacts;
 
   const myAvatarUrl =
     currentUser?.user_metadata?.user_avatar ||
@@ -468,16 +476,29 @@ export default function ChatPage() {
           newLabel={t("newMessage")}
           onNewMessage={() => router.push("/gekaixing/connect_people")}
         />
+        {contacts.length > 0 && (
+          <ConversationSearch
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder={t("searchPlaceholder")}
+          />
+        )}
         <nav className="min-h-0 flex-1 overflow-y-auto">
-          {contacts.map((contact) => (
-            <ConversationRow
-              key={contact.id}
-              contact={contact}
-              active={contact.id === selectedContactId}
-              timeLabel={formatListTime(contact.lastMessageAt)}
-              onSelect={() => handleContactSelect(contact.id)}
-            />
-          ))}
+          {trimmedQuery && filteredContacts.length === 0 ? (
+            <p className="px-4 py-6 text-center text-sm text-muted-foreground">
+              {t("noSearchResults")}
+            </p>
+          ) : (
+            filteredContacts.map((contact) => (
+              <ConversationRow
+                key={contact.id}
+                contact={contact}
+                active={contact.id === selectedContactId}
+                timeLabel={formatListTime(contact.lastMessageAt)}
+                onSelect={() => handleContactSelect(contact.id)}
+              />
+            ))
+          )}
         </nav>
       </aside>
 
@@ -495,8 +516,21 @@ export default function ChatPage() {
             newLabel={t("newMessage")}
             onNewMessage={() => router.push("/gekaixing/connect_people")}
           />
+          {contacts.length > 0 && (
+            <ConversationSearch
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder={t("searchPlaceholder")}
+            />
+          )}
           <nav className="min-h-0 flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+5.5rem)]">
-            {contacts.length === 0 ? (
+            {trimmedQuery && filteredContacts.length === 0 ? (
+              <div className="flex min-h-full items-center justify-center">
+                <p className="px-6 text-center text-sm text-muted-foreground">
+                  {t("noSearchResults")}
+                </p>
+              </div>
+            ) : contacts.length === 0 ? (
               <div className="flex min-h-full items-center justify-center">
                 <ChatEmptyState
                   hasContacts={false}
@@ -507,7 +541,7 @@ export default function ChatPage() {
                 />
               </div>
             ) : (
-              contacts.map((contact) => (
+              filteredContacts.map((contact) => (
                 <ConversationRow
                   key={contact.id}
                   contact={contact}
@@ -657,6 +691,39 @@ function ListHeader({
       >
         <SquarePen className="size-5" />
       </Button>
+    </div>
+  );
+}
+
+/** 会话搜索框：按联系人名字过滤列表，支持一键清空 */
+function ConversationSearch({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <div className="relative px-3 py-2">
+      <Search className="pointer-events-none absolute left-6 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="h-9 rounded-full border-border/60 bg-muted/30 pl-9 pr-9 text-sm focus-visible:ring-primary/20"
+      />
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          aria-label={placeholder}
+          className="absolute right-6 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <X className="size-4" />
+        </button>
+      )}
     </div>
   );
 }

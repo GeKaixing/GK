@@ -565,6 +565,8 @@
       "pickContact": "从左侧选择一个会话开始聊天",
       "findChats": "去找人聊天",
       "newMessage": "新私信",
+      "searchPlaceholder": "搜索会话",
+      "noSearchResults": "没有找到会话",
       "back": "返回",
       "dateToday": "今天",
       "dateYesterday": "昨天",

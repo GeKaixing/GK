@@ -565,6 +565,8 @@
       "pickContact": "Select a conversation from the left to start chatting",
       "findChats": "Find people to chat with",
       "newMessage": "New message",
+      "searchPlaceholder": "Search chats",
+      "noSearchResults": "No chats found",
       "back": "Back",
       "dateToday": "Today",
       "dateYesterday": "Yesterday",
