@@ -30,7 +30,7 @@ npx prisma studio        # DB GUI
 
 ### Routing & auth guard
 
-- `app/` is the App Router. **`proxy.ts`** at the repo root is Next 16's middleware (renamed from `middleware`). It refreshes the Supabase session via `utils/supabase/proxy.ts` (`updateSession`) and **redirects unauthenticated users to `/account`** unless the path is in the allowlist. If you change a public route, update this allowlist.
+- `app/` is the App Router. **`middleware.ts`** at the repo root is the auth middleware. It intentionally uses the legacy `middleware` convention instead of Next 16's `proxy.ts`: `proxy.ts` defaults to the **Node.js runtime**, which OpenNext Cloudflare does not support (it fails with "Node.js middleware is not currently supported"), while `middleware.ts` still runs on the **Edge runtime** and therefore works on both Vercel and Cloudflare. It refreshes the Supabase session via `utils/supabase/proxy.ts` (`updateSession`) and **redirects unauthenticated users to `/account`** unless the path is in the allowlist. If you change a public route, update this allowlist. Layout-level guards in `app/gekaixing/layout.tsx` and `app/dashboard/layout.tsx` additionally redirect unauthenticated users as defense in depth.
 - Supabase SSR clients: server side uses `utils/supabase/server.ts` (create a fresh client per function — do not hoist to a module global), browser side uses `utils/supabase/client.ts`.
 - Note the env-var naming is inconsistent across clients: `client.ts` reads `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`, while `server.ts` and `proxy.ts` read `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Keep both set.
 

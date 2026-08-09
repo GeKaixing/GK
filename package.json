@@ -9,9 +9,9 @@
     "lint": "eslint .",
     "init:storage": "tsx scripts/init-storage.ts",
     "test": "vitest run",
-    "build:cloudflare": "node scripts/build-cloudflare.mjs",
-    "preview:cloudflare": "npm run build:cloudflare && opennextjs-cloudflare preview",
-    "deploy:cloudflare": "npm run build:cloudflare && opennextjs-cloudflare deploy"
+    "build:cloudflare": "opennextjs-cloudflare build",
+    "preview:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.39",
