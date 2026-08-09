@@ -1,13 +1,13 @@
-import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { withTimeoutOrNull } from "@/lib/with-timeout";
 import { prisma } from "@/lib/prisma";
+import PremiumCardClient from "./PremiumCardClient";
+
+const PREMIUM_CARD_DISMISSED_COOKIE = "gkx_premium_card_dismissed_at";
+const DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 关闭后 7 天内不再展示
 
 export default async function PremiumCard() {
-  const t = await getTranslations("ImitationX.Premium");
-
   // 已购买会员的用户不再展示升级引导
   const supabase = await createClient();
   let userId: string | null = null;
@@ -29,19 +29,17 @@ export default async function PremiumCard() {
     if (dbUser?.isPremium) return null;
   }
 
-  return (
-    <div className="rounded-3xl border border-border/70 bg-background p-4 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-lg font-bold">{t("title")}</p>
-        <ShieldCheck className="h-6 w-6 shrink-0 text-blue-500" />
-      </div>
-      <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
-      <Link
-        href="/premium"
-        className="mt-3 block w-full rounded-full bg-primary py-2 text-center text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
-      >
-        {t("subscribe")}
-      </Link>
-    </div>
-  );
+  // 用户主动关闭后 7 天内不再展示（cookie 由服务端读取，首屏即隐藏、无闪烁）
+  try {
+    const cookieStore = await cookies();
+    const dismissedAt = Number(cookieStore.get(PREMIUM_CARD_DISMISSED_COOKIE)?.value);
+    // eslint-disable-next-line react-hooks/purity -- per-request TTL comparison in a server component
+    if (!Number.isNaN(dismissedAt) && Date.now() - dismissedAt < DISMISS_TTL_MS) {
+      return null;
+    }
+  } catch {
+    // ignore
+  }
+
+  return <PremiumCardClient />;
 }
