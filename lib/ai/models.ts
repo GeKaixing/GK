@@ -52,6 +52,66 @@ export const OPENAI_COMPATIBLE_PRESETS: Record<string, { label: string; baseURL:
     baseURL: "https://api.moonshot.cn/v1",
     models: ["moonshot-v1-8k", "moonshot-v1-32k"],
   },
+  minimax: {
+    label: "MiniMax",
+    baseURL: "https://api.minimaxi.com/v1",
+    models: ["MiniMax-M2.5", "MiniMax-M2.7", "MiniMax-Text-01"],
+  },
+  openrouter: {
+    label: "OpenRouter",
+    baseURL: "https://openrouter.ai/api/v1",
+    models: ["openrouter/auto"],
+  },
+  siliconflow: {
+    label: "SiliconFlow 硅基流动",
+    baseURL: "https://api.siliconflow.cn/v1",
+    models: ["deepseek-ai/DeepSeek-V3", "Qwen/Qwen2.5-72B-Instruct"],
+  },
+  xai: {
+    label: "xAI (Grok)",
+    baseURL: "https://api.x.ai/v1",
+    models: ["grok-4", "grok-3", "grok-2-latest"],
+  },
+  qwen: {
+    label: "通义千问 Qwen",
+    baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    models: ["qwen-max", "qwen-plus", "qwen-turbo"],
+  },
+  modelscope: {
+    label: "ModelScope 魔搭",
+    baseURL: "https://api-inference.modelscope.cn/v1",
+    models: ["Qwen/Qwen2.5-72B-Instruct"],
+  },
+  novita: {
+    label: "Novita AI",
+    baseURL: "https://api.novita.ai/v3/openai",
+    models: ["deepseek/deepseek-chat"],
+  },
+  nvidia: {
+    label: "Nvidia NIM",
+    baseURL: "https://integrate.api.nvidia.com/v1",
+    models: ["deepseek-ai/deepseek-r1", "meta/llama-3.3-70b-instruct"],
+  },
+  stepfun: {
+    label: "StepFun 阶跃星辰",
+    baseURL: "https://api.stepfun.com/v1",
+    models: ["step-2-16k", "step-1-8k"],
+  },
+  groq: {
+    label: "Groq",
+    baseURL: "https://api.groq.com/openai/v1",
+    models: ["llama-3.3-70b-versatile"],
+  },
+  mistral: {
+    label: "Mistral",
+    baseURL: "https://api.mistral.ai/v1",
+    models: ["mistral-large-latest"],
+  },
+  opencode: {
+    label: "OpenCode Go",
+    baseURL: "https://opencode.ai/zen/go/v1",
+    models: ["deepseek-v4-flash", "kimi-k3", "glm-5", "grok-4.5"],
+  },
 };
 
 export function normalizeModel(provider: AiProvider, value: unknown): string {

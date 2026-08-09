@@ -1,11 +1,16 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { KeyRound, Settings } from "lucide-react";
+import { KeyRound, Search, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { useLocale } from "next-intl";
 import Link from "next/link";
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Dialog,
   DialogContent,
@@ -72,6 +77,9 @@ type SettingAiText = {
   noKeyText: string;
   loadModels: string;
   customModel: string;
+  selectPreset: string;
+  searchPlaceholder: string;
+  noPresetMatch: string;
   labelGoogle: string;
   labelGoogleCompatible: string;
   labelOpenai: string;
@@ -104,6 +112,9 @@ function getText(locale: string): SettingAiText {
       noKeyText: "我没有key",
       loadModels: "加载模型列表",
       customModel: "自定义模型",
+      selectPreset: "选择服务商",
+      searchPlaceholder: "搜索服务商...",
+      noPresetMatch: "没有匹配的服务商",
       labelGoogle: "Gemini",
       labelGoogleCompatible: "Gemini 兼容",
       labelOpenai: "OpenAI",
@@ -136,6 +147,9 @@ function getText(locale: string): SettingAiText {
     noKeyText: "I don't have a key",
     loadModels: "Load models",
     customModel: "Custom model",
+    selectPreset: "Select provider",
+    searchPlaceholder: "Search providers...",
+    noPresetMatch: "No matching provider",
     labelGoogle: "Gemini",
     labelGoogleCompatible: "Gemini Compatible",
     labelOpenai: "OpenAI",
@@ -186,6 +200,8 @@ export default function SettingAI({
   const [loadingModels, setLoadingModels] = useState(false);
   const [modelsError, setModelsError] = useState("");
   const [customModelMode, setCustomModelMode] = useState(false);
+  const [presetOpen, setPresetOpen] = useState(false);
+  const [presetQuery, setPresetQuery] = useState("");
 
   useEffect(() => {
     const init = async (): Promise<void> => {
@@ -436,19 +452,63 @@ export default function SettingAI({
           {isOpenAiCompatible && (
             <div className="space-y-2">
               <p className="text-sm font-medium">{text.presetsLabel}</p>
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(OPENAI_COMPATIBLE_PRESETS).map(([key, preset]) => (
+              <Popover open={presetOpen} onOpenChange={setPresetOpen}>
+                <PopoverTrigger asChild>
                   <Button
-                    key={key}
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => applyPreset(key as keyof typeof OPENAI_COMPATIBLE_PRESETS)}
+                    className="w-full justify-start text-left"
                   >
-                    {preset.label}
+                    <Search className="h-3.5 w-3.5" />
+                    {text.selectPreset}
                   </Button>
-                ))}
-              </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-72 p-0" align="start">
+                  <div className="flex max-h-[60vh] flex-col">
+                    <div className="shrink-0 border-b border-border p-2">
+                      <div className="relative">
+                        <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                        <input
+                          type="text"
+                          value={presetQuery}
+                          onChange={(event) => setPresetQuery(event.target.value)}
+                          placeholder={text.searchPlaceholder}
+                          className="w-full rounded-md border border-border bg-transparent py-2 pl-8 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                          autoFocus
+                        />
+                      </div>
+                    </div>
+                    <div className="min-h-0 flex-1 overflow-y-auto p-1 custom-scrollbar">
+                      {Object.entries(OPENAI_COMPATIBLE_PRESETS)
+                        .filter(([, preset]) =>
+                          preset.label.toLowerCase().includes(presetQuery.trim().toLowerCase())
+                        )
+                        .map(([key, preset]) => (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => {
+                              applyPreset(key as keyof typeof OPENAI_COMPATIBLE_PRESETS);
+                              setPresetOpen(false);
+                              setPresetQuery("");
+                            }}
+                            className="w-full rounded-md px-2.5 py-2 text-left text-sm transition-colors hover:bg-muted/60"
+                          >
+                            {preset.label}
+                          </button>
+                        ))}
+                      {Object.entries(OPENAI_COMPATIBLE_PRESETS).filter(([, preset]) =>
+                        preset.label.toLowerCase().includes(presetQuery.trim().toLowerCase())
+                      ).length === 0 && (
+                        <p className="px-2.5 py-3 text-center text-xs text-muted-foreground">
+                          {text.noPresetMatch}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           )}
 
