@@ -45,6 +45,7 @@ export default function Password_resetDialog() {
     const [openAlertDialog, setOpenAlertDialog] = useState(false)
     const router = useRouter()
     const [email, setEmail] = useState('')
+    const [errorMsg, setErrorMsg] = useState('')
 
     useEffect(() => {
         if (open === false) {
@@ -53,11 +54,13 @@ export default function Password_resetDialog() {
     }, [open, router])
 
     async function password_reset() {
-
+        setErrorMsg('')
         const result = await PasswordResetFetch(email)
         const data = await result.json()
         if (data.success) {
             setOpenAlertDialog(true);
+        } else {
+            setErrorMsg(data.error || '')
         }
     }
 
@@ -77,6 +80,11 @@ export default function Password_resetDialog() {
                         className='w-full'
                         onClick={password_reset}
                     >{t('sendCode')}</Button>
+                    {errorMsg && (
+                        <p className="text-center text-sm text-red-500" role="alert">
+                            {errorMsg}
+                        </p>
+                    )}
                     <EnterMsmAlertDialog open={openAlertDialog} setOpen={setOpenAlertDialog} t={t} />
                 </div>
             </DialogContent>
