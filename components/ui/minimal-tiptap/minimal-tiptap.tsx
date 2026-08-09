@@ -34,6 +34,8 @@ export interface MinimalTiptapProps
   contentAfterEditor?: ReactNode
   className?: string
   editorContentClassName?: string
+  /** 仅当编辑器容器内获得焦点时才显示工具栏（用于回复框等紧凑场景） */
+  toolbarOnFocus?: boolean
 }
 
 const Toolbar = ({
@@ -138,6 +140,7 @@ export const MinimalTiptapEditor = ({
   contentAfterEditor,
   className,
   editorContentClassName,
+  toolbarOnFocus,
   ...props
 }: MinimalTiptapProps & {
   publish?: () => void
@@ -168,7 +171,7 @@ export const MinimalTiptapEditor = ({
       as="div"
       name="editor"
       className={cn(
-        "border-input min-data-[orientation=vertical]:h-72 flex h-auto w-full flex-col rounded-md border shadow-xs",
+        "gkx-tiptap-group border-input min-data-[orientation=vertical]:h-72 flex h-auto w-full flex-col rounded-md border shadow-xs",
         "focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]",
         className
       )}
@@ -183,15 +186,29 @@ export const MinimalTiptapEditor = ({
         <div className="flex justify-center">
           <Spin></Spin>
         </div>
-        : <Toolbar
-          editor={editor}
-          publish={publish}
-          value={value}
-          canPublish={canPublish}
-          onAiGenerate={onAiGenerate}
-          aiGenerating={aiGenerating}
-          toolbarLeftContent={toolbarLeftContent}
-        />}
+        : toolbarOnFocus ? (
+          <div className="gkx-toolbar-focus-only">
+            <Toolbar
+              editor={editor}
+              publish={publish}
+              value={value}
+              canPublish={canPublish}
+              onAiGenerate={onAiGenerate}
+              aiGenerating={aiGenerating}
+              toolbarLeftContent={toolbarLeftContent}
+            />
+          </div>
+        ) : (
+          <Toolbar
+            editor={editor}
+            publish={publish}
+            value={value}
+            canPublish={canPublish}
+            onAiGenerate={onAiGenerate}
+            aiGenerating={aiGenerating}
+            toolbarLeftContent={toolbarLeftContent}
+          />
+        )}
 
       <LinkBubbleMenu editor={editor} />
     </MeasuredContainer>

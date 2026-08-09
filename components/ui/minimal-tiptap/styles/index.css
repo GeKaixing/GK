@@ -7,6 +7,14 @@
 @import "./partials/zoom.css";
 
 
+/* 回复框：编辑器容器未聚焦时隐藏工具栏（点进输入框/工具栏内才显示） */
+.gkx-toolbar-focus-only {
+  display: none;
+}
+.gkx-tiptap-group:focus-within .gkx-toolbar-focus-only {
+  display: flex;
+}
+
 
 :root {
   --mt-overlay: rgba(251, 251, 251, 0.75);

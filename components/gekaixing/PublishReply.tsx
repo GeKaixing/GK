@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { userStore } from "@/store/user"
 import Link from "next/link"
 import { replyStore } from "@/store/reply"
@@ -88,6 +88,14 @@ export default function PublishReply({
             cleanupMedia([])
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    // 编辑器在 SSR 阶段不会渲染（immediatelyRender 在服务端被强制为 false），
+    // 若直接渲染会在 hydration 时与客户端产生不一致。因此只在客户端挂载后再
+    // 渲染编辑器，SSR 先渲染占位符。
+    const [mounted, setMounted] = useState(false)
+    useEffect(() => {
+        setMounted(true)
     }, [])
 
     async function handleReply() {
@@ -179,60 +187,65 @@ export default function PublishReply({
                             </Avatar>
 
                             <div className="min-w-0 flex-1">
-                                <MinimalTiptapEditor
-                                    value={value}
-                                    onChange={setValue}
-                                    onEditorReady={setEditor}
-                                    publish={handleReply}
-                                    canPublish={hasPublishableContent(value)}
-                                    status={false}
-                                    onAiGenerate={handleAiPolish}
-                                    aiGenerating={aiGenerating}
-                                    className="w-full"
-                                    editorContentClassName="px-3 py-2"
-                                    output="html"
-                                    placeholder={t("placeholder")}
-                                    editable
-                                    editorClassName="focus:outline-hidden"
-                                    toolbarLeftContent={
-                                        <div className="ml-2 flex items-center gap-1 overflow-x-auto whitespace-nowrap">
-                                            <input
-                                                ref={videoInputRef}
-                                                type="file"
-                                                accept="video/*"
-                                                className="hidden"
-                                                onChange={(event) => void handleVideoChange(event)}
-                                            />
-                                            <input
-                                                ref={audioInputRef}
-                                                type="file"
-                                                accept="audio/*"
-                                                className="hidden"
-                                                onChange={(event) => void handleAudioChange(event)}
-                                            />
-                                            <ToolbarButton
-                                                type="button"
-                                                size="sm"
-                                                onClick={() => videoInputRef.current?.click()}
-                                                disabled={videoUploading}
-                                                tooltip={tMedia("uploadVideo")}
-                                                aria-label={tMedia("uploadVideo")}
-                                            >
-                                                {videoUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Video className="h-4 w-4" />}
-                                            </ToolbarButton>
-                                            <ToolbarButton
-                                                type="button"
-                                                size="sm"
-                                                onClick={() => audioInputRef.current?.click()}
-                                                disabled={audioUploading}
-                                                tooltip={tMedia("uploadAudio")}
-                                                aria-label={tMedia("uploadAudio")}
-                                            >
-                                                {audioUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Music2 className="h-4 w-4" />}
-                                            </ToolbarButton>
-                                        </div>
-                                    }
-                                />
+                                {mounted ? (
+                                    <MinimalTiptapEditor
+                                        value={value}
+                                        onChange={setValue}
+                                        onEditorReady={setEditor}
+                                        publish={handleReply}
+                                        canPublish={hasPublishableContent(value)}
+                                        status={false}
+                                        onAiGenerate={handleAiPolish}
+                                        aiGenerating={aiGenerating}
+                                        className="w-full"
+                                        editorContentClassName="px-3 py-2"
+                                        output="html"
+                                        placeholder={t("placeholder")}
+                                        editable
+                                        editorClassName="focus:outline-hidden"
+                                        toolbarOnFocus
+                                        toolbarLeftContent={
+                                            <div className="ml-2 flex items-center gap-1 overflow-x-auto whitespace-nowrap">
+                                                <input
+                                                    ref={videoInputRef}
+                                                    type="file"
+                                                    accept="video/*"
+                                                    className="hidden"
+                                                    onChange={(event) => void handleVideoChange(event)}
+                                                />
+                                                <input
+                                                    ref={audioInputRef}
+                                                    type="file"
+                                                    accept="audio/*"
+                                                    className="hidden"
+                                                    onChange={(event) => void handleAudioChange(event)}
+                                                />
+                                                <ToolbarButton
+                                                    type="button"
+                                                    size="sm"
+                                                    onClick={() => videoInputRef.current?.click()}
+                                                    disabled={videoUploading}
+                                                    tooltip={tMedia("uploadVideo")}
+                                                    aria-label={tMedia("uploadVideo")}
+                                                >
+                                                    {videoUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Video className="h-4 w-4" />}
+                                                </ToolbarButton>
+                                                <ToolbarButton
+                                                    type="button"
+                                                    size="sm"
+                                                    onClick={() => audioInputRef.current?.click()}
+                                                    disabled={audioUploading}
+                                                    tooltip={tMedia("uploadAudio")}
+                                                    aria-label={tMedia("uploadAudio")}
+                                                >
+                                                    {audioUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Music2 className="h-4 w-4" />}
+                                                </ToolbarButton>
+                                            </div>
+                                        }
+                                    />
+                                ) : (
+                                    <div className="h-32 w-full rounded-md border border-input" />
+                                )}
                                 {mentionUsers.length > 0 && mentionToken ? (
                                     <div className="mt-2 max-h-56 overflow-y-auto rounded-md border border-border bg-background">
                                         {mentionUsers.map((user) => (

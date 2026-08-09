@@ -239,7 +239,7 @@ export const useMinimalTiptapEditor = ({
   )
 
   const editor = useEditor({
-    immediatelyRender: false,
+    immediatelyRender: true,
     extensions: createExtensions({ placeholder, uploader }),
     editorProps: {
       attributes: {
