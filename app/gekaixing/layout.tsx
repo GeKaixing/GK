@@ -1,8 +1,8 @@
 import Footer from "@/components/gekaixing/Footer";
-import GkxMain from "@/components/gekaixing/GkxMain";
-import HideOnGkx from "@/components/gekaixing/HideOnGkx";
+import ChatMain from "@/components/gekaixing/ChatMain";
 import MobileFooter from "@/components/gekaixing/MobileFooter";
 import MobileHeader from "@/components/gekaixing/MobileHeader";
+import RightRail from "@/components/gekaixing/RightRail";
 import Sidebar from "@/components/gekaixing/Sidebar";
 import { prisma } from "@/lib/prisma";
 import { withTimeoutOrNull } from "@/lib/with-timeout";
@@ -124,12 +124,10 @@ export default async function RootLayout({
         <header className="hidden sm:flex w-[88px] xl:w-[275px] shrink-0 sticky top-0 h-screen transition-all duration-200">
           <Sidebar user={userInfo} mentionCount={mentionCount} />
         </header>
-        <GkxMain>{children}</GkxMain>
-        <HideOnGkx>
-          <footer className="hidden lg:flex w-[290px] xl:w-[350px] shrink-0 pl-4 sticky top-0 h-screen overflow-y-auto">
-            <Footer />
-          </footer>
-        </HideOnGkx>
+        <ChatMain>{children}</ChatMain>
+        <RightRail>
+          <Footer />
+        </RightRail>
       </div>
       <MobileFooter
         id={userId ?? undefined}
