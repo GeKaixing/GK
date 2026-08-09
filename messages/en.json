@@ -622,6 +622,10 @@
     "backToAccount": "Back to Account",
     "signUpAgain": "Sign Up Again"
   },
+  "ErrorPage": {
+    "title": "Something went wrong",
+    "backButton": "Back"
+  },
   "Account": {
     "GoogleButton": {
       "signInWithGoogle": "Sign in with Google"

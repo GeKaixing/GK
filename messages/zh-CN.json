@@ -622,6 +622,10 @@
     "backToAccount": "返回账户",
     "signUpAgain": "重新注册"
   },
+  "ErrorPage": {
+    "title": "发生错误",
+    "backButton": "返回"
+  },
   "Account": {
     "GoogleButton": {
       "signInWithGoogle": "使用 Google 账号登录"

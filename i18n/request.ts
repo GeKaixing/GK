@@ -1,6 +1,13 @@
 import {getRequestConfig} from 'next-intl/server';
 import {notFound} from 'next/navigation';
 import { cookies } from 'next/headers';
+import enMessages from '../messages/en.json';
+import zhMessages from '../messages/zh-CN.json';
+
+const allMessages = {
+  en: enMessages,
+  'zh-CN': zhMessages,
+} as const;
 
 export default getRequestConfig(async ({locale}) => {
   const validLocales = ['en', 'zh-CN'];
@@ -20,6 +27,6 @@ export default getRequestConfig(async ({locale}) => {
 
   return {
     locale: validLocale,
-    messages: (await import(`../messages/${validLocale}.json`)).default
+    messages: allMessages[validLocale as keyof typeof allMessages]
   };
 });
