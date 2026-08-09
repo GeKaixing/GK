@@ -307,7 +307,12 @@ export async function recomputeAndCacheHomeFeed(userId: string | null): Promise<
   const lock = await tryAcquireFeedRecomputeLock(userId);
   if (!lock) {
     const existing = await getFeedCache(userId);
-    return existing?.postIds ?? [];
+    // If Redis (lock/cache) is unavailable and nothing is cached, compute the
+    // feed directly instead of returning an empty list.
+    if (existing) {
+      return existing.postIds;
+    }
+    return buildCandidatePool(userId);
   }
 
   try {
