@@ -16,6 +16,16 @@ export function buildLanguageModel(config: AiUserConfig): LanguageModel {
       })(config.model);
     case "anthropic":
       return createAnthropic({ apiKey: config.apiKey })(config.model);
+    case "anthropic-compatible":
+      return createAnthropic({
+        apiKey: config.apiKey,
+        ...(config.baseURL ? { baseURL: config.baseURL } : {}),
+      })(config.model);
+    case "google-compatible":
+      return createGoogleGenerativeAI({
+        apiKey: config.apiKey,
+        ...(config.baseURL ? { baseURL: config.baseURL } : {}),
+      })(config.model);
     case "google":
     default:
       return createGoogleGenerativeAI({ apiKey: config.apiKey })(config.model);

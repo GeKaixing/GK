@@ -28,9 +28,11 @@ export const ANTHROPIC_MODEL_OPTIONS = [
 
 export const DEFAULT_MODEL: Record<AiProvider, string> = {
   google: "gemini-3-flash-preview",
+  "google-compatible": "",
   openai: "gpt-5",
   "openai-compatible": "",
   anthropic: "claude-sonnet-4-5",
+  "anthropic-compatible": "",
 };
 
 /** Suggestive defaults for common OpenAI-compatible services. */
@@ -88,7 +90,11 @@ export function normalizeModel(provider: AiProvider, value: unknown): string {
 export function getModelCandidates(provider: AiProvider, preferred: unknown): string[] {
   const preferredModel = normalizeModel(provider, preferred);
 
-  if (provider === "openai-compatible") {
+  if (
+    provider === "openai-compatible" ||
+    provider === "anthropic-compatible" ||
+    provider === "google-compatible"
+  ) {
     return preferredModel ? [preferredModel] : [];
   }
 

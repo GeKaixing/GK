@@ -39,12 +39,16 @@ function maskApiKey(key: string, configuredText: string): string {
   return `${key.slice(0, 6)}...${key.slice(-4)}`;
 }
 
-const PROVIDER_OPTIONS: { value: AiProvider; label: string }[] = [
-  { value: "google", label: "Gemini" },
-  { value: "openai", label: "OpenAI" },
-  { value: "anthropic", label: "Anthropic" },
-  { value: "openai-compatible", label: "OpenAI 兼容" },
-];
+function getProviderOptions(text: SettingAiText): { value: AiProvider; label: string }[] {
+  return [
+    { value: "google", label: text.labelGoogle },
+    { value: "openai", label: text.labelOpenai },
+    { value: "anthropic", label: text.labelAnthropic },
+    { value: "google-compatible", label: text.labelGoogleCompatible },
+    { value: "openai-compatible", label: text.labelOpenaiCompatible },
+    { value: "anthropic-compatible", label: text.labelAnthropicCompatible },
+  ];
+}
 
 type SettingAiText = {
   configured: string;
@@ -66,6 +70,14 @@ type SettingAiText = {
   clearHint: string;
   saveButton: string;
   noKeyText: string;
+  loadModels: string;
+  customModel: string;
+  labelGoogle: string;
+  labelGoogleCompatible: string;
+  labelOpenai: string;
+  labelOpenaiCompatible: string;
+  labelAnthropic: string;
+  labelAnthropicCompatible: string;
 };
 
 function getText(locale: string): SettingAiText {
@@ -90,6 +102,14 @@ function getText(locale: string): SettingAiText {
       clearHint: "输入框留空并保存即可清空当前 Key。",
       saveButton: "保存",
       noKeyText: "我没有key",
+      loadModels: "加载模型列表",
+      customModel: "自定义模型",
+      labelGoogle: "Gemini",
+      labelGoogleCompatible: "Gemini 兼容",
+      labelOpenai: "OpenAI",
+      labelOpenaiCompatible: "OpenAI 兼容",
+      labelAnthropic: "Anthropic",
+      labelAnthropicCompatible: "Anthropic 兼容",
     };
   }
 
@@ -114,6 +134,14 @@ function getText(locale: string): SettingAiText {
     clearHint: "Leave blank and save to clear your key.",
     saveButton: "Save",
     noKeyText: "I don't have a key",
+    loadModels: "Load models",
+    customModel: "Custom model",
+    labelGoogle: "Gemini",
+    labelGoogleCompatible: "Gemini Compatible",
+    labelOpenai: "OpenAI",
+    labelOpenaiCompatible: "OpenAI Compatible",
+    labelAnthropic: "Anthropic",
+    labelAnthropicCompatible: "Anthropic Compatible",
   };
 }
 
@@ -121,7 +149,7 @@ function getKeyLink(provider: AiProvider): string {
   if (provider === "openai") {
     return "https://platform.openai.com/api-keys";
   }
-  if (provider === "anthropic") {
+  if (provider === "anthropic" || provider === "anthropic-compatible") {
     return "https://console.anthropic.com/";
   }
   if (provider === "openai-compatible") {
@@ -129,7 +157,6 @@ function getKeyLink(provider: AiProvider): string {
   }
   return "https://aistudio.google.com/api-keys";
 }
-
 export default function SettingAI({
   trigger,
   onSaved,
@@ -153,6 +180,12 @@ export default function SettingAI({
   const [savedKey, setSavedKey] = useState("");
   const [savedModel, setSavedModel] = useState(DEFAULT_MODEL.google);
   const [savedBaseUrl, setSavedBaseUrl] = useState("");
+
+  // OpenAI 兼容：从 baseURL 拉取的可用模型
+  const [compatibleModels, setCompatibleModels] = useState<string[]>([]);
+  const [loadingModels, setLoadingModels] = useState(false);
+  const [modelsError, setModelsError] = useState("");
+  const [customModelMode, setCustomModelMode] = useState(false);
 
   useEffect(() => {
     const init = async (): Promise<void> => {
@@ -199,6 +232,44 @@ export default function SettingAI({
     setProviderInput("openai-compatible");
     setBaseUrlInput(preset.baseURL);
     setModelInput(preset.models[0]);
+    setCompatibleModels(preset.models);
+    setCustomModelMode(false);
+    setModelsError("");
+  }
+
+  /** 从 OpenAI 兼容接口的 /models 拉取可用模型列表 */
+  async function fetchCompatibleModels(): Promise<void> {
+    const baseURL = baseUrlInput.trim().replace(/\/+$/, "");
+    const key = keyInput.trim();
+    if (!baseURL || !key) {
+      setModelsError(text.baseUrlLabel && text.keyLabel ? "请先填写 Base URL 和 API 密钥" : "Missing base URL or API key");
+      return;
+    }
+    setLoadingModels(true);
+    setModelsError("");
+    try {
+      const res = await fetch("/api/ai/models", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ baseURL, apiKey: key }),
+      });
+      if (!res.ok) {
+        const errBody = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(errBody?.error ?? `HTTP ${res.status}`);
+      }
+      const result = (await res.json()) as { data?: { data?: Array<{ id?: string }> } };
+      const ids = (result.data?.data ?? [])
+        .map((m) => m.id)
+        .filter((id): id is string => typeof id === "string" && id.length > 0);
+      if (!ids.length) throw new Error("empty model list");
+      setCompatibleModels(ids);
+      setCustomModelMode(false);
+      setModelInput((prev) => (ids.includes(prev) ? prev : ids[0]));
+    } catch (err) {
+      setModelsError(err instanceof Error ? err.message : "Failed to load models");
+    } finally {
+      setLoadingModels(false);
+    }
   }
 
   async function saveAiKey(): Promise<void> {
@@ -280,9 +351,14 @@ export default function SettingAI({
     }
   }
 
-  const providerLabel = PROVIDER_OPTIONS.find((option) => option.value === savedProvider)?.label ?? "Gemini";
+  const providerOptions = getProviderOptions(text);
+  const providerLabel = providerOptions.find((option) => option.value === savedProvider)?.label ?? text.labelGoogle;
   const triggerModel = savedProvider === "openai-compatible" && savedBaseUrl ? savedBaseUrl : savedModel;
-  const isCompatible = providerInput === "openai-compatible";
+  const isCompatible =
+    providerInput === "openai-compatible" ||
+    providerInput === "anthropic-compatible" ||
+    providerInput === "google-compatible";
+  const isOpenAiCompatible = providerInput === "openai-compatible";
   const isSelectModel =
     providerInput === "google" || providerInput === "openai" || providerInput === "anthropic";
   const modelOptions =
@@ -326,7 +402,7 @@ export default function SettingAI({
                 <SelectValue placeholder={text.providerLabel} />
               </SelectTrigger>
               <SelectContent>
-                {PROVIDER_OPTIONS.map((option) => (
+                {providerOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -357,7 +433,7 @@ export default function SettingAI({
             {text.clearHint}
           </p>
 
-          {isCompatible && (
+          {isOpenAiCompatible && (
             <div className="space-y-2">
               <p className="text-sm font-medium">{text.presetsLabel}</p>
               <div className="flex flex-wrap gap-2">
@@ -392,13 +468,53 @@ export default function SettingAI({
                 </SelectContent>
               </Select>
             ) : (
-              <Input
-                placeholder={text.modelPlaceholder}
-                value={modelInput}
-                onChange={(event) => setModelInput(event.target.value)}
-                disabled={loading}
-                className="w-full"
-              />
+              <div className="space-y-2">
+                {compatibleModels.length > 0 && !customModelMode ? (
+                  <Select
+                    value={modelInput}
+                    onValueChange={(value) => {
+                      if (value === "__custom__") {
+                        setCustomModelMode(true);
+                      } else {
+                        setModelInput(value);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={text.modelPlaceholder} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {compatibleModels.map((model) => (
+                        <SelectItem key={model} value={model}>
+                          {model}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="__custom__">{text.customModel}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    placeholder={text.modelPlaceholder}
+                    value={modelInput}
+                    onChange={(event) => setModelInput(event.target.value)}
+                    disabled={loading}
+                    className="w-full"
+                  />
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void fetchCompatibleModels()}
+                  disabled={loadingModels}
+                  className="w-full"
+                >
+                  {loadingModels ? <Spin /> : text.loadModels}
+                </Button>
+                {modelsError && (
+                  <p className="text-xs text-red-500">{modelsError}</p>
+                )}
+              </div>
             )}
             <p className="text-xs text-muted-foreground">{text.modelHint}</p>
           </div>
@@ -409,7 +525,11 @@ export default function SettingAI({
               <Input
                 placeholder={text.baseUrlPlaceholder}
                 value={baseUrlInput}
-                onChange={(event) => setBaseUrlInput(event.target.value)}
+                onChange={(event) => {
+                  setBaseUrlInput(event.target.value);
+                  setCompatibleModels([]);
+                  setModelsError("");
+                }}
                 disabled={loading}
                 className="w-full"
               />

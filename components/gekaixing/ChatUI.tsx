@@ -16,7 +16,27 @@ import {
   SquarePen,
 } from "lucide-react"
 import { getUserAiConfig } from "@/lib/ai/config"
+import {
+  ANTHROPIC_MODEL_OPTIONS,
+  GOOGLE_MODEL_OPTIONS,
+  OPENAI_MODEL_OPTIONS,
+} from "@/lib/ai/models"
+import type { AiProvider } from "@/lib/ai/types"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { createClient } from "@/utils/supabase/client"
+
+function providerLabelOf(provider: AiProvider): string {
+  if (provider === "google" || provider === "google-compatible") return "Gemini"
+  if (provider === "openai") return "OpenAI"
+  if (provider === "anthropic" || provider === "anthropic-compatible") return "Anthropic"
+  return "AI"
+}
 
 type Message = {
   id: string
@@ -37,6 +57,8 @@ export default function ChatUI({
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
   const [aiModelLabel, setAiModelLabel] = useState("")
+  const [aiProvider, setAiProvider] = useState<AiProvider>("google")
+  const [aiModel, setAiModel] = useState("")
 
   const { addSession, updateSessionTitle } = useAiSessions()
 
@@ -80,16 +102,12 @@ export default function ChatUI({
       if (!user) return
 
       const config = getUserAiConfig(user)
-      const providerLabel =
-        config.provider === "google"
-          ? "Gemini"
-          : config.provider === "openai"
-            ? "OpenAI"
-            : config.provider === "anthropic"
-              ? "Anthropic"
-              : "AI"
+      setAiProvider(config.provider)
+      setAiModel(config.model)
       setAiModelLabel(
-        config.model ? `${providerLabel} · ${config.model}` : providerLabel
+        config.model
+          ? `${providerLabelOf(config.provider)} · ${config.model}`
+          : providerLabelOf(config.provider)
       )
     } catch {
       // 读取失败不阻塞聊天
@@ -99,6 +117,34 @@ export default function ChatUI({
   useEffect(() => {
     void reloadAiLabel()
   }, [reloadAiLabel])
+
+  /** 切换模型：写入用户配置并刷新顶栏显示 */
+  const saveModel = useCallback(
+    async (model: string): Promise<void> => {
+      try {
+        const supabase = createClient()
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
+        if (!user) return
+
+        const nextMetadata: Record<string, unknown> = {
+          ...(user.user_metadata ?? {}),
+        };
+        nextMetadata.ai_model = model;
+        if (aiProvider === "google") {
+          nextMetadata.gemini_model = model;
+        }
+
+        await supabase.auth.updateUser({ data: nextMetadata });
+        setAiModel(model);
+        setAiModelLabel(`${providerLabelOf(aiProvider)} · ${model}`);
+      } catch {
+        // 保存失败不阻塞
+      }
+    },
+    [aiProvider]
+  )
 
   function mergeMessages(
     historyMessages: Message[],
@@ -405,14 +451,38 @@ useEffect(() => {
     <div className="flex h-[calc(100dvh-3.5rem)] w-full flex-col">
       {/* 顶栏 */}
       <header className="flex items-center justify-between border-b px-4 py-2">
-        <button
-          type="button"
-          className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold hover:bg-muted/60"
-        >
-          <Sparkles className="h-4 w-4 text-primary" />
-          <span className="truncate">{aiModelLabel || t("assistantTitle")}</span>
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-        </button>
+        {aiProvider === "google" || aiProvider === "openai" || aiProvider === "anthropic" ? (
+          <Select
+            value={aiModel}
+            onValueChange={(model) => void saveModel(model)}
+          >
+            <SelectTrigger className="flex items-center gap-2 rounded-full border-border px-3 py-1.5 text-sm font-semibold">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <SelectValue placeholder={t("assistantTitle")} />
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </SelectTrigger>
+            <SelectContent>
+              {(aiProvider === "google"
+                ? GOOGLE_MODEL_OPTIONS
+                : aiProvider === "openai"
+                  ? OPENAI_MODEL_OPTIONS
+                  : ANTHROPIC_MODEL_OPTIONS
+              ).map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <button
+            type="button"
+            className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold hover:bg-muted/60"
+          >
+            <Sparkles className="h-4 w-4 text-primary" />
+            <span className="truncate">{aiModelLabel || t("assistantTitle")}</span>
+          </button>
+        )}
         <div className="flex items-center gap-1">
           <button
             type="button"

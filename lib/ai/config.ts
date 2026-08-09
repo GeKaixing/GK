@@ -1,7 +1,14 @@
 import type { AiProvider, AiUserConfig } from "./types";
 import { normalizeModel } from "./models";
 
-const VALID_PROVIDERS: AiProvider[] = ["google", "openai", "openai-compatible", "anthropic"];
+const VALID_PROVIDERS: AiProvider[] = [
+  "google",
+  "google-compatible",
+  "openai",
+  "openai-compatible",
+  "anthropic",
+  "anthropic-compatible",
+];
 
 export function normalizeProvider(value: unknown): AiProvider {
   return VALID_PROVIDERS.includes(value as AiProvider) ? (value as AiProvider) : "google";
@@ -37,6 +44,11 @@ export function getUserAiConfig(
     provider,
     apiKey,
     model: normalizeModel(provider, metadata.ai_model),
-    ...(provider === "openai-compatible" && baseURL ? { baseURL } : {}),
+    ...((provider === "openai-compatible" ||
+      provider === "anthropic-compatible" ||
+      provider === "google-compatible") &&
+    baseURL
+      ? { baseURL }
+      : {}),
   };
 }
