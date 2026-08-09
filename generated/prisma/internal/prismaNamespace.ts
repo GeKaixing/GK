@@ -407,10 +407,13 @@ export const ModelName = {
   ConversationParticipant: 'ConversationParticipant',
   Message: 'Message',
   ConversationRead: 'ConversationRead',
+  WorkTask: 'WorkTask',
   ChatAISession: 'ChatAISession',
   ChatAIMessage: 'ChatAIMessage',
   JobPosting: 'JobPosting',
-  UserAction: 'UserAction'
+  UserAction: 'UserAction',
+  LiveStream: 'LiveStream',
+  LiveChatMessage: 'LiveChatMessage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -426,7 +429,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "follow" | "post" | "like" | "bookmark" | "share" | "conversation" | "conversationParticipant" | "message" | "conversationRead" | "chatAISession" | "chatAIMessage" | "jobPosting" | "userAction"
+    modelProps: "user" | "follow" | "post" | "like" | "bookmark" | "share" | "conversation" | "conversationParticipant" | "message" | "conversationRead" | "workTask" | "chatAISession" | "chatAIMessage" | "jobPosting" | "userAction" | "liveStream" | "liveChatMessage"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1170,6 +1173,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    WorkTask: {
+      payload: Prisma.$WorkTaskPayload<ExtArgs>
+      fields: Prisma.WorkTaskFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WorkTaskFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkTaskPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WorkTaskFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkTaskPayload>
+        }
+        findFirst: {
+          args: Prisma.WorkTaskFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkTaskPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WorkTaskFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkTaskPayload>
+        }
+        findMany: {
+          args: Prisma.WorkTaskFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkTaskPayload>[]
+        }
+        create: {
+          args: Prisma.WorkTaskCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkTaskPayload>
+        }
+        createMany: {
+          args: Prisma.WorkTaskCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WorkTaskCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkTaskPayload>[]
+        }
+        delete: {
+          args: Prisma.WorkTaskDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkTaskPayload>
+        }
+        update: {
+          args: Prisma.WorkTaskUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkTaskPayload>
+        }
+        deleteMany: {
+          args: Prisma.WorkTaskDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WorkTaskUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WorkTaskUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkTaskPayload>[]
+        }
+        upsert: {
+          args: Prisma.WorkTaskUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkTaskPayload>
+        }
+        aggregate: {
+          args: Prisma.WorkTaskAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkTask>
+        }
+        groupBy: {
+          args: Prisma.WorkTaskGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkTaskGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WorkTaskCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkTaskCountAggregateOutputType> | number
+        }
+      }
+    }
     ChatAISession: {
       payload: Prisma.$ChatAISessionPayload<ExtArgs>
       fields: Prisma.ChatAISessionFieldRefs
@@ -1466,6 +1543,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LiveStream: {
+      payload: Prisma.$LiveStreamPayload<ExtArgs>
+      fields: Prisma.LiveStreamFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LiveStreamFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveStreamPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LiveStreamFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveStreamPayload>
+        }
+        findFirst: {
+          args: Prisma.LiveStreamFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveStreamPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LiveStreamFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveStreamPayload>
+        }
+        findMany: {
+          args: Prisma.LiveStreamFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveStreamPayload>[]
+        }
+        create: {
+          args: Prisma.LiveStreamCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveStreamPayload>
+        }
+        createMany: {
+          args: Prisma.LiveStreamCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LiveStreamCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveStreamPayload>[]
+        }
+        delete: {
+          args: Prisma.LiveStreamDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveStreamPayload>
+        }
+        update: {
+          args: Prisma.LiveStreamUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveStreamPayload>
+        }
+        deleteMany: {
+          args: Prisma.LiveStreamDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LiveStreamUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LiveStreamUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveStreamPayload>[]
+        }
+        upsert: {
+          args: Prisma.LiveStreamUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveStreamPayload>
+        }
+        aggregate: {
+          args: Prisma.LiveStreamAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLiveStream>
+        }
+        groupBy: {
+          args: Prisma.LiveStreamGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LiveStreamGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LiveStreamCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LiveStreamCountAggregateOutputType> | number
+        }
+      }
+    }
+    LiveChatMessage: {
+      payload: Prisma.$LiveChatMessagePayload<ExtArgs>
+      fields: Prisma.LiveChatMessageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LiveChatMessageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveChatMessagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LiveChatMessageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveChatMessagePayload>
+        }
+        findFirst: {
+          args: Prisma.LiveChatMessageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveChatMessagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LiveChatMessageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveChatMessagePayload>
+        }
+        findMany: {
+          args: Prisma.LiveChatMessageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveChatMessagePayload>[]
+        }
+        create: {
+          args: Prisma.LiveChatMessageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveChatMessagePayload>
+        }
+        createMany: {
+          args: Prisma.LiveChatMessageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LiveChatMessageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveChatMessagePayload>[]
+        }
+        delete: {
+          args: Prisma.LiveChatMessageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveChatMessagePayload>
+        }
+        update: {
+          args: Prisma.LiveChatMessageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveChatMessagePayload>
+        }
+        deleteMany: {
+          args: Prisma.LiveChatMessageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LiveChatMessageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LiveChatMessageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveChatMessagePayload>[]
+        }
+        upsert: {
+          args: Prisma.LiveChatMessageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LiveChatMessagePayload>
+        }
+        aggregate: {
+          args: Prisma.LiveChatMessageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLiveChatMessage>
+        }
+        groupBy: {
+          args: Prisma.LiveChatMessageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LiveChatMessageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LiveChatMessageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LiveChatMessageCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1607,6 +1832,8 @@ export const ConversationParticipantScalarFieldEnum = {
   id: 'id',
   conversationId: 'conversationId',
   userId: 'userId',
+  role: 'role',
+  mutedAt: 'mutedAt',
   joinedAt: 'joinedAt'
 } as const
 
@@ -1634,6 +1861,23 @@ export const ConversationReadScalarFieldEnum = {
 } as const
 
 export type ConversationReadScalarFieldEnum = (typeof ConversationReadScalarFieldEnum)[keyof typeof ConversationReadScalarFieldEnum]
+
+
+export const WorkTaskScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  title: 'title',
+  description: 'description',
+  assigneeId: 'assigneeId',
+  status: 'status',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkTaskScalarFieldEnum = (typeof WorkTaskScalarFieldEnum)[keyof typeof WorkTaskScalarFieldEnum]
 
 
 export const ChatAISessionScalarFieldEnum = {
@@ -1688,6 +1932,37 @@ export const UserActionScalarFieldEnum = {
 } as const
 
 export type UserActionScalarFieldEnum = (typeof UserActionScalarFieldEnum)[keyof typeof UserActionScalarFieldEnum]
+
+
+export const LiveStreamScalarFieldEnum = {
+  id: 'id',
+  authorId: 'authorId',
+  title: 'title',
+  description: 'description',
+  category: 'category',
+  status: 'status',
+  streamUrl: 'streamUrl',
+  thumbnailUrl: 'thumbnailUrl',
+  viewerCount: 'viewerCount',
+  startedAt: 'startedAt',
+  scheduledAt: 'scheduledAt',
+  endedAt: 'endedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LiveStreamScalarFieldEnum = (typeof LiveStreamScalarFieldEnum)[keyof typeof LiveStreamScalarFieldEnum]
+
+
+export const LiveChatMessageScalarFieldEnum = {
+  id: 'id',
+  streamId: 'streamId',
+  authorId: 'authorId',
+  content: 'content',
+  createdAt: 'createdAt'
+} as const
+
+export type LiveChatMessageScalarFieldEnum = (typeof LiveChatMessageScalarFieldEnum)[keyof typeof LiveChatMessageScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1985,10 +2260,13 @@ export type GlobalOmitConfig = {
   conversationParticipant?: Prisma.ConversationParticipantOmit
   message?: Prisma.MessageOmit
   conversationRead?: Prisma.ConversationReadOmit
+  workTask?: Prisma.WorkTaskOmit
   chatAISession?: Prisma.ChatAISessionOmit
   chatAIMessage?: Prisma.ChatAIMessageOmit
   jobPosting?: Prisma.JobPostingOmit
   userAction?: Prisma.UserActionOmit
+  liveStream?: Prisma.LiveStreamOmit
+  liveChatMessage?: Prisma.LiveChatMessageOmit
 }
 
 /* Types for Logging */

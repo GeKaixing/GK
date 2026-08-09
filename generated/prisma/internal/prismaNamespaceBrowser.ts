@@ -61,10 +61,13 @@ export const ModelName = {
   ConversationParticipant: 'ConversationParticipant',
   Message: 'Message',
   ConversationRead: 'ConversationRead',
+  WorkTask: 'WorkTask',
   ChatAISession: 'ChatAISession',
   ChatAIMessage: 'ChatAIMessage',
   JobPosting: 'JobPosting',
-  UserAction: 'UserAction'
+  UserAction: 'UserAction',
+  LiveStream: 'LiveStream',
+  LiveChatMessage: 'LiveChatMessage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -185,6 +188,8 @@ export const ConversationParticipantScalarFieldEnum = {
   id: 'id',
   conversationId: 'conversationId',
   userId: 'userId',
+  role: 'role',
+  mutedAt: 'mutedAt',
   joinedAt: 'joinedAt'
 } as const
 
@@ -212,6 +217,23 @@ export const ConversationReadScalarFieldEnum = {
 } as const
 
 export type ConversationReadScalarFieldEnum = (typeof ConversationReadScalarFieldEnum)[keyof typeof ConversationReadScalarFieldEnum]
+
+
+export const WorkTaskScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  title: 'title',
+  description: 'description',
+  assigneeId: 'assigneeId',
+  status: 'status',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkTaskScalarFieldEnum = (typeof WorkTaskScalarFieldEnum)[keyof typeof WorkTaskScalarFieldEnum]
 
 
 export const ChatAISessionScalarFieldEnum = {
@@ -266,6 +288,37 @@ export const UserActionScalarFieldEnum = {
 } as const
 
 export type UserActionScalarFieldEnum = (typeof UserActionScalarFieldEnum)[keyof typeof UserActionScalarFieldEnum]
+
+
+export const LiveStreamScalarFieldEnum = {
+  id: 'id',
+  authorId: 'authorId',
+  title: 'title',
+  description: 'description',
+  category: 'category',
+  status: 'status',
+  streamUrl: 'streamUrl',
+  thumbnailUrl: 'thumbnailUrl',
+  viewerCount: 'viewerCount',
+  startedAt: 'startedAt',
+  scheduledAt: 'scheduledAt',
+  endedAt: 'endedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LiveStreamScalarFieldEnum = (typeof LiveStreamScalarFieldEnum)[keyof typeof LiveStreamScalarFieldEnum]
+
+
+export const LiveChatMessageScalarFieldEnum = {
+  id: 'id',
+  streamId: 'streamId',
+  authorId: 'authorId',
+  content: 'content',
+  createdAt: 'createdAt'
+} as const
+
+export type LiveChatMessageScalarFieldEnum = (typeof LiveChatMessageScalarFieldEnum)[keyof typeof LiveChatMessageScalarFieldEnum]
 
 
 export const SortOrder = {

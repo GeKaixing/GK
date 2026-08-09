@@ -74,7 +74,8 @@ export async function GET(request: Request) {
         lastMessage: conv.lastMessage,
         lastMessageAt: conv.lastMessageAt,
         unreadCount: Math.max(0, unreadCount),
-        participantId: otherParticipant?.id,
+        // 群聊没有"对方"概念，不泄露任意成员 id 作为 participantId
+        participantId: conv.isGroup ? null : otherParticipant?.id,
         participantEmail: otherParticipant?.email,
       };
     });
@@ -130,7 +131,11 @@ export async function POST(request: Request) {
           name:
             typeof name === "string" && name.trim() ? name.trim() : "Group",
           participants: {
-            create: participantUserIds.map((userId) => ({ userId })),
+            create: participantUserIds.map((userId) => ({
+              userId,
+              // 创建者成为群管理员
+              role: userId === user.id ? "admin" : "member",
+            })),
           },
           readStates: {
             create: participantUserIds.map((userId) => ({

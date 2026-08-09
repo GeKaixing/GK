@@ -136,6 +136,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (participant.mutedAt) {
+      return NextResponse.json(
+        { error: "You are muted", code: "MUTED" },
+        { status: 403 }
+      );
+    }
+
     const message = await prisma.$transaction(async (tx) => {
       const newMessage = await tx.message.create({
         data: {

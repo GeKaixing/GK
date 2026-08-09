@@ -69,6 +69,11 @@ export type Message = Prisma.MessageModel
  */
 export type ConversationRead = Prisma.ConversationReadModel
 /**
+ * Model WorkTask
+ * 
+ */
+export type WorkTask = Prisma.WorkTaskModel
+/**
  * Model ChatAISession
  * 
  */
@@ -88,3 +93,13 @@ export type JobPosting = Prisma.JobPostingModel
  * 
  */
 export type UserAction = Prisma.UserActionModel
+/**
+ * Model LiveStream
+ * 
+ */
+export type LiveStream = Prisma.LiveStreamModel
+/**
+ * Model LiveChatMessage
+ * 
+ */
+export type LiveChatMessage = Prisma.LiveChatMessageModel

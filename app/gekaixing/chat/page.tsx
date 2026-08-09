@@ -11,6 +11,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import {
   Send,
@@ -23,6 +33,9 @@ import {
   X,
   Check,
   UserPlus,
+  CalendarDays,
+  Info,
+  Trash2,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -30,6 +43,9 @@ import Link from "next/link";
 import { User } from "@supabase/supabase-js";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
+import GroupMembersDialog from "@/components/gekaixing/chat/GroupMembersDialog";
+import GroupInfoDialog from "@/components/gekaixing/chat/GroupInfoDialog";
+import WorkCalendarDialog from "@/components/gekaixing/chat/WorkCalendarDialog";
 
 interface Contact {
   id: string;
@@ -165,6 +181,11 @@ export default function ChatPage() {
   const [userResults, setUserResults] = useState<UserSearchResult[]>([]);
   const [userSearching, setUserSearching] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<UserSearchResult[]>([]);
+
+  const [groupInfoOpen, setGroupInfoOpen] = useState(false);
+  const [groupMembersOpen, setGroupMembersOpen] = useState(false);
+  const [workCalendarOpen, setWorkCalendarOpen] = useState(false);
+  const [deleteConversationOpen, setDeleteConversationOpen] = useState(false);
 
   const myAvatarUrl =
     currentUser?.user_metadata?.user_avatar ||
@@ -405,6 +426,9 @@ export default function ChatPage() {
         });
       } else {
         setMessages((prev) => prev.filter((m) => m.id !== tempId));
+        if (result.code === "MUTED") {
+          toast.error(t("youAreMuted"));
+        }
       }
     } catch (error) {
       console.error("Failed to send message:", error);
@@ -601,6 +625,35 @@ export default function ChatPage() {
     }
   };
 
+  const handleDeleteConversation = async () => {
+    if (!selectedContactId) return;
+    setDeleteConversationOpen(false);
+    try {
+      const res = await fetch(
+        `/api/chat/conversations/${selectedContactId}/me`,
+        { method: "DELETE" }
+      );
+      const result = await res.json();
+      if (result.success) {
+        setContacts((prev) => prev.filter((c) => c.id !== selectedContactId));
+        setSelectedContactId("");
+        setMessages([]);
+        toast.success(t("conversationDeleted"));
+      } else {
+        toast.error(result.error || t("updateFailed"));
+      }
+    } catch {
+      toast.error(t("updateFailed"));
+    }
+  };
+
+  const handleGroupClosed = () => {
+    setGroupInfoOpen(false);
+    setSelectedContactId("");
+    setMessages([]);
+    setContacts((prev) => prev.filter((c) => c.id !== selectedContactId));
+  };
+
   if (isLoading) {
     return (
       <div className="flex h-[calc(100dvh-3.5rem)] flex-col items-center justify-center gap-3 bg-background sm:h-[100dvh]">
@@ -744,7 +797,15 @@ export default function ChatPage() {
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                {selectedContact.participantId ? (
+                {selectedContact.isGroup ? (
+                  <button
+                    type="button"
+                    onClick={() => setGroupInfoOpen(true)}
+                    className="block max-w-full truncate text-[15px] font-semibold tracking-tight hover:underline"
+                  >
+                    {selectedContact.name}
+                  </button>
+                ) : selectedContact.participantId ? (
                   <Link
                     href={`/gekaixing/user/${selectedContact.participantId}`}
                     className="block truncate text-[15px] font-semibold tracking-tight hover:underline"
@@ -757,16 +818,56 @@ export default function ChatPage() {
                   </h2>
                 )}
               </div>
-              {selectedContact.isGroup && (
+              {!selectedContact.isGroup && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setPickerOpen("add")}
-                  aria-label={t("addPeopleToGroup")}
-                  className="size-9 shrink-0 rounded-full text-primary hover:bg-primary/10"
+                  onClick={() => setDeleteConversationOpen(true)}
+                  aria-label={t("deleteConversation")}
+                  className="size-8 shrink-0 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                 >
-                  <UserPlus className="size-5" />
+                  <Trash2 className="size-4" />
                 </Button>
+              )}
+              {selectedContact.isGroup && (
+                <div className="flex shrink-0 items-center">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setWorkCalendarOpen(true)}
+                    aria-label={t("workCalendar")}
+                    className="size-8 rounded-full text-primary hover:bg-primary/10"
+                  >
+                    <CalendarDays className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setGroupInfoOpen(true)}
+                    aria-label={t("groupInfo")}
+                    className="size-8 rounded-full text-primary hover:bg-primary/10"
+                  >
+                    <Info className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setGroupMembersOpen(true)}
+                    aria-label={t("groupMembers")}
+                    className="size-8 rounded-full text-primary hover:bg-primary/10"
+                  >
+                    <Users className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setPickerOpen("add")}
+                    aria-label={t("addPeopleToGroup")}
+                    className="size-8 rounded-full text-primary hover:bg-primary/10"
+                  >
+                    <UserPlus className="size-4" />
+                  </Button>
+                </div>
               )}
             </header>
 
@@ -865,6 +966,50 @@ export default function ChatPage() {
         onToggleMember={toggleMember}
         onAddMembers={handleAddMembers}
       />
+
+      <GroupMembersDialog
+        open={groupMembersOpen}
+        onOpenChange={setGroupMembersOpen}
+        conversationId={selectedContactId}
+        currentUserId={currentUser?.id}
+      />
+
+      <GroupInfoDialog
+        open={groupInfoOpen}
+        onOpenChange={setGroupInfoOpen}
+        conversationId={selectedContactId}
+        onDisbanded={handleGroupClosed}
+        onLeft={handleGroupClosed}
+      />
+
+      <WorkCalendarDialog
+        open={workCalendarOpen}
+        onOpenChange={setWorkCalendarOpen}
+        conversationId={selectedContactId}
+      />
+
+      <AlertDialog
+        open={deleteConversationOpen}
+        onOpenChange={setDeleteConversationOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("deleteConversationConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("deleteConversationConfirmDesc")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => void handleDeleteConversation()}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("deleteConversation")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
