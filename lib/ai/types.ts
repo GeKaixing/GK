@@ -1,4 +1,4 @@
-export type AiProvider = "google" | "openai" | "openai-compatible";
+export type AiProvider = "google" | "openai" | "openai-compatible" | "anthropic";
 
 export interface AiUserConfig {
   provider: AiProvider;

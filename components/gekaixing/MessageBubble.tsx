@@ -47,7 +47,7 @@ export function MessageBubble({
         isUser ? "justify-end" : "justify-start"
       )}
     >
-      <div className={cn("flex flex-col", isUser ? "items-end" : "items-start")}>
+      <div className={cn("flex max-w-[80%] flex-col", isUser ? "items-end" : "items-start")}>
         {/* AI 消息显示模型标签 */}
         {!isUser && (
           <div className="mb-1 flex items-center gap-1.5 px-1 text-xs font-semibold text-muted-foreground">
@@ -57,7 +57,7 @@ export function MessageBubble({
         )}
         <div
           className={cn(
-            "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed break-words",
+            "w-fit rounded-2xl px-4 py-3 text-sm leading-relaxed break-words",
             "relative",
             "transition-all duration-200",
             isUser

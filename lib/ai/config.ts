@@ -1,7 +1,7 @@
 import type { AiProvider, AiUserConfig } from "./types";
 import { normalizeModel } from "./models";
 
-const VALID_PROVIDERS: AiProvider[] = ["google", "openai", "openai-compatible"];
+const VALID_PROVIDERS: AiProvider[] = ["google", "openai", "openai-compatible", "anthropic"];
 
 export function normalizeProvider(value: unknown): AiProvider {
   return VALID_PROVIDERS.includes(value as AiProvider) ? (value as AiProvider) : "google";

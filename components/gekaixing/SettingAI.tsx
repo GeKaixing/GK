@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { KeyRound } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { KeyRound, Settings } from "lucide-react";
 import { toast } from "sonner";
 import { useLocale } from "next-intl";
 import Link from "next/link";
@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getUserAiConfig, normalizeProvider } from "@/lib/ai/config";
 import {
+  ANTHROPIC_MODEL_OPTIONS,
   DEFAULT_MODEL,
   GOOGLE_MODEL_OPTIONS,
   OPENAI_COMPATIBLE_PRESETS,
@@ -41,6 +42,7 @@ function maskApiKey(key: string, configuredText: string): string {
 const PROVIDER_OPTIONS: { value: AiProvider; label: string }[] = [
   { value: "google", label: "Gemini" },
   { value: "openai", label: "OpenAI" },
+  { value: "anthropic", label: "Anthropic" },
   { value: "openai-compatible", label: "OpenAI 兼容" },
 ];
 
@@ -119,13 +121,24 @@ function getKeyLink(provider: AiProvider): string {
   if (provider === "openai") {
     return "https://platform.openai.com/api-keys";
   }
+  if (provider === "anthropic") {
+    return "https://console.anthropic.com/";
+  }
   if (provider === "openai-compatible") {
     return "https://api.deepseek.com/";
   }
   return "https://aistudio.google.com/api-keys";
 }
 
-export default function SettingAI() {
+export default function SettingAI({
+  trigger,
+  onSaved,
+}: {
+  /** 自定义触发器（用于聊天页顶栏等场景）；不传则用设置列表项样式 */
+  trigger?: ReactNode;
+  /** 保存成功后的回调（用于刷新界面上的模型显示） */
+  onSaved?: () => void;
+}) {
   const locale = useLocale();
   const text = getText(locale);
   const [open, setOpen] = useState(false);
@@ -261,6 +274,7 @@ export default function SettingAI() {
       setBaseUrlInput(nextConfig.baseURL ?? "");
       toast.success(nextConfig.apiKey ? text.saved : text.cleared);
       setOpen(false);
+      onSaved?.();
     } finally {
       setLoading(false);
     }
@@ -269,8 +283,14 @@ export default function SettingAI() {
   const providerLabel = PROVIDER_OPTIONS.find((option) => option.value === savedProvider)?.label ?? "Gemini";
   const triggerModel = savedProvider === "openai-compatible" && savedBaseUrl ? savedBaseUrl : savedModel;
   const isCompatible = providerInput === "openai-compatible";
-  const isSelectModel = providerInput === "google" || providerInput === "openai";
-  const modelOptions = providerInput === "google" ? GOOGLE_MODEL_OPTIONS : OPENAI_MODEL_OPTIONS;
+  const isSelectModel =
+    providerInput === "google" || providerInput === "openai" || providerInput === "anthropic";
+  const modelOptions =
+    providerInput === "google"
+      ? GOOGLE_MODEL_OPTIONS
+      : providerInput === "anthropic"
+        ? ANTHROPIC_MODEL_OPTIONS
+        : OPENAI_MODEL_OPTIONS;
 
   return (
     <Dialog
@@ -283,12 +303,14 @@ export default function SettingAI() {
       }}
     >
       <DialogTrigger asChild>
-        <button type="button" className="w-full text-left">
-          <SettingAccountLi
-            icon={<KeyRound />}
-            text={`${text.keyLabel} (${providerLabel})${savedKey ? ` · ${maskApiKey(savedKey, text.configured)}` : ""} · ${triggerModel}`}
-          />
-        </button>
+        {trigger ?? (
+          <button type="button" className="w-full text-left">
+            <SettingAccountLi
+              icon={<KeyRound />}
+              text={`${text.keyLabel} (${providerLabel})${savedKey ? ` · ${maskApiKey(savedKey, text.configured)}` : ""} · ${triggerModel}`}
+            />
+          </button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] w-[calc(100vw-1.5rem)] overflow-y-auto sm:max-w-lg">
         <DialogHeader className="space-y-2">

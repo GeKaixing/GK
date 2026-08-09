@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import MessageBubble from "./MessageBubble"
+import SettingAI from "./SettingAI"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { useAiSessions } from "@/store/AiSessions"
@@ -10,6 +11,7 @@ import {
   ArrowUp,
   ChevronDown,
   Paperclip,
+  Settings,
   Sparkles,
   SquarePen,
 } from "lucide-react"
@@ -39,10 +41,26 @@ export default function ChatUI({
   const { addSession, updateSessionTitle } = useAiSessions()
 
   const bottomRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const autoSentRef = useRef(false)
   const historyAddedRef = useRef(false) // ⭐ 防止重复加入历史
 
   const router = useRouter()
+
+  /** 输入框随内容自动增高（最多 ~200px） */
+  const resizeTextarea = useCallback((): void => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = "auto"
+    el.style.height = `${Math.min(el.scrollHeight, 200)}px`
+  }, [])
+
+  /** 发送后把输入框高度重置为单行 */
+  const resetTextarea = useCallback((): void => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = "auto"
+  }, [])
 
   const buildFallbackTitle = useCallback((text: string): string => {
     const normalized = text.replace(/\s+/g, " ").trim()
@@ -51,40 +69,36 @@ export default function ChatUI({
   }, [t])
 
   /**
-   * 显示当前 AI 提供商 / 模型（读取用户配置）
+   * 读取并显示当前 AI 提供商 / 模型
    */
-  useEffect(() => {
-    let cancelled = false
+  const reloadAiLabel = useCallback(async (): Promise<void> => {
+    try {
+      const supabase = createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return
 
-    async function loadConfig() {
-      try {
-        const supabase = createClient()
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
-        if (cancelled || !user) return
-
-        const config = getUserAiConfig(user)
-        const providerLabel =
-          config.provider === "google"
-            ? "Gemini"
-            : config.provider === "openai"
-              ? "OpenAI"
+      const config = getUserAiConfig(user)
+      const providerLabel =
+        config.provider === "google"
+          ? "Gemini"
+          : config.provider === "openai"
+            ? "OpenAI"
+            : config.provider === "anthropic"
+              ? "Anthropic"
               : "AI"
-        setAiModelLabel(
-          config.model ? `${providerLabel} · ${config.model}` : providerLabel
-        )
-      } catch {
-        // 读取失败不阻塞聊天
-      }
-    }
-
-    void loadConfig()
-
-    return () => {
-      cancelled = true
+      setAiModelLabel(
+        config.model ? `${providerLabel} · ${config.model}` : providerLabel
+      )
+    } catch {
+      // 读取失败不阻塞聊天
     }
   }, [])
+
+  useEffect(() => {
+    void reloadAiLabel()
+  }, [reloadAiLabel])
 
   function mergeMessages(
     historyMessages: Message[],
@@ -188,6 +202,7 @@ useEffect(() => {
     if (!text.trim() || loading) return
 
     setInput("")
+    resetTextarea()
     setLoading(true)
 
     const assistantId = crypto.randomUUID()
@@ -289,6 +304,7 @@ useEffect(() => {
     input,
     loading,
     messages,
+    resetTextarea,
     t,
     userId,
   ])
@@ -339,6 +355,52 @@ useEffect(() => {
     sendMessage(text)
   }
 
+  const inputBox = (
+    <div className="mx-auto w-full max-w-[760px]">
+      <div
+        className={cn(
+          "grid grid-cols-[auto_1fr_auto] items-end gap-2 rounded-2xl border border-border bg-background p-2 shadow-sm",
+          "transition-shadow focus-within:ring-2 focus-within:ring-primary/40"
+        )}
+      >
+        <button
+          type="button"
+          aria-label="Attach"
+          className="p-1.5 text-muted-foreground hover:text-foreground"
+        >
+          <Paperclip className="h-5 w-5" />
+        </button>
+        <textarea
+          ref={textareaRef}
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value)
+            resizeTextarea()
+          }}
+          onKeyDown={handleKeyDown}
+          placeholder="Ask anything"
+          rows={1}
+          className={cn(
+            "min-w-0 w-full resize-none bg-transparent px-1 py-1.5 text-sm",
+            "focus:outline-none"
+          )}
+        />
+        <button
+          type="button"
+          onClick={handleSend}
+          disabled={loading || !input.trim()}
+          aria-label={t("send")}
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
+        >
+          <ArrowUp className="h-4 w-4" />
+        </button>
+      </div>
+      <p className="mt-2 text-center text-xs text-muted-foreground">
+        {t("disclaimer")}
+      </p>
+    </div>
+  )
+
   return (
     <div className="flex h-[calc(100dvh-3.5rem)] w-full flex-col">
       {/* 顶栏 */}
@@ -360,70 +422,49 @@ useEffect(() => {
           >
             <SquarePen className="h-4 w-4" />
           </button>
+          <SettingAI
+            trigger={
+              <button
+                type="button"
+                aria-label="设置"
+                className="rounded-full p-2 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+              >
+                <Settings className="h-4 w-4" />
+              </button>
+            }
+            onSaved={() => void reloadAiLabel()}
+          />
         </div>
       </header>
 
-      {/* 消息区 */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-[760px] px-4 py-8">
-          {messages.length === 0 ? (
+      {messages.length === 0 ? (
+        /* 空状态：GKX 字标 + 输入框 一起垂直居中 */
+        <div className="flex min-h-0 flex-1 flex-col justify-center gap-8 px-4 pb-8">
+          <div className="mx-auto w-full max-w-[760px]">
             <GrokEmptyState t={t} />
-          ) : (
-            messages.map((msg) => (
-              <MessageBubble
-                key={msg.id}
-                role={msg.role}
-                content={msg.content}
-                loading={loading && msg.role === "assistant" && !msg.content}
-              />
-            ))
-          )}
-          <div ref={bottomRef} />
-        </div>
-      </div>
-
-      {/* 输入区 */}
-      <div className="px-4 pb-5 pt-2">
-        <div className="mx-auto w-full max-w-[760px]">
-          <div
-            className={cn(
-              "flex items-end gap-2 rounded-2xl border border-border bg-background p-2 shadow-sm",
-              "transition-shadow focus-within:ring-2 focus-within:ring-primary/40"
-            )}
-          >
-            <button
-              type="button"
-              aria-label="Attach"
-              className="p-1.5 text-muted-foreground hover:text-foreground"
-            >
-              <Paperclip className="h-5 w-5" />
-            </button>
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask anything"
-              rows={1}
-              className={cn(
-                "flex-1 resize-none bg-transparent px-1 py-1.5 text-sm",
-                "focus:outline-none"
-              )}
-            />
-            <button
-              type="button"
-              onClick={handleSend}
-              disabled={loading || !input.trim()}
-              aria-label={t("send")}
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
-            >
-              <ArrowUp className="h-4 w-4" />
-            </button>
           </div>
-          <p className="mt-2 text-center text-xs text-muted-foreground">
-            {t("disclaimer")}
-          </p>
+          {inputBox}
         </div>
-      </div>
+      ) : (
+        <>
+          {/* 消息区 */}
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="mx-auto w-full max-w-[760px] px-4 py-8">
+              {messages.map((msg) => (
+                <MessageBubble
+                  key={msg.id}
+                  role={msg.role}
+                  content={msg.content}
+                  loading={loading && msg.role === "assistant" && !msg.content}
+                />
+              ))}
+              <div ref={bottomRef} />
+            </div>
+          </div>
+          {/* 输入区（底部） */}
+          <div className="px-4 pb-5 pt-2">{inputBox}</div>
+        </>
+      )}
     </div>
   )
 }
@@ -433,7 +474,7 @@ useEffect(() => {
  */
 function GrokEmptyState({ t }: { t: ReturnType<typeof useTranslations> }) {
   return (
-    <div className="flex min-h-[55vh] flex-col items-center justify-center text-center">
+    <div className="text-center">
       <h1 className="text-5xl font-bold tracking-tight">
         {t("assistantTitle")}
       </h1>

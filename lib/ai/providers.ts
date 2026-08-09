@@ -1,3 +1,4 @@
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 import type { LanguageModel } from "ai";
@@ -13,6 +14,8 @@ export function buildLanguageModel(config: AiUserConfig): LanguageModel {
         apiKey: config.apiKey,
         ...(config.baseURL ? { baseURL: config.baseURL } : {}),
       })(config.model);
+    case "anthropic":
+      return createAnthropic({ apiKey: config.apiKey })(config.model);
     case "google":
     default:
       return createGoogleGenerativeAI({ apiKey: config.apiKey })(config.model);

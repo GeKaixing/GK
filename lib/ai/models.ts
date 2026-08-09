@@ -18,10 +18,19 @@ export const OPENAI_MODEL_OPTIONS = [
   "gpt-4.1-mini",
 ] as const;
 
+export const ANTHROPIC_MODEL_OPTIONS = [
+  "claude-opus-4-5",
+  "claude-sonnet-4-5",
+  "claude-haiku-4-5",
+  "claude-3-7-sonnet",
+  "claude-3-5-haiku",
+] as const;
+
 export const DEFAULT_MODEL: Record<AiProvider, string> = {
   google: "gemini-3-flash-preview",
   openai: "gpt-5",
   "openai-compatible": "",
+  anthropic: "claude-sonnet-4-5",
 };
 
 /** Suggestive defaults for common OpenAI-compatible services. */
@@ -62,6 +71,12 @@ export function normalizeModel(provider: AiProvider, value: unknown): string {
       : DEFAULT_MODEL.openai;
   }
 
+  if (provider === "anthropic") {
+    return (ANTHROPIC_MODEL_OPTIONS as readonly string[]).includes(normalized)
+      ? normalized
+      : DEFAULT_MODEL.anthropic;
+  }
+
   return normalized;
 }
 
@@ -77,7 +92,12 @@ export function getModelCandidates(provider: AiProvider, preferred: unknown): st
     return preferredModel ? [preferredModel] : [];
   }
 
-  const list = provider === "google" ? GOOGLE_MODEL_OPTIONS : OPENAI_MODEL_OPTIONS;
+  const list =
+    provider === "google"
+      ? GOOGLE_MODEL_OPTIONS
+      : provider === "anthropic"
+        ? ANTHROPIC_MODEL_OPTIONS
+        : OPENAI_MODEL_OPTIONS;
   const rest = list.filter((model) => model !== preferredModel);
   return [preferredModel, ...rest];
 }
