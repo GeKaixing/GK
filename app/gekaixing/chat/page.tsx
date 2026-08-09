@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { User } from "@supabase/supabase-js";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -557,9 +558,18 @@ export default function ChatPage() {
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <h2 className="truncate text-[15px] font-semibold tracking-tight">
-                  {selectedContact.name}
-                </h2>
+                {selectedContact.participantId ? (
+                  <Link
+                    href={`/gekaixing/user/${selectedContact.participantId}`}
+                    className="block truncate text-[15px] font-semibold tracking-tight hover:underline"
+                  >
+                    {selectedContact.name}
+                  </Link>
+                ) : (
+                  <h2 className="truncate text-[15px] font-semibold tracking-tight">
+                    {selectedContact.name}
+                  </h2>
+                )}
               </div>
             </header>
 
@@ -664,12 +674,24 @@ function ConversationRow({
   onSelect: () => void;
 }) {
   const unread = contact.unreadCount > 0;
+  const nameClass = cn(
+    "truncate text-[15px] leading-5",
+    unread ? "font-bold text-foreground" : "font-semibold text-foreground/90"
+  );
 
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
       className={cn(
-        "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors",
+        "flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors",
         active ? "bg-muted/80" : "hover:bg-muted/50"
       )}
     >
@@ -687,14 +709,17 @@ function ConversationRow({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
-          <span
-            className={cn(
-              "truncate text-[15px] leading-5",
-              unread ? "font-bold text-foreground" : "font-semibold text-foreground/90"
-            )}
-          >
-            {contact.name}
-          </span>
+          {contact.participantId ? (
+            <Link
+              href={`/gekaixing/user/${contact.participantId}`}
+              onClick={(e) => e.stopPropagation()}
+              className={cn(nameClass, "hover:underline")}
+            >
+              {contact.name}
+            </Link>
+          ) : (
+            <span className={nameClass}>{contact.name}</span>
+          )}
           {timeLabel && (
             <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{timeLabel}</span>
           )}
@@ -715,7 +740,7 @@ function ConversationRow({
           )}
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -745,7 +770,7 @@ function MessageGroup({
   const firstSenderName = messages[0].senderName || contactName;
 
   return (
-    <div className={cn("flex items-end gap-2", isMe && "flex-row-reverse")}>
+    <div className={cn("flex gap-2", isMe ? "flex-row-reverse items-end" : "items-start")}>
       <Avatar className="mb-0.5 size-7 shrink-0 ring-1 ring-border/40">
         <AvatarImage
           src={
@@ -768,6 +793,18 @@ function MessageGroup({
       </Avatar>
 
       <div className={cn("flex max-w-[75%] flex-col", isMe ? "items-end" : "items-start")}>
+        {!isMe && (
+          <Link
+            href={
+              messages[0].senderId
+                ? `/gekaixing/user/${messages[0].senderId}`
+                : "#"
+            }
+            className="mb-1 px-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground hover:underline"
+          >
+            {firstSenderName}
+          </Link>
+        )}
         <div className={cn("flex flex-col gap-1", isMe ? "items-end" : "items-start")}>
           {messages.map((m, i) => {
             const isLast = i === messages.length - 1;
