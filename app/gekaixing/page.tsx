@@ -1,9 +1,13 @@
 import PostStore from "@/components/gekaixing/PostStore";
 import { getHomeFeed } from "@/lib/feed/service";
-import type { FeedPage, FeedPostItem as Post } from "@/lib/feed/types";
+import type { FeedPage, FeedPostItem as Post, FeedTab } from "@/lib/feed/types";
 import { prisma } from "@/lib/prisma";
 import { withTimeoutOrNull } from "@/lib/with-timeout";
 import { createClient } from "@/utils/supabase/server";
+import { getTranslations } from "next-intl/server";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +22,7 @@ const EMPTY_FEED: FeedPage = {
   },
 };
 
-async function getFeed(limit: number = 20): Promise<FeedPage> {
+async function getFeed(limit: number = 20, tab: FeedTab = "foryou"): Promise<FeedPage> {
   let userId: string | null = null;
 
   try {
@@ -32,6 +36,7 @@ async function getFeed(limit: number = 20): Promise<FeedPage> {
         userId,
         cursor: null,
         limit,
+        tab,
       }),
       8000
     );
@@ -40,18 +45,40 @@ async function getFeed(limit: number = 20): Promise<FeedPage> {
       return feed;
     }
 
-    return getFallbackFeed(userId, limit);
+    return getFallbackFeed(userId, limit, tab);
   } catch (error) {
     console.error("Failed to load gekaixing feed:", error);
-    return getFallbackFeed(userId, limit);
+    return getFallbackFeed(userId, limit, tab);
   }
 }
 
-async function getFallbackFeed(userId: string | null, limit: number): Promise<FeedPage> {
+async function getFallbackFeed(userId: string | null, limit: number, tab: FeedTab): Promise<FeedPage> {
   try {
+    let where: Prisma.PostWhereInput = { parentId: null };
+
+    if (tab === "following" && userId) {
+      const follows = await prisma.follow.findMany({
+        where: {
+          followerId: userId,
+          status: "FOLLOWING",
+        },
+        select: {
+          followingId: true,
+        },
+      });
+      const followingIds = follows.map((item) => item.followingId);
+      if (followingIds.length === 0) {
+        return EMPTY_FEED;
+      }
+      where = {
+        parentId: null,
+        authorId: { in: followingIds },
+      };
+    }
+
     const rows = await withTimeoutOrNull(
       prisma.post.findMany({
-        where: { parentId: null },
+        where,
         orderBy: { createdAt: "desc" },
         take: limit,
         select: {
@@ -135,12 +162,55 @@ async function getFallbackFeed(userId: string | null, limit: number): Promise<Fe
   }
 }
 
-export default async function Page() {
-  const feed = await getFeed();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  const params = await searchParams;
+  const tab: FeedTab = params.tab === "following" ? "following" : "foryou";
+  const feed = await getFeed(20, tab);
+  const tf = await getTranslations("ImitationX.Feed");
 
   return (
-    <div className="px-4 pt-4">
-      <PostStore data={feed.data} nextCursor={feed.page.nextCursor} hasMore={feed.page.hasMore} />
+    <div>
+      <div className="sticky top-14 z-10 border-b border-border bg-background/95 backdrop-blur sm:top-0">
+        <nav className="grid grid-cols-2" aria-label={tf("following")}>
+          <Link
+            href="/gekaixing"
+            aria-current={tab === "foryou" ? "page" : undefined}
+            className={cn(
+              "relative py-3 text-center text-sm font-medium transition-colors",
+              tab !== "following"
+                ? "text-foreground"
+                : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+            )}
+          >
+            {tf("forYou")}
+            {tab !== "following" ? (
+              <div className="absolute bottom-0 left-1/2 h-1 w-12 -translate-x-1/2 rounded-full bg-blue-500" />
+            ) : null}
+          </Link>
+          <Link
+            href="/gekaixing?tab=following"
+            aria-current={tab === "following" ? "page" : undefined}
+            className={cn(
+              "relative py-3 text-center text-sm font-medium transition-colors",
+              tab === "following"
+                ? "text-foreground"
+                : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+            )}
+          >
+            {tf("following")}
+            {tab === "following" ? (
+              <div className="absolute bottom-0 left-1/2 h-1 w-12 -translate-x-1/2 rounded-full bg-blue-500" />
+            ) : null}
+          </Link>
+        </nav>
+      </div>
+      <div className="px-4 pt-4">
+        <PostStore data={feed.data} nextCursor={feed.page.nextCursor} hasMore={feed.page.hasMore} feedQuery={{ tab }} />
+      </div>
     </div>
   );
 }

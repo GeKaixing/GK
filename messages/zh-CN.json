@@ -113,7 +113,9 @@
       "mine": "我的",
       "settings": "设置",
       "publish": "发布",
-      "login": "登录"
+      "login": "登录",
+      "notifications": "通知",
+      "chat": "聊天"
     },
     "Gkx": {
       "newChat": "新对话",
@@ -190,7 +192,10 @@
     },
     "Feed": {
       "loading": "加载中...",
-      "allLoaded": "已显示全部内容"
+      "allLoaded": "已显示全部内容",
+      "forYou": "为你推荐",
+      "following": "正在关注",
+      "followingEmpty": "关注一些人，在这里查看他们的动态"
     },
     "Hot": {
       "title": "今日头条",
@@ -216,6 +221,7 @@
     "FollowCard": {
       "loading": "加载中...",
       "noBio": "还没有介绍自己",
+      "whoToFollow": "谁值得关注",
       "following": "已关注",
       "follow": "关注",
       "notFound": "未找到数据"

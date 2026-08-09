@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import type { FeedCachePayload, FeedPageCachePayload } from "@/lib/feed/types";
+import type { FeedCachePayload, FeedPageCachePayload, FeedTab } from "@/lib/feed/types";
 
 const FEED_CACHE_TTL_SECONDS = 300;
 const FEED_CACHE_STALE_MS = 2 * 60 * 1000;
@@ -49,21 +49,24 @@ function getResolvedUserId(userId: string | null): string {
   return userId ?? "anon";
 }
 
-export function getFeedRankedCacheKey(userId: string | null): string {
-  return `${FEED_CACHE_PREFIX}:${getResolvedUserId(userId)}`;
+export function getFeedRankedCacheKey(userId: string | null, tab: FeedTab = "foryou"): string {
+  const suffix = tab === "following" ? ":following" : "";
+  return `${FEED_CACHE_PREFIX}:${getResolvedUserId(userId)}${suffix}`;
 }
 
-export function getFeedPageCacheKey(userId: string | null, page: number): string {
-  return `${FEED_CACHE_PREFIX}:${getResolvedUserId(userId)}:page:${page}`;
+export function getFeedPageCacheKey(userId: string | null, page: number, tab: FeedTab = "foryou"): string {
+  const suffix = tab === "following" ? ":following" : "";
+  return `${FEED_CACHE_PREFIX}:${getResolvedUserId(userId)}${suffix}:page:${page}`;
 }
 
-function getFeedLockKey(userId: string | null): string {
-  return `${FEED_CACHE_PREFIX}:${getResolvedUserId(userId)}:recompute:lock`;
+function getFeedLockKey(userId: string | null, tab: FeedTab = "foryou"): string {
+  const suffix = tab === "following" ? ":following" : "";
+  return `${FEED_CACHE_PREFIX}:${getResolvedUserId(userId)}${suffix}:recompute:lock`;
 }
 
-export async function getFeedCache(userId: string | null): Promise<FeedCachePayload | null> {
+export async function getFeedCache(userId: string | null, tab: FeedTab = "foryou"): Promise<FeedCachePayload | null> {
   try {
-    const raw = await runRedisCommand(["GET", getFeedRankedCacheKey(userId)]);
+    const raw = await runRedisCommand(["GET", getFeedRankedCacheKey(userId, tab)]);
     if (typeof raw !== "string") {
       return null;
     }
@@ -80,11 +83,11 @@ export async function getFeedCache(userId: string | null): Promise<FeedCachePayl
   }
 }
 
-export async function setFeedCache(userId: string | null, payload: FeedCachePayload): Promise<void> {
+export async function setFeedCache(userId: string | null, payload: FeedCachePayload, tab: FeedTab = "foryou"): Promise<void> {
   try {
     await runRedisCommand([
       "SET",
-      getFeedRankedCacheKey(userId),
+      getFeedRankedCacheKey(userId, tab),
       JSON.stringify(payload),
       "EX",
       FEED_CACHE_TTL_SECONDS,
@@ -96,10 +99,11 @@ export async function setFeedCache(userId: string | null, payload: FeedCachePayl
 
 export async function getFeedPageCache(
   userId: string | null,
-  page: number
+  page: number,
+  tab: FeedTab = "foryou"
 ): Promise<FeedPageCachePayload | null> {
   try {
-    const raw = await runRedisCommand(["GET", getFeedPageCacheKey(userId, page)]);
+    const raw = await runRedisCommand(["GET", getFeedPageCacheKey(userId, page, tab)]);
     if (typeof raw !== "string") {
       return null;
     }
@@ -124,12 +128,13 @@ export async function getFeedPageCache(
 export async function setFeedPageCache(
   userId: string | null,
   page: number,
-  payload: FeedPageCachePayload
+  payload: FeedPageCachePayload,
+  tab: FeedTab = "foryou"
 ): Promise<void> {
   try {
     await runRedisCommand([
       "SET",
-      getFeedPageCacheKey(userId, page),
+      getFeedPageCacheKey(userId, page, tab),
       JSON.stringify(payload),
       "EX",
       FEED_CACHE_TTL_SECONDS,
@@ -142,10 +147,18 @@ export async function setFeedPageCache(
 export async function deleteFeedCache(userId: string | null): Promise<void> {
   try {
     const resolvedUserId = getResolvedUserId(userId);
-    const pagePattern = `${FEED_CACHE_PREFIX}:${resolvedUserId}:page:*`;
-    const keysRaw = await runRedisCommand(["KEYS", pagePattern]);
-    const keys = Array.isArray(keysRaw) ? keysRaw.filter((key): key is string => typeof key === "string") : [];
-    const commands: Array<Array<string | number>> = [["DEL", getFeedRankedCacheKey(userId)]];
+    const patterns = [
+      `${FEED_CACHE_PREFIX}:${resolvedUserId}:page:*`,
+      `${FEED_CACHE_PREFIX}:${resolvedUserId}:following:page:*`,
+    ];
+    const keysRaw = await Promise.all(
+      patterns.map((pattern) => runRedisCommand(["KEYS", pattern]))
+    );
+    const keys = keysRaw.flat().filter((key): key is string => typeof key === "string");
+    const commands: Array<Array<string | number>> = [
+      ["DEL", getFeedRankedCacheKey(userId)],
+      ["DEL", getFeedRankedCacheKey(userId, "following")],
+    ];
 
     keys.forEach((key) => {
       commands.push(["DEL", key]);
@@ -166,9 +179,9 @@ export interface FeedRecomputeLock {
   token: string;
 }
 
-export async function tryAcquireFeedRecomputeLock(userId: string | null): Promise<FeedRecomputeLock | null> {
+export async function tryAcquireFeedRecomputeLock(userId: string | null, tab: FeedTab = "foryou"): Promise<FeedRecomputeLock | null> {
   try {
-    const key = getFeedLockKey(userId);
+    const key = getFeedLockKey(userId, tab);
     const token = crypto.randomUUID();
     const result = await runRedisCommand(["SET", key, token, "EX", FEED_LOCK_TTL_SECONDS, "NX"]);
 

@@ -130,7 +130,7 @@ export default async function RootLayout({
           <Sidebar user={userInfo} mentionCount={mentionCount} />
         </header>
         <main className="flex-1 w-full max-w-[600px] border-x border-border">{children}</main>
-        <footer className="hidden lg:flex w-[290px] xl:w-[350px] shrink-0 pl-4 py-4 sticky top-0 h-screen overflow-y-auto">
+        <footer className="hidden lg:flex w-[290px] xl:w-[350px] shrink-0 pl-4  sticky top-0 h-screen overflow-y-auto">
           <Footer />
         </footer>
       </div>
@@ -139,6 +139,8 @@ export default async function RootLayout({
         labels={{
           home: mobileT("home"),
           search: mobileT("search"),
+          notifications: mobileT("notifications"),
+          chat: mobileT("chat"),
           mine: mobileT("mine"),
         }}
       />

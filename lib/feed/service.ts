@@ -10,7 +10,7 @@ import {
   tryAcquireFeedRecomputeLock,
 } from "@/lib/feed/cache";
 import { prisma } from "@/lib/prisma";
-import type { FeedPage, FeedPostItem } from "@/lib/feed/types";
+import type { FeedPage, FeedPostItem, FeedTab } from "@/lib/feed/types";
 
 const FOLLOWING_CANDIDATE_LIMIT = 400;
 const HOT_CANDIDATE_LIMIT = 300;
@@ -21,6 +21,7 @@ interface FeedQueryOptions {
   userId: string | null;
   cursor: string | null;
   limit: number;
+  tab?: FeedTab;
 }
 
 interface FeedCandidate {
@@ -161,7 +162,31 @@ async function getFollowingAuthorSet(userId: string): Promise<Set<string>> {
   return new Set<string>(follows.map((item) => item.followingId));
 }
 
-async function buildCandidatePool(userId: string | null): Promise<string[]> {
+async function buildCandidatePool(userId: string | null, tab: FeedTab = "foryou"): Promise<string[]> {
+  // Following tab: pure reverse-chronological posts from followed authors (X behavior).
+  if (tab === "following") {
+    if (!userId) {
+      return [];
+    }
+
+    const followingIds = Array.from(await getFollowingAuthorSet(userId));
+    if (!followingIds.length) {
+      return [];
+    }
+
+    const rows = await prisma.post.findMany({
+      where: {
+        parentId: null,
+        authorId: { in: followingIds },
+      },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      take: FOLLOWING_CANDIDATE_LIMIT,
+      select: { id: true },
+    });
+
+    return rows.map((row) => row.id);
+  }
+
   const followingAuthorSet = userId ? await getFollowingAuthorSet(userId) : new Set<string>();
   const followingIds = Array.from(followingAuthorSet);
   const behaviorBoostMap = userId ? await getBehaviorAuthorBoostMap(userId) : new Map<string, number>();
@@ -303,24 +328,28 @@ async function hydratePostsForPage(userId: string | null, pagePostIds: string[])
   return pagePostIds.map((id) => byId.get(id)).filter((item): item is FeedPostItem => item !== undefined);
 }
 
-export async function recomputeAndCacheHomeFeed(userId: string | null): Promise<string[]> {
-  const lock = await tryAcquireFeedRecomputeLock(userId);
+export async function recomputeAndCacheHomeFeed(userId: string | null, tab: FeedTab = "foryou"): Promise<string[]> {
+  const lock = await tryAcquireFeedRecomputeLock(userId, tab);
   if (!lock) {
-    const existing = await getFeedCache(userId);
+    const existing = await getFeedCache(userId, tab);
     // If Redis (lock/cache) is unavailable and nothing is cached, compute the
     // feed directly instead of returning an empty list.
     if (existing) {
       return existing.postIds;
     }
-    return buildCandidatePool(userId);
+    return buildCandidatePool(userId, tab);
   }
 
   try {
-    const rankedPostIds = await buildCandidatePool(userId);
-    await setFeedCache(userId, {
-      postIds: rankedPostIds,
-      computedAt: Date.now(),
-    });
+    const rankedPostIds = await buildCandidatePool(userId, tab);
+    await setFeedCache(
+      userId,
+      {
+        postIds: rankedPostIds,
+        computedAt: Date.now(),
+      },
+      tab
+    );
     return rankedPostIds;
   } finally {
     await releaseFeedRecomputeLock(lock);
@@ -329,16 +358,17 @@ export async function recomputeAndCacheHomeFeed(userId: string | null): Promise<
 
 export async function getHomeFeed(options: FeedQueryOptions): Promise<FeedPage> {
   const limit = normalizeLimit(options.limit);
-  let cached = await getFeedCache(options.userId);
+  const tab: FeedTab = options.tab ?? "foryou";
+  let cached = await getFeedCache(options.userId, tab);
 
   if (!cached) {
-    const postIds = await recomputeAndCacheHomeFeed(options.userId);
+    const postIds = await recomputeAndCacheHomeFeed(options.userId, tab);
     cached = {
       postIds,
       computedAt: Date.now(),
     };
   } else if (isFeedCacheStale(cached)) {
-    void recomputeAndCacheHomeFeed(options.userId).catch((error) => {
+    void recomputeAndCacheHomeFeed(options.userId, tab).catch((error) => {
       console.error("Async feed recompute failed:", error);
     });
   }
@@ -346,7 +376,7 @@ export async function getHomeFeed(options: FeedQueryOptions): Promise<FeedPage> 
   const startIndex = getStartIndex(cached.postIds, options.cursor);
   const pageNumber = getPageNumber(startIndex, limit);
   const isPageAligned = startIndex % limit === 0;
-  let pageCache = isPageAligned ? await getFeedPageCache(options.userId, pageNumber) : null;
+  let pageCache = isPageAligned ? await getFeedPageCache(options.userId, pageNumber, tab) : null;
   if (pageCache && pageCache.limit !== limit) {
     pageCache = null;
   }
@@ -365,7 +395,7 @@ export async function getHomeFeed(options: FeedQueryOptions): Promise<FeedPage> 
     };
 
     if (isPageAligned) {
-      await setFeedPageCache(options.userId, pageNumber, pageCache);
+      await setFeedPageCache(options.userId, pageNumber, pageCache, tab);
     }
   }
 
@@ -373,7 +403,7 @@ export async function getHomeFeed(options: FeedQueryOptions): Promise<FeedPage> 
 
   // If cached IDs no longer exist (deleted/filtered), recompute once to avoid blank feed pages.
   if (posts.length === 0 && pageCache.postIds.length > 0) {
-    const refreshedPostIds = await recomputeAndCacheHomeFeed(options.userId);
+    const refreshedPostIds = await recomputeAndCacheHomeFeed(options.userId, tab);
     const refreshedStartIndex = getStartIndex(refreshedPostIds, options.cursor);
     const refreshedPagePostIds = refreshedPostIds.slice(refreshedStartIndex, refreshedStartIndex + limit);
     const refreshedHasMore = refreshedStartIndex + limit < refreshedPostIds.length;

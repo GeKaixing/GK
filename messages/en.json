@@ -113,7 +113,9 @@
       "mine": "Me",
       "settings": "Settings",
       "publish": "Post",
-      "login": "Login"
+      "login": "Login",
+      "notifications": "Notifications",
+      "chat": "Chat"
     },
     "Gkx": {
       "newChat": "New Chat",
@@ -190,7 +192,10 @@
     },
     "Feed": {
       "loading": "Loading...",
-      "allLoaded": "You've reached the end"
+      "allLoaded": "You've reached the end",
+      "forYou": "For you",
+      "following": "Following",
+      "followingEmpty": "Follow people to see their posts"
     },
     "Hot": {
       "title": "Trending",
@@ -216,6 +221,7 @@
     "FollowCard": {
       "loading": "Loading...",
       "noBio": "No bio yet",
+      "whoToFollow": "Who to follow",
       "following": "Following",
       "follow": "Follow",
       "notFound": "No data found"

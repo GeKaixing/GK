@@ -3,6 +3,7 @@ import { userStore } from "@/store/user";
 import { postModalStore } from "@/store/postModal";
 import { MessageSquare, House, LogIn, Settings, Users, Search, Sparkles, CircleEllipsis, Heart, Bookmark, Feather, User as UserIcon, ShieldCheck, Bell, BriefcaseBusiness } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -25,6 +26,22 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
     const [isMoreOpen, setIsMoreOpen] = useState(false)
     const { openModal } = postModalStore()
     const displayMentionCount = pathname === "/gekaixing/notifications" ? 0 : mentionCount
+    const isActivePath = (href: string) => pathname === href || pathname.startsWith(href + "/")
+    const homeActive = pathname === "/gekaixing"
+    const moreActive = ["/gekaixing/likes", "/gekaixing/bookmarks", "/gekaixing/notifications", "/gekaixing/jobs"].some(
+      (href) => isActivePath(href)
+    )
+    const settingsActive = user?.id ? isActivePath("/gekaixing/settings") : false
+    const profileActive = user?.id ? isActivePath(`/gekaixing/user/${user.id}`) : false
+
+    const navItems = [
+      { href: "/gekaixing", icon: House, label: t("home"), active: homeActive },
+      { href: "/gekaixing/chat", icon: MessageSquare, label: t("chat"), active: isActivePath("/gekaixing/chat") },
+      { href: "/gekaixing/connect_people", icon: Users, label: t("connect"), active: isActivePath("/gekaixing/connect_people") },
+      { href: "/gekaixing/explore", icon: Search, label: t("explore"), active: isActivePath("/gekaixing/explore") },
+      { href: "/gekaixing/gkx", icon: Sparkles, label: "GKX", active: isActivePath("/gekaixing/gkx") },
+      { href: "/gekaixing/premium", icon: ShieldCheck, label: t("premium"), active: isActivePath("/gekaixing/premium") },
+    ]
 
     useEffect(() => {
         userStore.setState({
@@ -47,52 +64,37 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
     }
 
     return (
-        <nav className="w-full h-screen flex justify-end px-2 lg:pr-4">
-            <div className="flex flex-col h-full w-full lg:w-[200px]">
-                <ul className="space-y-1 flex flex-col items-center lg:items-start">
-                    <li className="w-full">
-                        <Link href="/gekaixing" className="flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full transition-colors">
-                            <House className="w-7 h-7" />
-                            <span className="hidden lg:inline">{t("home")}</span>
-                        </Link>
-                    </li>
-                    <li className="w-full">
-                        <Link href="/gekaixing/chat" className="flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full transition-colors">
-                            <MessageSquare className="w-7 h-7" />
-                            <span className="hidden lg:inline">{t("chat")}</span>
-                        </Link>
-                    </li>
-                    <li className="w-full">
-                        <Link href="/gekaixing/connect_people" className="flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full transition-colors">
-                            <Users className="w-7 h-7" />
-                            <span className="hidden lg:inline">{t("connect")}</span>
-                        </Link>
-                    </li>
-                    <li className="w-full">
-                        <Link href="/gekaixing/explore" className="flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full transition-colors">
-                            <Search className="w-7 h-7" />
-                            <span className="hidden lg:inline">{t("explore")}</span>
-                        </Link>
-                    </li>
-                    <li className="w-full">
-                        <Link href="/gekaixing/gkx" className="flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full transition-colors">
-                            <Sparkles className="w-7 h-7" />
-                            <span className="hidden lg:inline">GKX</span>
-                        </Link>
-                    </li>
-                    <li className="w-full">
-                        <Link href="/gekaixing/premium" className="flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full transition-colors">
-                            <ShieldCheck className="w-7 h-7" />
-                            <span className="hidden lg:inline">{t("premium")}</span>
-                        </Link>
-                    </li>
+        <nav className="w-full h-screen px-2 xl:px-4">
+            <div className="flex flex-col h-full w-full">
+                <div className="hidden xl:block px-3 pt-3 pb-1">
+                    <Link href="/gekaixing" className="inline-flex items-center">
+                        <Image src="/logo.svg" width={52} height={12} alt="logo" className="dark:hidden" />
+                        <Image src="/logo-white.svg" width={52} height={12} alt="logo white" className="hidden dark:block" />
+                    </Link>
+                </div>
+                <ul className="space-y-1 flex flex-col items-center xl:items-start">
+                    {navItems.map((item) => {
+                        const Icon = item.icon
+                        return (
+                            <li key={item.href} className="w-full">
+                                <Link
+                                    href={item.href}
+                                    aria-current={item.active ? "page" : undefined}
+                                    className={`flex items-center justify-center xl:justify-start gap-0 xl:gap-3 text-xl rounded-full p-3 w-full transition-colors hover:bg-muted/70 ${item.active ? "font-bold" : "font-normal"}`}
+                                >
+                                    <Icon className="w-7 h-7" fill={item.active ? "currentColor" : "none"} />
+                                    <span className="hidden xl:inline">{item.label}</span>
+                                </Link>
+                            </li>
+                        )
+                    })}
 
                     <li className="w-full">
                         <DropdownMenu open={isMoreOpen} onOpenChange={setIsMoreOpen}>
                             <DropdownMenuTrigger asChild>
-                                <button className="flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full cursor-pointer transition-colors">
-                                    <CircleEllipsis className="w-7 h-7" />
-                                    <span className="hidden lg:inline">{t("more")}</span>
+                                <button className={`flex items-center justify-center xl:justify-start gap-0 xl:gap-3 text-xl rounded-full p-3 w-full cursor-pointer transition-colors hover:bg-muted/70 ${moreActive ? "font-bold" : "font-normal"}`}>
+                                    <CircleEllipsis className="w-7 h-7" fill={moreActive ? "currentColor" : "none"} />
+                                    <span className="hidden xl:inline">{t("more")}</span>
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="right" align="start" className="w-48">
@@ -123,17 +125,25 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
 
                     {user?.id && (
                         <li className="w-full">
-                            <Link href="/gekaixing/settings" className="flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full transition-colors">
-                                <Settings className="w-7 h-7" />
-                                <span className="hidden lg:inline">{t("settings")}</span>
+                            <Link
+                                href="/gekaixing/settings"
+                                aria-current={settingsActive ? "page" : undefined}
+                                className={`flex items-center justify-center xl:justify-start gap-0 xl:gap-3 text-xl rounded-full p-3 w-full transition-colors hover:bg-muted/70 ${settingsActive ? "font-bold" : "font-normal"}`}
+                            >
+                                <Settings className="w-7 h-7" fill={settingsActive ? "currentColor" : "none"} />
+                                <span className="hidden xl:inline">{t("settings")}</span>
                             </Link>
                         </li>
                     )}
                     {user?.id && (
                         <li className="w-full">
-                            <Link href={`/gekaixing/user/${user?.id}`} className="flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full transition-colors">
-                                <UserIcon className="w-7 h-7" />
-                                <span className="hidden lg:inline">{t("profile")}</span>
+                            <Link
+                                href={`/gekaixing/user/${user?.id}`}
+                                aria-current={profileActive ? "page" : undefined}
+                                className={`flex items-center justify-center xl:justify-start gap-0 xl:gap-3 text-xl rounded-full p-3 w-full transition-colors hover:bg-muted/70 ${profileActive ? "font-bold" : "font-normal"}`}
+                            >
+                                <UserIcon className="w-7 h-7" fill={profileActive ? "currentColor" : "none"} />
+                                <span className="hidden xl:inline">{t("profile")}</span>
                             </Link>
                         </li>
                     )}
@@ -142,19 +152,19 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
                         <li className="w-full mt-4 flex justify-center items-center">
                             <button
                                 onClick={openModal}
-                                className="w-12 h-12 lg:w-full lg:h-auto lg:py-3 bg-primary text-primary-foreground rounded-full flex items-center justify-center hover:opacity-90 transition-colors"
+                                className="w-12 h-12 xl:w-full xl:h-auto xl:py-3 bg-primary text-primary-foreground rounded-full flex items-center justify-center hover:opacity-90 transition-colors"
                             >
-                                <Feather className="w-5 h-5 lg:hidden" />
-                                <span className="hidden lg:inline font-bold text-lg">{t("publish")}</span>
+                                <Feather className="w-5 h-5 xl:hidden" />
+                                <span className="hidden xl:inline font-bold text-lg">{t("publish")}</span>
                             </button>
                         </li>
                     )}
 
                     {!user?.id ? (
                         <li className="w-full">
-                            <Link href="/account" className="flex items-center justify-center lg:justify-start gap-0 lg:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full transition-colors">
+                            <Link href="/account" className="flex items-center justify-center xl:justify-start gap-0 xl:gap-3 text-xl font-bold hover:bg-muted/70 rounded-full p-3 w-full transition-colors">
                                 <LogIn className="w-7 h-7" />
-                                <span className="hidden lg:inline">{t("login")}</span>
+                                <span className="hidden xl:inline">{t("login")}</span>
                             </Link>
                         </li>
                     ) : null}

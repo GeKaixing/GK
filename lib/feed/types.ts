@@ -1,3 +1,5 @@
+export type FeedTab = "foryou" | "following";
+
 export interface FeedPostItem {
   id: string;
   content: string;

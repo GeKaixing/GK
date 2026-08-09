@@ -76,10 +76,19 @@ export default function PostList({
     return JSON.stringify(feedQuery)
   }, [feedQuery])
 
+  const feedQueryStringRef = useRef(feedQueryString)
+
   useEffect(() => {
     setNextCursor(initialNextCursor)
     setHasMore(initialHasMore)
   }, [initialNextCursor, initialHasMore])
+
+  // When the feed tab changes, drop in-flight responses from the previous tab
+  // and reset the scroll position (X behavior).
+  useEffect(() => {
+    feedQueryStringRef.current = feedQueryString
+    window.scrollTo(0, 0)
+  }, [feedQueryString])
 
   const offsets = useMemo(() => {
     const nextOffsets: number[] = [0]
@@ -178,6 +187,7 @@ export default function PostList({
       return
     }
 
+    const queryAtFetch = feedQueryStringRef.current
     setIsLoading(true)
     setErrorMessage("")
 
@@ -201,7 +211,16 @@ export default function PostList({
         throw new Error(`HTTP ${response.status}`)
       }
 
+      // Discard responses that resolved after the feed tab changed.
+      if (feedQueryStringRef.current !== queryAtFetch) {
+        return
+      }
+
       const payload = (await response.json()) as FeedApiResponse
+      if (feedQueryStringRef.current !== queryAtFetch) {
+        return
+      }
+
       const normalizedPosts: Post[] = payload.data.map((post) => ({
         ...post,
         createdAt: new Date(post.createdAt),
@@ -211,8 +230,10 @@ export default function PostList({
       setNextCursor(payload.page.nextCursor)
       setHasMore(payload.page.hasMore)
     } catch (error) {
-      console.error("Failed to load more posts:", error)
-      setErrorMessage("加载更多失败，请稍后重试")
+      if (feedQueryStringRef.current === queryAtFetch) {
+        console.error("Failed to load more posts:", error)
+        setErrorMessage("加载更多失败，请稍后重试")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -287,6 +308,10 @@ export default function PostList({
       {!hasMore && posts.length > 0 ? (
         pathName.includes('/gekaixing/status')? null : (
         <div className="py-4 text-center text-sm text-muted-foreground">{t("allLoaded")}</div>)
+      ) : null}
+
+      {!hasMore && !isLoading && posts.length === 0 && feedQuery?.tab === "following" ? (
+        <div className="py-10 px-4 text-center text-sm text-muted-foreground">{t("followingEmpty")}</div>
       ) : null}
 
       {errorMessage ? (

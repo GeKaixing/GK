@@ -75,6 +75,7 @@ export async function GET(req: NextRequest) {
     const scope = (searchParams.get("scope") || "home") as FeedScope;
     const targetId = searchParams.get("targetId");
     const cursor = searchParams.get("cursor");
+    const tab = searchParams.get("tab") === "following" ? "following" : "foryou";
     const requestedLimit = Number(searchParams.get("limit") || "20");
     const limit = Number.isFinite(requestedLimit)
       ? Math.min(Math.max(requestedLimit, 1), 40)
@@ -85,6 +86,7 @@ export async function GET(req: NextRequest) {
         userId: userId ?? null,
         cursor,
         limit,
+        tab,
       });
       if (userId) {
         await Promise.allSettled(
