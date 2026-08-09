@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { getCachedJson, setCachedJson } from "@/lib/redis";
+
 type NewsCategory = "us" | "tech" | "sports" | "entertainment";
 
 interface NewsItem {
@@ -44,6 +46,7 @@ const MAX_ITEMS = 10;
 const FEED_TIMEOUT_MS = 8000;
 const FEED_REVALIDATE_SECONDS = 300;
 const FEED_USER_AGENT = "Mozilla/5.0 (compatible; GekaixingNews/1.0)";
+const CACHE_PREFIX = "sidebar:news:hot-us";
 
 interface ParsedItem extends NewsItem {
   pubDate: number;
@@ -213,6 +216,12 @@ function parseCategory(value: string | null): NewsCategory {
 export async function GET(request: Request): Promise<Response> {
   const requestUrl = new URL(request.url);
   const category = parseCategory(requestUrl.searchParams.get("category"));
+  const cacheKey = `${CACHE_PREFIX}:${category}`;
+
+  const cached = await getCachedJson<NewsItem[]>(cacheKey);
+  if (Array.isArray(cached)) {
+    return NextResponse.json({ success: true, category, data: cached });
+  }
 
   const sources = CATEGORY_FEEDS[category];
   const feeds = await Promise.all(sources.map((source) => fetchFeed(source)));
@@ -245,6 +254,8 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   const data: NewsItem[] = selected.map(({ pubDate: _pubDate, ...rest }) => rest);
+
+  await setCachedJson(cacheKey, data, FEED_REVALIDATE_SECONDS);
 
   return NextResponse.json({ success: true, category, data });
 }

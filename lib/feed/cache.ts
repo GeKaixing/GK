@@ -1,49 +1,11 @@
 import crypto from "node:crypto";
 import type { FeedCachePayload, FeedPageCachePayload, FeedTab } from "@/lib/feed/types";
+import { runRedisCommand } from "@/lib/redis";
 
 const FEED_CACHE_TTL_SECONDS = 300;
 const FEED_CACHE_STALE_MS = 2 * 60 * 1000;
 const FEED_CACHE_PREFIX = "feed:user";
 const FEED_LOCK_TTL_SECONDS = 15;
-
-function getRedisConfig(): { url: string; token: string } | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-
-  if (!url || !token) {
-    return null;
-  }
-
-  return { url, token };
-}
-
-async function runRedisCommand(command: Array<string | number>): Promise<unknown> {
-  const config = getRedisConfig();
-  if (!config) {
-    return null;
-  }
-
-  const response = await fetch(config.url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${config.token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(command),
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Redis command failed with status ${response.status}`);
-  }
-
-  const payload = (await response.json()) as { result?: unknown; error?: string };
-  if (payload.error) {
-    throw new Error(payload.error);
-  }
-
-  return payload.result ?? null;
-}
 
 function getResolvedUserId(userId: string | null): string {
   return userId ?? "anon";
