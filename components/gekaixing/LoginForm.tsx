@@ -110,7 +110,7 @@ export default function LoginForm() {
                     )}
                 />
                 <Button type="submit"
-                    className='w-full bg-black text-white'
+                    className='w-full bg-black text-white '
                     disabled={status}
                 >
                     {status ? <Spin></Spin> : t('submit')}

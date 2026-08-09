@@ -10,7 +10,7 @@ export default function Button({ children, className, ...props }: ButtonProps) {
   return (
     <button
       className={clsx(
-        'h-9 w-2xs rounded-2xl border border-border bg-background text-foreground flex justify-center items-center transition-colors hover:bg-muted',
+        'h-9 w-2xs rounded-2xl border border-border bg-background text-foreground flex justify-center items-center transition-colors hover:bg-muted hover:text-black',
         className,
       )}
       {...props}
