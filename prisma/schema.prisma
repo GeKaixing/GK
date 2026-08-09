@@ -256,8 +256,10 @@ model UserAction {
 
   @@index([userId, createdAt])
   @@index([targetAuthorId, createdAt])
+  @@index([targetAuthorId, actionType, createdAt])
   @@index([targetPostId, createdAt])
   @@index([actionType, createdAt])
+  @@index([createdAt])
 }
 
 enum FollowStatus {

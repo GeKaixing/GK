@@ -1,7 +1,9 @@
+import { cache } from "react";
+
 import { withTimeoutOrNull } from "@/lib/with-timeout";
 import { createClient } from "@/utils/supabase/server";
 
-export async function getDashboardViewer(): Promise<{ userId: string | null }> {
+export const getDashboardViewer = cache(async (): Promise<{ userId: string | null }> => {
   try {
     const supabase = await createClient();
     const authResult = await withTimeoutOrNull(supabase.auth.getUser(), 8000);
@@ -12,4 +14,4 @@ export async function getDashboardViewer(): Promise<{ userId: string | null }> {
     console.error("Failed to resolve dashboard viewer:", error);
     return { userId: null };
   }
-}
+});

@@ -128,10 +128,6 @@ function toRate(numerator: number, denominator: number): number {
   return (numerator / denominator) * 100;
 }
 
-function countUniqueUsers(rows: Array<{ userId: string }>): number {
-  return rows.length;
-}
-
 function countUniqueUsersByPost(rows: Array<{ targetPostId: string | null; userId: string }>): Map<string, number> {
   const postMap = new Map<string, number>();
 
@@ -304,7 +300,7 @@ function getContentSegment(post: { content: string; videoUrl: string | null; aud
   return "short_text";
 }
 
-export async function getDashboardHomeData(userId: string | null): Promise<DashboardHomeData> {
+export const getDashboardHomeData = cache(async (userId: string | null): Promise<DashboardHomeData> => {
   if (!userId) {
     return DEFAULT_HOME_DATA;
   }
@@ -328,6 +324,12 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
     eightDaysAgoStart.setDate(todayStart.getDate() - 8);
     const sixDaysAgoStart = new Date(todayStart);
     sixDaysAgoStart.setDate(todayStart.getDate() - 6);
+    const thirteenDaysAgo = new Date(now);
+    thirteenDaysAgo.setDate(now.getDate() - 13);
+    const twentyDaysAgo = new Date(todayStart);
+    twentyDaysAgo.setDate(todayStart.getDate() - 20);
+    const twentyOneDaysAgo = new Date(todayStart);
+    twentyOneDaysAgo.setDate(todayStart.getDate() - 21);
     const nonSelfActionWhere = {
       userId: {
         not: userId,
@@ -351,31 +353,12 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
       myMessages,
       weeklyReplies,
       weeklyPosts,
-      impressionUsers,
-      postClickUsers,
-      replyUsers,
-      profileEnterUsers,
-      impressionsPv,
-      postClicksPv,
-      repliesReceivedPv,
-      profileEntersPv,
       interactionRows,
-      recentPosts,
       recentPostRows,
-      contentSegmentPosts,
-      dauRows,
-      wauRows,
       mauRows,
-      newUsersToday,
-      d1CohortRows,
-      d1RetainedRows,
-      d7CohortRows,
-      d7RetainedRows,
-      interactions7d,
-      activeUsers7dRows,
-      dauTrendActionRows,
-      retentionCohortUsers,
-      retentionCohortActionRows,
+      interactionCountRows,
+      trendActionRows,
+      cohortUserRows,
     ] = await Promise.all([
       prisma.follow.count({ where: { followerId: userId, status: "FOLLOWING" } }),
       prisma.follow.count({ where: { followingId: userId, status: "FOLLOWING" } }),
@@ -384,90 +367,6 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
       prisma.message.count({ where: { senderId: userId } }),
       prisma.post.count({ where: { authorId: userId, parentId: { not: null }, createdAt: { gte: weekAgo } } }),
       prisma.post.count({ where: { authorId: userId, parentId: null, createdAt: { gte: weekAgo } } }),
-      prisma.userAction.groupBy({
-        by: ["userId"],
-        where: {
-          ...nonSelfActionWhere,
-          actionType: "FEED_IMPRESSION",
-          targetAuthorId: userId,
-          createdAt: { gte: weekAgo },
-        },
-      }),
-      prisma.userAction.groupBy({
-        by: ["userId"],
-        where: {
-          ...nonSelfActionWhere,
-          actionType: "POST_CLICK",
-          targetAuthorId: userId,
-          createdAt: { gte: weekAgo },
-          NOT: {
-            metadata: {
-              contains: "\"kind\":\"profile_enter\"",
-            },
-          },
-        },
-      }),
-      prisma.userAction.groupBy({
-        by: ["userId"],
-        where: {
-          ...nonSelfActionWhere,
-          actionType: "REPLY_CREATE",
-          targetAuthorId: userId,
-          createdAt: { gte: weekAgo },
-        },
-      }),
-      prisma.userAction.groupBy({
-        by: ["userId"],
-        where: {
-          ...nonSelfActionWhere,
-          actionType: "POST_CLICK",
-          targetAuthorId: userId,
-          createdAt: { gte: weekAgo },
-          metadata: {
-            contains: "\"kind\":\"profile_enter\"",
-          },
-        },
-      }),
-      prisma.userAction.count({
-        where: {
-          ...nonSelfActionWhere,
-          actionType: "FEED_IMPRESSION",
-          targetAuthorId: userId,
-          createdAt: { gte: weekAgo },
-        },
-      }),
-      prisma.userAction.count({
-        where: {
-          ...nonSelfActionWhere,
-          actionType: "POST_CLICK",
-          targetAuthorId: userId,
-          createdAt: { gte: weekAgo },
-          NOT: {
-            metadata: {
-              contains: "\"kind\":\"profile_enter\"",
-            },
-          },
-        },
-      }),
-      prisma.userAction.count({
-        where: {
-          ...nonSelfActionWhere,
-          actionType: "REPLY_CREATE",
-          targetAuthorId: userId,
-          createdAt: { gte: weekAgo },
-        },
-      }),
-      prisma.userAction.count({
-        where: {
-          ...nonSelfActionWhere,
-          actionType: "POST_CLICK",
-          targetAuthorId: userId,
-          createdAt: { gte: weekAgo },
-          metadata: {
-            contains: "\"kind\":\"profile_enter\"",
-          },
-        },
-      }),
       prisma.userAction.findMany({
         where: {
           ...nonSelfActionWhere,
@@ -485,16 +384,21 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
         },
       }),
       prisma.post.findMany({
-        where: { authorId: userId, parentId: null },
+        where: {
+          authorId: userId,
+          createdAt: { gte: thirteenDaysAgo },
+        },
         orderBy: { createdAt: "desc" },
-        take: 8,
         select: {
           id: true,
           content: true,
           createdAt: true,
+          parentId: true,
           likeCount: true,
           replyCount: true,
           shareCount: true,
+          videoUrl: true,
+          audioUrl: true,
           author: {
             select: {
               name: true,
@@ -503,102 +407,12 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
           },
         },
       }),
-      prisma.post.findMany({
-        where: {
-          authorId: userId,
-          createdAt: { gte: new Date(new Date().setDate(new Date().getDate() - 13)) },
-        },
-        select: {
-          createdAt: true,
-          parentId: true,
-        },
-      }),
-      prisma.post.findMany({
-        where: {
-          authorId: userId,
-          parentId: null,
-          createdAt: { gte: weekAgo },
-        },
-        select: {
-          id: true,
-          content: true,
-          videoUrl: true,
-          audioUrl: true,
-        },
-      }),
-      prisma.userAction.groupBy({
-        by: ["userId"],
-        where: {
-          createdAt: {
-            gte: todayStart,
-            lt: tomorrowStart,
-          },
-        },
-      }),
-      prisma.userAction.groupBy({
-        by: ["userId"],
-        where: {
-          createdAt: { gte: weekAgo },
-        },
-      }),
       prisma.userAction.groupBy({
         by: ["userId"],
         where: {
           createdAt: { gte: monthAgo },
         },
       }),
-      prisma.user.count({
-        where: {
-          createdAt: {
-            gte: todayStart,
-            lt: tomorrowStart,
-          },
-        },
-      }),
-      prisma.user.findMany({
-        where: {
-          createdAt: {
-            gte: twoDaysAgoStart,
-            lt: yesterdayStart,
-          },
-        },
-        select: { id: true },
-      }),
-      prisma.userAction.groupBy({
-        by: ["userId"],
-        where: {
-          createdAt: {
-            gte: yesterdayStart,
-            lt: todayStart,
-          },
-        },
-      }),
-      prisma.user.findMany({
-        where: {
-          createdAt: {
-            gte: eightDaysAgoStart,
-            lt: sevenDaysAgoStart,
-          },
-        },
-        select: { id: true },
-      }),
-      prisma.userAction.groupBy({
-        by: ["userId"],
-        where: {
-          createdAt: {
-            gte: sixDaysAgoStart,
-            lt: yesterdayStart,
-          },
-        },
-      }),
-      prisma.userAction.count({
-        where: {
-          createdAt: { gte: weekAgo },
-          actionType: {
-            in: INTERACTION_ACTION_TYPES,
-          },
-        },
-      }),
       prisma.userAction.groupBy({
         by: ["userId"],
         where: {
@@ -606,11 +420,14 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
           actionType: {
             in: INTERACTION_ACTION_TYPES,
           },
+        },
+        _count: {
+          _all: true,
         },
       }),
       prisma.userAction.findMany({
         where: {
-          createdAt: { gte: new Date(todayStart.getTime() - 13 * 24 * 60 * 60 * 1000) },
+          createdAt: { gte: twentyDaysAgo },
         },
         select: {
           userId: true,
@@ -620,8 +437,8 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
       prisma.user.findMany({
         where: {
           createdAt: {
-            gte: new Date(todayStart.getTime() - 21 * 24 * 60 * 60 * 1000),
-            lt: new Date(todayStart.getTime() - 7 * 24 * 60 * 60 * 1000),
+            gte: twentyOneDaysAgo,
+            lt: tomorrowStart,
           },
         },
         select: {
@@ -629,110 +446,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
           createdAt: true,
         },
       }),
-      prisma.userAction.findMany({
-        where: {
-          createdAt: {
-            gte: new Date(todayStart.getTime() - 20 * 24 * 60 * 60 * 1000),
-            lt: todayStart,
-          },
-        },
-        select: {
-          userId: true,
-          createdAt: true,
-        },
-      }),
     ]);
-    const impressions = countUniqueUsers(impressionUsers);
-    const postClicks = countUniqueUsers(postClickUsers);
-    const repliesReceived = countUniqueUsers(replyUsers);
-    const profileEnters = countUniqueUsers(profileEnterUsers);
-    const dau = dauRows.length;
-    const wau = wauRows.length;
-    const mau = mauRows.length;
-    const d1CohortSet = new Set(d1CohortRows.map((item) => item.id));
-    const d1RetainedSet = new Set(d1RetainedRows.map((item) => item.userId));
-    const d1RetainedUsers = Array.from(d1CohortSet).filter((id) => d1RetainedSet.has(id)).length;
-    const d7CohortSet = new Set(d7CohortRows.map((item) => item.id));
-    const d7RetainedSet = new Set(d7RetainedRows.map((item) => item.userId));
-    const d7RetainedUsers = Array.from(d7CohortSet).filter((id) => d7RetainedSet.has(id)).length;
-    const activeUsers7d = activeUsers7dRows.length;
-    const avgInteractionsPerActiveUser7d = activeUsers7d > 0 ? interactions7d / activeUsers7d : 0;
-    const dauDayKeys = getRecentDayKeys(14);
-    const dauSetsByDay = new Map<string, Set<string>>(dauDayKeys.map((key) => [key, new Set<string>()]));
-    dauTrendActionRows.forEach((row) => {
-      const key = formatLocalDayKey(row.createdAt);
-      const bucket = dauSetsByDay.get(key);
-      if (bucket) {
-        bucket.add(row.userId);
-      }
-    });
-    const dauTrend = dauDayKeys.map((date) => ({
-      date,
-      dau: dauSetsByDay.get(date)?.size ?? 0,
-    }));
-
-    const cohortUsersByDay = new Map<string, string[]>();
-    retentionCohortUsers.forEach((user) => {
-      const dayKey = formatLocalDayKey(user.createdAt);
-      const current = cohortUsersByDay.get(dayKey) ?? [];
-      current.push(user.id);
-      cohortUsersByDay.set(dayKey, current);
-    });
-    const actionDaysByUser = new Map<string, Set<string>>();
-    retentionCohortActionRows.forEach((row) => {
-      const current = actionDaysByUser.get(row.userId) ?? new Set<string>();
-      current.add(formatLocalDayKey(row.createdAt));
-      actionDaysByUser.set(row.userId, current);
-    });
-    const retentionCohortKeys: string[] = [];
-    for (let offset = 21; offset >= 8; offset -= 1) {
-      const date = new Date(todayStart);
-      date.setDate(todayStart.getDate() - offset);
-      retentionCohortKeys.push(formatLocalDayKey(date));
-    }
-    const retentionCohorts = retentionCohortKeys.map((cohortDate) => {
-      const cohortUsers = cohortUsersByDay.get(cohortDate) ?? [];
-      const cohortStart = new Date(`${cohortDate}T00:00:00`);
-      const d1Date = new Date(cohortStart);
-      d1Date.setDate(cohortStart.getDate() + 1);
-      const d7Date = new Date(cohortStart);
-      d7Date.setDate(cohortStart.getDate() + 7);
-      const d1Key = formatLocalDayKey(d1Date);
-      const d7Key = formatLocalDayKey(d7Date);
-      const d1Retained = cohortUsers.filter((id) => actionDaysByUser.get(id)?.has(d1Key)).length;
-      const d7Retained = cohortUsers.filter((id) => actionDaysByUser.get(id)?.has(d7Key)).length;
-
-      return {
-        cohortDate,
-        users: cohortUsers.length,
-        d1Retention: toRate(d1Retained, cohortUsers.length),
-        d7Retention: toRate(d7Retained, cohortUsers.length),
-      };
-    });
-    const weeklyRetentionMap = new Map<
-      string,
-      { users: number; d1Weighted: number; d7Weighted: number }
-    >();
-    retentionCohorts.forEach((item) => {
-      const weekKey = getWeekStartKey(item.cohortDate);
-      const current = weeklyRetentionMap.get(weekKey) ?? {
-        users: 0,
-        d1Weighted: 0,
-        d7Weighted: 0,
-      };
-      current.users += item.users;
-      current.d1Weighted += item.d1Retention * item.users;
-      current.d7Weighted += item.d7Retention * item.users;
-      weeklyRetentionMap.set(weekKey, current);
-    });
-    const retentionWeeklyCohorts = Array.from(weeklyRetentionMap.entries())
-      .sort((left, right) => left[0].localeCompare(right[0]))
-      .map(([cohortDate, value]) => ({
-        cohortDate,
-        users: value.users,
-        d1Retention: value.users > 0 ? value.d1Weighted / value.users : 0,
-        d7Retention: value.users > 0 ? value.d7Weighted / value.users : 0,
-      }));
 
     const keys = getRecentDayKeys(14);
     const trendMap = toTrendMap(keys);
@@ -752,7 +466,26 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
       }
     });
 
-    const recentPostIds = recentPosts.map((item) => item.id);
+    const contentSegmentPosts = recentPostRows.filter(
+      (item) => item.parentId === null && item.createdAt >= weekAgo
+    );
+    const recentPosts = recentPostRows
+      .filter((item) => item.parentId === null)
+      .slice(0, 8)
+      .map((item) => ({
+        id: item.id,
+        content: item.content,
+        createdAt: item.createdAt,
+        likeCount: item.likeCount,
+        replyCount: item.replyCount,
+        shareCount: item.shareCount,
+        author: item.author,
+      }));
+
+    const metricPostIds = Array.from(
+      new Set([...recentPosts.map((item) => item.id), ...contentSegmentPosts.map((item) => item.id)])
+    );
+
     const [
       impressionByPostRows,
       postClickByPostRows,
@@ -762,7 +495,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
       postClickPvByPostRows,
       profileEnterPvByPostRows,
       replyPvByPostRows,
-    ] = recentPostIds.length
+    ] = metricPostIds.length
       ? await Promise.all([
           prisma.userAction.groupBy({
             by: ["targetPostId", "userId"],
@@ -770,7 +503,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
               ...nonSelfActionWhere,
               actionType: "FEED_IMPRESSION",
               targetAuthorId: userId,
-              targetPostId: { in: recentPostIds },
+              targetPostId: { in: metricPostIds },
               createdAt: { gte: weekAgo },
             },
           }),
@@ -780,7 +513,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
               ...nonSelfActionWhere,
               actionType: "POST_CLICK",
               targetAuthorId: userId,
-              targetPostId: { in: recentPostIds },
+              targetPostId: { in: metricPostIds },
               createdAt: { gte: weekAgo },
               NOT: {
                 metadata: {
@@ -795,7 +528,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
               ...nonSelfActionWhere,
               actionType: "POST_CLICK",
               targetAuthorId: userId,
-              targetPostId: { in: recentPostIds },
+              targetPostId: { in: metricPostIds },
               createdAt: { gte: weekAgo },
               metadata: {
                 contains: "\"kind\":\"profile_enter\"",
@@ -808,7 +541,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
               ...nonSelfActionWhere,
               actionType: "REPLY_CREATE",
               targetAuthorId: userId,
-              targetPostId: { in: recentPostIds },
+              targetPostId: { in: metricPostIds },
               createdAt: { gte: weekAgo },
             },
           }),
@@ -818,7 +551,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
               ...nonSelfActionWhere,
               actionType: "FEED_IMPRESSION",
               targetAuthorId: userId,
-              targetPostId: { in: recentPostIds },
+              targetPostId: { in: metricPostIds },
               createdAt: { gte: weekAgo },
             },
             _count: {
@@ -831,7 +564,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
               ...nonSelfActionWhere,
               actionType: "POST_CLICK",
               targetAuthorId: userId,
-              targetPostId: { in: recentPostIds },
+              targetPostId: { in: metricPostIds },
               createdAt: { gte: weekAgo },
               NOT: {
                 metadata: {
@@ -849,7 +582,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
               ...nonSelfActionWhere,
               actionType: "POST_CLICK",
               targetAuthorId: userId,
-              targetPostId: { in: recentPostIds },
+              targetPostId: { in: metricPostIds },
               createdAt: { gte: weekAgo },
               metadata: {
                 contains: "\"kind\":\"profile_enter\"",
@@ -865,7 +598,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
               ...nonSelfActionWhere,
               actionType: "REPLY_CREATE",
               targetAuthorId: userId,
-              targetPostId: { in: recentPostIds },
+              targetPostId: { in: metricPostIds },
               createdAt: { gte: weekAgo },
             },
             _count: {
@@ -883,128 +616,6 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
     const postClicksPvByPost = countEventsByPost(postClickPvByPostRows);
     const profileEntersPvByPost = countEventsByPost(profileEnterPvByPostRows);
     const repliesPvByPost = countEventsByPost(replyPvByPostRows);
-    const contentSegmentPostIds = contentSegmentPosts.map((post) => post.id);
-    const [
-      contentImpressionUvRows,
-      contentPostClickUvRows,
-      contentProfileUvRows,
-      contentReplyUvRows,
-      contentImpressionPvRows,
-      contentPostClickPvRows,
-      contentProfilePvRows,
-      contentReplyPvRows,
-    ] = contentSegmentPostIds.length
-      ? await Promise.all([
-          prisma.userAction.groupBy({
-            by: ["targetPostId", "userId"],
-            where: {
-              ...nonSelfActionWhere,
-              actionType: "FEED_IMPRESSION",
-              targetAuthorId: userId,
-              targetPostId: { in: contentSegmentPostIds },
-              createdAt: { gte: weekAgo },
-            },
-          }),
-          prisma.userAction.groupBy({
-            by: ["targetPostId", "userId"],
-            where: {
-              ...nonSelfActionWhere,
-              actionType: "POST_CLICK",
-              targetAuthorId: userId,
-              targetPostId: { in: contentSegmentPostIds },
-              createdAt: { gte: weekAgo },
-              NOT: {
-                metadata: {
-                  contains: "\"kind\":\"profile_enter\"",
-                },
-              },
-            },
-          }),
-          prisma.userAction.groupBy({
-            by: ["targetPostId", "userId"],
-            where: {
-              ...nonSelfActionWhere,
-              actionType: "POST_CLICK",
-              targetAuthorId: userId,
-              targetPostId: { in: contentSegmentPostIds },
-              createdAt: { gte: weekAgo },
-              metadata: {
-                contains: "\"kind\":\"profile_enter\"",
-              },
-            },
-          }),
-          prisma.userAction.groupBy({
-            by: ["targetPostId", "userId"],
-            where: {
-              ...nonSelfActionWhere,
-              actionType: "REPLY_CREATE",
-              targetAuthorId: userId,
-              targetPostId: { in: contentSegmentPostIds },
-              createdAt: { gte: weekAgo },
-            },
-          }),
-          prisma.userAction.groupBy({
-            by: ["targetPostId"],
-            where: {
-              ...nonSelfActionWhere,
-              actionType: "FEED_IMPRESSION",
-              targetAuthorId: userId,
-              targetPostId: { in: contentSegmentPostIds },
-              createdAt: { gte: weekAgo },
-            },
-            _count: {
-              _all: true,
-            },
-          }),
-          prisma.userAction.groupBy({
-            by: ["targetPostId"],
-            where: {
-              ...nonSelfActionWhere,
-              actionType: "POST_CLICK",
-              targetAuthorId: userId,
-              targetPostId: { in: contentSegmentPostIds },
-              createdAt: { gte: weekAgo },
-              NOT: {
-                metadata: {
-                  contains: "\"kind\":\"profile_enter\"",
-                },
-              },
-            },
-            _count: {
-              _all: true,
-            },
-          }),
-          prisma.userAction.groupBy({
-            by: ["targetPostId"],
-            where: {
-              ...nonSelfActionWhere,
-              actionType: "POST_CLICK",
-              targetAuthorId: userId,
-              targetPostId: { in: contentSegmentPostIds },
-              createdAt: { gte: weekAgo },
-              metadata: {
-                contains: "\"kind\":\"profile_enter\"",
-              },
-            },
-            _count: {
-              _all: true,
-            },
-          }),
-          prisma.userAction.groupBy({
-            by: ["targetPostId"],
-            where: {
-              ...nonSelfActionWhere,
-              actionType: "REPLY_CREATE",
-              targetAuthorId: userId,
-              targetPostId: { in: contentSegmentPostIds },
-              createdAt: { gte: weekAgo },
-            },
-            _count: {
-              _all: true,
-            },
-          }),
-        ])
-      : [[], [], [], [], [], [], [], []];
 
     const recentPostsWithMetrics = recentPosts.map((item) => {
       const itemImpressions = impressionsByPost.get(item.id) ?? 0;
@@ -1034,6 +645,9 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
       };
     });
 
+    // Engagement metrics (UV + PV) come from the same interaction rows already
+    // fetched for traffic sources / funnel / audience, so no extra queries.
+    const metricBucket = createActionMetricBucket();
     const trafficMap = new Map<string, ActionMetricBucket>();
     const funnelSets = {
       impressionsUsers: new Set<string>(),
@@ -1060,6 +674,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
       const existingBucket = trafficMap.get(sourceKey) ?? createActionMetricBucket();
       applyActionToBucket(existingBucket, action);
       trafficMap.set(sourceKey, existingBucket);
+      applyActionToBucket(metricBucket, action);
 
       if (action.actionType === "FEED_IMPRESSION") {
         funnelSets.impressionsUsers.add(action.userId);
@@ -1075,6 +690,15 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
         funnelSets.postClicksPv += 1;
       }
     });
+
+    const impressions = metricBucket.impressionsUsers.size;
+    const postClicks = metricBucket.postClickUsers.size;
+    const repliesReceived = metricBucket.repliesUsers.size;
+    const profileEnters = metricBucket.profileEnterUsers.size;
+    const impressionsPv = metricBucket.impressionsPv;
+    const postClicksPv = metricBucket.postClicksPv;
+    const repliesReceivedPv = metricBucket.repliesPv;
+    const profileEntersPv = metricBucket.profileEntersPv;
 
     const trafficSources: DashboardTrafficSourceItem[] = Array.from(trafficMap.entries())
       .map(([source, bucket]) => bucketToTrafficItem(source, bucket))
@@ -1198,15 +822,6 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
       };
     });
 
-    const contentImpressionUvByPost = countUniqueUsersByPost(contentImpressionUvRows);
-    const contentPostClickUvByPost = countUniqueUsersByPost(contentPostClickUvRows);
-    const contentProfileUvByPost = countUniqueUsersByPost(contentProfileUvRows);
-    const contentReplyUvByPost = countUniqueUsersByPost(contentReplyUvRows);
-    const contentImpressionPvByPost = countEventsByPost(contentImpressionPvRows);
-    const contentPostClickPvByPost = countEventsByPost(contentPostClickPvRows);
-    const contentProfilePvByPost = countEventsByPost(contentProfilePvRows);
-    const contentReplyPvByPost = countEventsByPost(contentReplyPvRows);
-
     const contentSegmentBucket = new Map<
       string,
       {
@@ -1236,14 +851,14 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
         profileEntersPv: 0,
       };
       current.posts += 1;
-      current.impressions += contentImpressionUvByPost.get(post.id) ?? 0;
-      current.postClicks += contentPostClickUvByPost.get(post.id) ?? 0;
-      current.replies += contentReplyUvByPost.get(post.id) ?? 0;
-      current.profileEnters += contentProfileUvByPost.get(post.id) ?? 0;
-      current.impressionsPv += contentImpressionPvByPost.get(post.id) ?? 0;
-      current.postClicksPv += contentPostClickPvByPost.get(post.id) ?? 0;
-      current.repliesPv += contentReplyPvByPost.get(post.id) ?? 0;
-      current.profileEntersPv += contentProfilePvByPost.get(post.id) ?? 0;
+      current.impressions += impressionsByPost.get(post.id) ?? 0;
+      current.postClicks += postClicksByPost.get(post.id) ?? 0;
+      current.replies += repliesByPost.get(post.id) ?? 0;
+      current.profileEnters += profileEntersByPost.get(post.id) ?? 0;
+      current.impressionsPv += impressionsPvByPost.get(post.id) ?? 0;
+      current.postClicksPv += postClicksPvByPost.get(post.id) ?? 0;
+      current.repliesPv += repliesPvByPost.get(post.id) ?? 0;
+      current.profileEntersPv += profileEntersPvByPost.get(post.id) ?? 0;
       contentSegmentBucket.set(segment, current);
     });
 
@@ -1272,6 +887,128 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
         };
       })
       .filter((item): item is DashboardContentSegmentItem => !!item);
+
+    // Core activity metrics.
+    const activeUsers7d = interactionCountRows.length;
+    const interactions7d = interactionCountRows.reduce((sum, row) => sum + row._count._all, 0);
+    const avgInteractionsPerActiveUser7d = activeUsers7d > 0 ? interactions7d / activeUsers7d : 0;
+    const mau = mauRows.length;
+
+    const dauDayKeys = getRecentDayKeys(14);
+    const dauSetsByDay = new Map<string, Set<string>>(dauDayKeys.map((key) => [key, new Set<string>()]));
+    trendActionRows.forEach((row) => {
+      const key = formatLocalDayKey(row.createdAt);
+      const bucket = dauSetsByDay.get(key);
+      if (bucket) {
+        bucket.add(row.userId);
+      }
+    });
+    const dauTrend = dauDayKeys.map((date) => ({
+      date,
+      dau: dauSetsByDay.get(date)?.size ?? 0,
+    }));
+
+    const dauUsers = new Set<string>();
+    const wauUsers = new Set<string>();
+    trendActionRows.forEach((row) => {
+      if (row.createdAt >= todayStart) {
+        dauUsers.add(row.userId);
+      }
+      if (row.createdAt >= weekAgo) {
+        wauUsers.add(row.userId);
+      }
+    });
+    const dau = dauUsers.size;
+    const wau = wauUsers.size;
+
+    // Retention cohorts.
+    const cohortUsersByDay = new Map<string, string[]>();
+    cohortUserRows.forEach((user) => {
+      const dayKey = formatLocalDayKey(user.createdAt);
+      const current = cohortUsersByDay.get(dayKey) ?? [];
+      current.push(user.id);
+      cohortUsersByDay.set(dayKey, current);
+    });
+    const actionDaysByUser = new Map<string, Set<string>>();
+    const d1RetainedSet = new Set<string>();
+    const d7RetainedSet = new Set<string>();
+    trendActionRows.forEach((row) => {
+      if (row.createdAt >= yesterdayStart && row.createdAt < todayStart) {
+        d1RetainedSet.add(row.userId);
+      }
+      if (row.createdAt >= sixDaysAgoStart && row.createdAt < yesterdayStart) {
+        d7RetainedSet.add(row.userId);
+      }
+      const current = actionDaysByUser.get(row.userId) ?? new Set<string>();
+      current.add(formatLocalDayKey(row.createdAt));
+      actionDaysByUser.set(row.userId, current);
+    });
+
+    const d1CohortSet = new Set(
+      cohortUserRows
+        .filter((user) => user.createdAt >= twoDaysAgoStart && user.createdAt < yesterdayStart)
+        .map((user) => user.id)
+    );
+    const d7CohortSet = new Set(
+      cohortUserRows
+        .filter((user) => user.createdAt >= eightDaysAgoStart && user.createdAt < sevenDaysAgoStart)
+        .map((user) => user.id)
+    );
+    const d1RetainedUsers = Array.from(d1CohortSet).filter((id) => d1RetainedSet.has(id)).length;
+    const d7RetainedUsers = Array.from(d7CohortSet).filter((id) => d7RetainedSet.has(id)).length;
+    const newUsersToday = cohortUserRows.filter(
+      (user) => user.createdAt >= todayStart && user.createdAt < tomorrowStart
+    ).length;
+
+    const retentionCohortKeys: string[] = [];
+    for (let offset = 21; offset >= 8; offset -= 1) {
+      const date = new Date(todayStart);
+      date.setDate(todayStart.getDate() - offset);
+      retentionCohortKeys.push(formatLocalDayKey(date));
+    }
+    const retentionCohorts = retentionCohortKeys.map((cohortDate) => {
+      const cohortUsers = cohortUsersByDay.get(cohortDate) ?? [];
+      const cohortStart = new Date(`${cohortDate}T00:00:00`);
+      const d1Date = new Date(cohortStart);
+      d1Date.setDate(cohortStart.getDate() + 1);
+      const d7Date = new Date(cohortStart);
+      d7Date.setDate(cohortStart.getDate() + 7);
+      const d1Key = formatLocalDayKey(d1Date);
+      const d7Key = formatLocalDayKey(d7Date);
+      const d1Retained = cohortUsers.filter((id) => actionDaysByUser.get(id)?.has(d1Key)).length;
+      const d7Retained = cohortUsers.filter((id) => actionDaysByUser.get(id)?.has(d7Key)).length;
+
+      return {
+        cohortDate,
+        users: cohortUsers.length,
+        d1Retention: toRate(d1Retained, cohortUsers.length),
+        d7Retention: toRate(d7Retained, cohortUsers.length),
+      };
+    });
+    const weeklyRetentionMap = new Map<
+      string,
+      { users: number; d1Weighted: number; d7Weighted: number }
+    >();
+    retentionCohorts.forEach((item) => {
+      const weekKey = getWeekStartKey(item.cohortDate);
+      const current = weeklyRetentionMap.get(weekKey) ?? {
+        users: 0,
+        d1Weighted: 0,
+        d7Weighted: 0,
+      };
+      current.users += item.users;
+      current.d1Weighted += item.d1Retention * item.users;
+      current.d7Weighted += item.d7Retention * item.users;
+      weeklyRetentionMap.set(weekKey, current);
+    });
+    const retentionWeeklyCohorts = Array.from(weeklyRetentionMap.entries())
+      .sort((left, right) => left[0].localeCompare(right[0]))
+      .map(([cohortDate, value]) => ({
+        cohortDate,
+        users: value.users,
+        d1Retention: value.users > 0 ? value.d1Weighted / value.users : 0,
+        d7Retention: value.users > 0 ? value.d7Weighted / value.users : 0,
+      }));
 
     return {
       summary: {
@@ -1321,7 +1058,7 @@ export async function getDashboardHomeData(userId: string | null): Promise<Dashb
     console.error("Failed to get dashboard home data:", error);
     return DEFAULT_HOME_DATA;
   }
-}
+});
 
 export const getDashboardAffiliationsData = cache(async (userId: string | null): Promise<DashboardAffiliationsData> => {
   if (!userId) {
@@ -1393,21 +1130,6 @@ export const getDashboardAffiliationsData = cache(async (userId: string | null):
   }
 });
 
-const ACTION_TYPES = [
-  "FEED_IMPRESSION",
-  "POST_CREATE",
-  "REPLY_CREATE",
-  "POST_LIKE",
-  "POST_UNLIKE",
-  "POST_BOOKMARK",
-  "POST_UNBOOKMARK",
-  "POST_SHARE",
-  "FOLLOW",
-  "UNFOLLOW",
-  "POST_CLICK",
-  "DWELL",
-] as const;
-
 export const getDashboardRadarData = cache(async (userId: string | null): Promise<DashboardRadarData> => {
   if (!userId) {
     return {
@@ -1421,16 +1143,14 @@ export const getDashboardRadarData = cache(async (userId: string | null): Promis
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
 
-    const [actionCounts, recentActions, recentPosts] = await Promise.all([
-      Promise.all(
-        ACTION_TYPES.map(async (actionType) => {
-          const count = await prisma.userAction.count({ where: { userId, actionType } });
-          return {
-            actionType,
-            count,
-          };
-        })
-      ),
+    const [actionCountRows, recentActions, recentPosts] = await Promise.all([
+      prisma.userAction.groupBy({
+        by: ["actionType"],
+        where: { userId },
+        _count: {
+          _all: true,
+        },
+      }),
       prisma.userAction.findMany({
         where: {
           userId,
@@ -1481,7 +1201,8 @@ export const getDashboardRadarData = cache(async (userId: string | null): Promis
       }
     });
 
-    const actionSummary: DashboardUserActionItem[] = actionCounts
+    const actionSummary: DashboardUserActionItem[] = actionCountRows
+      .map((item) => ({ actionType: item.actionType, count: item._count._all }))
       .sort((left, right) => right.count - left.count)
       .filter((item) => item.count > 0);
 

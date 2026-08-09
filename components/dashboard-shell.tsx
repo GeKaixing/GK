@@ -5,9 +5,9 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DASHBOARD_NAV_ITEMS, type DashboardNavKey } from "@/lib/dashboard/navigation";
+import { getDashboardViewer } from "@/lib/dashboard/viewer";
 import { prisma } from "@/lib/prisma";
 import { withTimeoutOrNull } from "@/lib/with-timeout";
-import { createClient } from "@/utils/supabase/server";
 
 type DashboardShellProps = {
   children: React.ReactNode;
@@ -36,14 +36,12 @@ export default async function DashboardShell({ children }: DashboardShellProps):
     | undefined;
 
   try {
-    const supabase = await createClient();
-    const authResult = await withTimeoutOrNull(supabase.auth.getUser(), 8000);
-    const user = authResult?.data.user ?? null;
+    const { userId } = await getDashboardViewer();
 
-    if (user?.id) {
+    if (userId) {
       const profile = await withTimeoutOrNull(
         prisma.user.findUnique({
-          where: { id: user.id },
+          where: { id: userId },
           select: {
             name: true,
             avatar: true,
@@ -54,9 +52,9 @@ export default async function DashboardShell({ children }: DashboardShellProps):
       );
 
       currentUser = {
-        name: profile?.name ?? user.user_metadata?.name ?? "User",
-        email: profile?.email ?? user.email ?? "",
-        avatar: profile?.avatar ?? user.user_metadata?.avatar_url ?? "/avatars/shadcn.jpg",
+        name: profile?.name ?? "User",
+        email: profile?.email ?? "",
+        avatar: profile?.avatar ?? "/avatars/shadcn.jpg",
       };
     }
   } catch (error) {
