@@ -19,10 +19,35 @@ interface NewsResponse {
   error?: string;
 }
 
-async function newsFetch(url: string): Promise<Response> {
-  return fetch(url, {
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const newsCache = new Map<string, { data: NewsItem[]; fetchedAt: number }>();
+
+function peekNewsCache(url: string): NewsItem[] | null {
+  const hit = newsCache.get(url);
+  if (hit && Date.now() - hit.fetchedAt < CACHE_TTL_MS) {
+    return hit.data;
+  }
+  return null;
+}
+
+/** Fetch a feed once per 5 minutes per session; tab switches reuse the cache. */
+async function newsFetch(url: string): Promise<NewsItem[]> {
+  const cached = peekNewsCache(url);
+  if (cached) {
+    return cached;
+  }
+
+  const result = await fetch(url, {
     cache: "no-store",
   });
+  const json = (await result.json()) as NewsResponse;
+  if (!result.ok || !json.success) {
+    throw new Error(json.error ?? "Failed to load news");
+  }
+
+  const data = Array.isArray(json.data) ? json.data : [];
+  newsCache.set(url, { data, fetchedAt: Date.now() });
+  return data;
 }
 
 export default function NEWs({ url }: { url: string }) {
@@ -35,18 +60,23 @@ export default function NEWs({ url }: { url: string }) {
     let cancelled = false;
 
     async function loadNews(): Promise<void> {
-      setLoading(true);
       setError("");
 
-      try {
-        const result = await newsFetch(url);
-        const json = (await result.json()) as NewsResponse;
-        if (!result.ok || !json.success) {
-          throw new Error(json.error ?? "Failed to load news");
-        }
-
+      // Cache hit: render immediately, no loading flash.
+      const cached = peekNewsCache(url);
+      if (cached) {
         if (!cancelled) {
-          setData(Array.isArray(json.data) ? json.data : []);
+          setData(cached);
+          setLoading(false);
+        }
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const items = await newsFetch(url);
+        if (!cancelled) {
+          setData(items);
         }
       } catch (fetchError) {
         if (!cancelled) {

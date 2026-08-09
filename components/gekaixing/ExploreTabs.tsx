@@ -15,6 +15,9 @@ interface ToutiaoHotItem {
   hot_value: string;
 }
 
+const TOUTIAO_CACHE_TTL_MS = 5 * 60 * 1000;
+let toutiaoCache: { data: ToutiaoHotItem[]; fetchedAt: number } | null = null;
+
 export async function ToutiaoHotGTE() {
   return await fetch("https://dabenshi.cn/other/api/hot.php?type=toutiaoHot", {
     method: "GET",
@@ -38,11 +41,17 @@ function ExploreTabs() {
       return;
     }
     async function fetchf(): Promise<void> {
+      if (toutiaoCache && Date.now() - toutiaoCache.fetchedAt < TOUTIAO_CACHE_TTL_MS) {
+        setData(toutiaoCache.data);
+        return;
+      }
       try {
         const result = await ToutiaoHotGTE();
         const json = (await result.json()) as { success?: boolean; data?: ToutiaoHotItem[] };
         if (json.success) {
-          setData(Array.isArray(json.data) ? json.data : []);
+          const items = Array.isArray(json.data) ? json.data : [];
+          toutiaoCache = { data: items, fetchedAt: Date.now() };
+          setData(items);
         }
       } catch (error) {
         console.error(error);
