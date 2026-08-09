@@ -17,7 +17,8 @@ export default function ChatMain({ children }: { children: ReactNode }) {
     pathname === "/gekaixing/gkx" ||
     pathname.startsWith("/gekaixing/gkx/") ||
     pathname === "/gekaixing/chat" ||
-    pathname.startsWith("/gekaixing/chat/")
+    pathname.startsWith("/gekaixing/chat/") ||
+    pathname.startsWith("/gekaixing/live/")
 
   return (
     <main

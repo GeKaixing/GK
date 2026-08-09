@@ -15,7 +15,8 @@ export default function RightRail({ children }: { children: ReactNode }) {
     pathname === "/gekaixing/gkx" ||
     pathname.startsWith("/gekaixing/gkx/") ||
     pathname === "/gekaixing/chat" ||
-    pathname.startsWith("/gekaixing/chat/")
+    pathname.startsWith("/gekaixing/chat/") ||
+    pathname.startsWith("/gekaixing/live/")
 
   if (isFullWidthChat) return null
 

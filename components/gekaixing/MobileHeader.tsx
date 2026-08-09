@@ -14,6 +14,7 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  Radio,
   User as UserIcon,
   Users,
 } from "lucide-react";
@@ -152,6 +153,7 @@ function MobileDrawer({
             <DrawerItem href="/gekaixing/chat" icon={<MessageSquare className="h-5 w-5" />} label={t("chat")} />
             <DrawerItem href="/gekaixing/connect_people" icon={<Users className="h-5 w-5" />} label={t("connect")} />
             <DrawerItem href="/gekaixing/explore" icon={<Search className="h-5 w-5" />} label={t("explore")} />
+            <DrawerItem href="/gekaixing/live" icon={<Radio className="h-5 w-5" />} label={t("live")} />
             <DrawerItem href="/gekaixing/gkx" icon={<Sparkles className="h-5 w-5" />} label="GKX" />
             <DrawerItem href="/premium" icon={<ShieldCheck className="h-5 w-5" />} label={t("premium")} />
             <DrawerItem href="/gekaixing/likes" icon={<Heart className="h-5 w-5" />} label={t("likes")} />
