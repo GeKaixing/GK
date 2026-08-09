@@ -762,6 +762,15 @@
         "confirm": "Confirm"
       }
     },
+    "UpdatePassword": {
+      "title": "Update your password",
+      "description": "Enter your new password",
+      "placeholder": "New password",
+      "confirm": "Confirm",
+      "hidePassword": "Hide password",
+      "showPassword": "Show password",
+      "updateFailed": "Failed to update password, please try again"
+    },
     "Cropped": {
       "updateSuccess": "Updated successfully",
       "updateFailed": "Update failed",

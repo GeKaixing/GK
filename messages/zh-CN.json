@@ -762,6 +762,15 @@
         "confirm": "确认"
       }
     },
+    "UpdatePassword": {
+      "title": "更新你的密码",
+      "description": "输入你的新密码",
+      "placeholder": "请新密码",
+      "confirm": "确认",
+      "hidePassword": "隐藏密码",
+      "showPassword": "显示密码",
+      "updateFailed": "更新密码失败，请重试"
+    },
     "Cropped": {
       "updateSuccess": "更新成功",
       "updateFailed": "更新失败",
