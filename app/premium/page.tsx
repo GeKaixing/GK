@@ -63,8 +63,8 @@ export default function PremiumPage(): ReactElement {
   const t = useTranslations('ImitationX.Premium')
 
   return (
-    <div className='min-h-screen bg-background text-foreground'>
-      <div className='mx-auto max-w-5xl px-4 pb-10 pt-16 text-center'>
+    <>
+      <div className='mx-auto max-w-3xl px-4 pb-10 pt-16 text-center'>
         <h1 className='text-4xl font-bold'>{t('title')}</h1>
         <p className='mt-4 text-lg text-muted-foreground'>{t('subtitle')}</p>
       </div>
@@ -133,7 +133,7 @@ export default function PremiumPage(): ReactElement {
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

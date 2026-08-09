@@ -13,7 +13,7 @@ export default async function PremiumCard() {
       </div>
       <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       <Link
-        href="/gekaixing/premium"
+        href="/premium"
         className="mt-3 block w-full rounded-full bg-primary py-2 text-center text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
       >
         {t("subscribe")}

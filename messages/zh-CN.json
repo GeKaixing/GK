@@ -133,6 +133,18 @@
       "inputPlaceholder": "输入消息...",
       "send": "发送",
       "emptyState": "开始和 GKX 对话吧 🚀",
+  "tagline": "你的 AI 助手，随时为你服务",
+  "suggestedPrompts": [
+    "写一首关于夏天的诗",
+    "用简单的语言解释什么是黑洞",
+    "帮我写一段 React 组件代码",
+    "给这条推文起个标题"
+  ],
+  "searchPlaceholder": "搜索会话",
+  "dateToday": "今天",
+  "datePrev7": "近 7 天",
+  "datePrev30": "近 30 天",
+  "dateOlder": "更早",
       "copySuccess": "复制成功",
       "copyFailed": "复制失败",
       "copyMessage": "复制消息",
@@ -317,6 +329,7 @@
       "subtitle": "更少广告、更强功能、优先展示你的内容",
       "recommended": "推荐",
       "subscribe": "订阅",
+      "backHome": "返回首页",
       "whyTitle": "为什么选择 Premium？",
       "whyCards": {
         "1": {
@@ -550,7 +563,16 @@
       "me": "我",
       "sendTo": "给 {name} 发消息...",
       "emptyContacts": "暂无聊天，去关注其他用户开始聊天吧",
-      "selectContact": "选择一个联系人开始聊天"
+      "selectContact": "选择一个联系人开始聊天",
+      "emptyTitle": "暂无聊天",
+      "emptySub": "关注感兴趣的人，然后来聊两句吧",
+      "pickContact": "从上方选择一个会话开始聊天",
+      "findChats": "去找人聊天",
+      "dateToday": "今天",
+      "dateYesterday": "昨天",
+      "send": "发送",
+      "scrollLeft": "向左滚动",
+      "scrollRight": "向右滚动"
     },
     "UserPageMeta": {
       "defaultDescription": "查看该用户的帖子、回复与收藏内容。",

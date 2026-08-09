@@ -133,6 +133,18 @@
       "inputPlaceholder": "Type a message...",
       "send": "Send",
       "emptyState": "Start chatting with GKX 🚀",
+  "tagline": "Your AI assistant, ready when you are",
+  "suggestedPrompts": [
+    "Write a poem about summer",
+    "Explain black holes in simple terms",
+    "Help me write a React component",
+    "Suggest a title for this tweet"
+  ],
+  "searchPlaceholder": "Search conversations",
+  "dateToday": "Today",
+  "datePrev7": "Previous 7 days",
+  "datePrev30": "Previous 30 days",
+  "dateOlder": "Older",
       "copySuccess": "Copied",
       "copyFailed": "Copy failed",
       "copyMessage": "Copy message",
@@ -317,6 +329,7 @@
       "subtitle": "Fewer ads, stronger features, and better visibility for your content",
       "recommended": "Recommended",
       "subscribe": "Subscribe",
+      "backHome": "Back to home",
       "whyTitle": "Why choose Premium?",
       "whyCards": {
         "1": {
@@ -550,7 +563,16 @@
       "me": "Me",
       "sendTo": "Send a message to {name}...",
       "emptyContacts": "No chats yet. Follow users to start chatting.",
-      "selectContact": "Select a contact to start chatting"
+      "selectContact": "Select a contact to start chatting",
+      "emptyTitle": "No chats yet",
+      "emptySub": "Follow people you like and start a conversation",
+      "pickContact": "Pick a conversation above to start chatting",
+      "findChats": "Find people to chat with",
+      "dateToday": "Today",
+      "dateYesterday": "Yesterday",
+      "send": "Send",
+      "scrollLeft": "Scroll left",
+      "scrollRight": "Scroll right"
     },
     "UserPageMeta": {
       "defaultDescription": "View this user's posts, replies and bookmarks.",
