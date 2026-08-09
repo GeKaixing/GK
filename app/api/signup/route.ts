@@ -13,21 +13,62 @@ export async function POST(request: Request) {
       request.headers.get("origin") ||
       process.env.NEXT_PUBLIC_URL ||
       "http://localhost:3000";
+    const redirectTo = `${origin}/auth/confirm`;
 
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${origin}/auth/confirm`,
+        emailRedirectTo: redirectTo,
       },
     });
 
     if (error || !data.user) {
+      // 已注册且已确认的邮箱，signUp() 会返回 "User already registered"
+      if (error?.message?.toLowerCase().includes("already registered")) {
+        return NextResponse.json(
+          { error: error.message, code: "ALREADY_REGISTERED" },
+          { status: 409 }
+        );
+      }
       return NextResponse.json(
         { error: error?.message ?? "Signup failed" },
         { status: 401 }
       );
     }
+
+    // 已确认的老账户（无 session + email_confirmed_at 有值）→ 让用户去登录
+    if (!data.session && data.user.email_confirmed_at) {
+      return NextResponse.json(
+        { error: "Email already registered", code: "ALREADY_REGISTERED" },
+        { status: 409 }
+      );
+    }
+
+    // 对"已注册但未确认"的邮箱，signUp() 不会再发确认邮件——这正是"点了链接
+    // 出错后再次提交就没有邮件"的原因。无 session 说明该邮箱已注册过；但首次
+    // 注册的账户是刚由这次请求创建的（created_at≈现在，邮件已发出），无需补发，
+    // 只有创建超过 60 秒的老账户才 resend() 重新发送确认邮件。
+    const isExistingUnconfirmed =
+      !data.session &&
+      Date.now() - new Date(data.user.created_at).getTime() > 60_000;
+
+    if (isExistingUnconfirmed) {
+      const { error: resendError } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: { emailRedirectTo: redirectTo },
+      });
+
+      if (resendError) {
+        return NextResponse.json(
+          { error: resendError.message },
+          { status: 429 }
+        );
+      }
+    }
+
+    const authUserId = data.user.id;
 
     // ✅ 邮箱有唯一约束，按 email 关联档案：
     // - 已存在（旧 auth id 残留）→ 把 id 同步为当前 auth id，避免"同一邮箱两账号"撞唯一约束
@@ -35,11 +76,11 @@ export async function POST(request: Request) {
     await prisma.user.upsert({
       where: { email },
       update: {
-        id: data.user.id,
+        id: authUserId,
       },
       create: {
-        id: data.user.id,
-        userid: `user_${data.user.id.slice(0, 8)}`,
+        id: authUserId,
+        userid: `user_${authUserId.slice(0, 8)}`,
         email,
         name: name ?? "anonymity",
         avatar: avatar ?? null,

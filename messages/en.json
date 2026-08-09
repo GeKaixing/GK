@@ -693,6 +693,7 @@
         "passwordMin": "Password must be at least 6 characters."
       },
       "signupFailed": "Sign up failed",
+      "alreadyRegistered": "This email is already registered. Please log in instead.",
       "emailLabel": "Email",
       "emailPlaceholder": "Enter your email",
       "passwordLabel": "Password",

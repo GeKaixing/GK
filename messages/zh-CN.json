@@ -693,6 +693,7 @@
         "passwordMin": "密码必须至少包含6个字符。"
       },
       "signupFailed": "注册失败",
+      "alreadyRegistered": "该邮箱已注册，请直接登录。",
       "emailLabel": "邮箱",
       "emailPlaceholder": "请输入邮箱",
       "passwordLabel": "密码",

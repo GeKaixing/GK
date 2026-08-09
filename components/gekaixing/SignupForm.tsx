@@ -70,7 +70,11 @@ export default function SignupForm() {
             setOpen(true);
         } else {
             setStatus(false)
-            toast.error(t('signupFailed'))
+            toast.error(
+                data.code === 'ALREADY_REGISTERED'
+                    ? t('alreadyRegistered')
+                    : (data.error || t('signupFailed'))
+            )
         }
     }
     return (
