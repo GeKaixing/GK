@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import MessageBubble from "./MessageBubble"
 import SettingAI from "./SettingAI"
+import ChatHistoryPanel from "./ChatHistoryPanel"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { useAiSessions } from "@/store/AiSessions"
 import { useTranslations } from "next-intl"
 import {
   ArrowUp,
-  ChevronDown,
+  History,
   Paperclip,
   Settings,
   Sparkles,
@@ -59,6 +60,8 @@ export default function ChatUI({
   const [aiModelLabel, setAiModelLabel] = useState("")
   const [aiProvider, setAiProvider] = useState<AiProvider>("google")
   const [aiModel, setAiModel] = useState("")
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [historyOpenCount, setHistoryOpenCount] = useState(0)
 
   const { addSession, updateSessionTitle } = useAiSessions()
 
@@ -170,6 +173,8 @@ useEffect(() => {
   if (historyLoadedRef.current === initialSessionId) return
 
   historyLoadedRef.current = initialSessionId
+  // ⭐ 切换到另一个会话时重置，避免「已加入历史」标记残留
+  historyAddedRef.current = false
 
   async function loadHistory() {
     try {
@@ -459,7 +464,6 @@ useEffect(() => {
             <SelectTrigger className="flex items-center gap-2 rounded-full border-border px-3 py-1.5 text-sm font-semibold">
               <Sparkles className="h-4 w-4 text-primary" />
               <SelectValue placeholder={t("assistantTitle")} />
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </SelectTrigger>
             <SelectContent>
               {(aiProvider === "google"
@@ -484,6 +488,17 @@ useEffect(() => {
           </button>
         )}
         <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => {
+              setHistoryOpenCount((c) => c + 1)
+              setHistoryOpen(true)
+            }}
+            aria-label={t("history")}
+            className="rounded-full p-2 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+          >
+            <History className="h-4 w-4" />
+          </button>
           <button
             type="button"
             onClick={() => router.push("/gekaixing/gkx")}
@@ -535,6 +550,13 @@ useEffect(() => {
           <div className="px-4 pb-5 pt-2">{inputBox}</div>
         </>
       )}
+
+      <ChatHistoryPanel
+        key={historyOpenCount}
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
+        currentSessionId={initialSessionId}
+      />
     </div>
   )
 }
