@@ -1,23 +1,25 @@
-import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { NextResponse } from "next/server";
+
+import { getChatMessages } from "@/lib/ai/pi-chat";
+import { createClient } from "@/utils/supabase/server";
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url)
-  const sessionId = searchParams.get("sessionId")
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!sessionId) {
-    return NextResponse.json([], { status: 200 })
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const messages = await prisma.chatAIMessage.findMany({
-    where: { sessionId },
-    orderBy: { createdAt: "asc" },
-    select: {
-      id: true,
-      role: true,
-      content: true,
-    },
-  })
+  const { searchParams } = new URL(req.url);
+  const sessionId = searchParams.get("sessionId");
 
-  return NextResponse.json(messages)
+  if (!sessionId) {
+    return NextResponse.json([]);
+  }
+
+  const messages = await getChatMessages(sessionId, user.id);
+  return NextResponse.json(messages);
 }

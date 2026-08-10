@@ -1,7 +1,7 @@
 import { getUserAiConfig } from "@/lib/ai/config";
 import { generateAiText } from "@/lib/ai/text";
 import type { AiUserConfig } from "@/lib/ai/types";
-import { prisma } from "@/lib/prisma";
+import { setChatTitle } from "@/lib/ai/pi-chat";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -71,29 +71,15 @@ export async function POST(req: Request): Promise<Response> {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const session = await prisma.chatAISession.findFirst({
-      where: {
-        id: sessionId,
-        userId: user.id,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    if (!session) {
-      return NextResponse.json({ error: "Session not found" }, { status: 404 });
-    }
-
     const config = getUserAiConfig(user);
     const fallbackTitle = buildFallbackTitle(text);
     const aiTitle = await generateAiTitle(config, text);
     const nextTitle = aiTitle ?? fallbackTitle;
 
-    await prisma.chatAISession.update({
-      where: { id: session.id },
-      data: { title: nextTitle },
-    });
+    const updated = await setChatTitle(sessionId, user.id, nextTitle);
+    if (!updated) {
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    }
 
     return NextResponse.json({ title: nextTitle });
   } catch (error) {
