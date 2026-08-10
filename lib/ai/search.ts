@@ -2,7 +2,6 @@
 // AI tools. Multi-source and fail-soft so a slow/blocked host never throws:
 //   1. Bing HTML (cn.bing.com) — keyless, reachable from mainland China and Vercel.
 //   2. Wikipedia (en/zh)       — clean factual results; reachable on Vercel.
-//   3. NewsAPI                 — recent news; only when NEWS_API_KEY is set.
 
 const WIKIPEDIA_LANGS = ["en", "zh"] as const;
 const SEARCH_TIMEOUT_MS = 6000;
@@ -153,37 +152,6 @@ async function searchWikipedia(query: string): Promise<SearchResult[]> {
   return results;
 }
 
-/** Recent-news hits from NewsAPI; no-op unless NEWS_API_KEY is set. */
-async function searchNews(query: string): Promise<SearchResult[]> {
-  const apiKey = process.env.NEWS_API_KEY;
-  if (!apiKey) return [];
-
-  const url =
-    "https://newsapi.org/v2/everything?" +
-    new URLSearchParams({
-      q: query,
-      pageSize: "5",
-      sortBy: "publishedAt",
-    }).toString();
-
-  const res = await fetchWithTimeout(url, {
-    headers: { "X-Api-Key": apiKey },
-  });
-  if (!res) return [];
-
-  const data = (await res.json().catch(() => null)) as {
-    articles?: Array<{ title: string; description: string | null; url: string }>;
-  } | null;
-
-  return (data?.articles ?? [])
-    .filter((article) => article.title && article.url)
-    .map((article) => ({
-      title: article.title,
-      url: article.url,
-      snippet: article.description ?? "",
-    }));
-}
-
 /**
  * Search the web for `query`. Returns a deduped list of
  * { title, url, snippet } hits; empty array when nothing is reachable.
@@ -192,15 +160,14 @@ export async function searchWeb(query: string): Promise<SearchResult[]> {
   const trimmed = query.trim();
   if (!trimmed) return [];
 
-  const [bing, wiki, news] = await Promise.all([
+  const [bing, wiki] = await Promise.all([
     searchBing(trimmed),
     searchWikipedia(trimmed),
-    searchNews(trimmed),
   ]);
 
   const seen = new Set<string>();
   const merged: SearchResult[] = [];
-  for (const item of [...bing, ...wiki, ...news]) {
+  for (const item of [...bing, ...wiki]) {
     const key = item.url.replace(/\/+$/, "").toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
