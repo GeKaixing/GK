@@ -13,6 +13,7 @@ import { Loader2, Radio } from "lucide-react";
 import "@livekit/components-styles";
 
 import PlayerControls, { type QualityOption } from "./PlayerControls";
+import { useVideoAspect } from "./useVideoAspect";
 
 /**
  * LiveKit 直播房间：
@@ -125,6 +126,7 @@ function RoomContent({
   const tracks = useTracks([Track.Source.Camera]);
   const mainTrack = tracks[0];
   const videoRef = useRef<HTMLVideoElement>(null);
+  const videoAspect = useVideoAspect(videoRef);
   const [activeQuality, setActiveQuality] = useState("high");
 
   // 将摄像头 track attach 到自有的 <video> 元素
@@ -176,7 +178,7 @@ function RoomContent({
   const videoElement = (
     <video
       ref={videoRef}
-      className="absolute inset-0 h-full w-full object-cover"
+      className="absolute inset-0 h-full w-full bg-background object-cover"
       autoPlay
       muted
       playsInline
@@ -187,7 +189,10 @@ function RoomContent({
     <div className="relative">
       {isHost ? (
         /* 主播：自见 + LiveKit ControlBar（麦克风/摄像头开关） */
-        <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
+        <div
+          className="relative aspect-video w-full overflow-hidden rounded-2xl bg-background"
+          style={videoAspect ? { aspectRatio: String(videoAspect) } : undefined}
+        >
           {videoElement}
           <RoomAudioRenderer />
           <ControlBar

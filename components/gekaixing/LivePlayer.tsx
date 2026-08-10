@@ -117,7 +117,7 @@ export default function LivePlayer({
     return (
       <div
         className={cn(
-          "relative w-full aspect-video overflow-hidden rounded-2xl bg-black",
+          "relative w-full aspect-video overflow-hidden rounded-2xl bg-background",
           className
         )}
       >

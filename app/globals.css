@@ -144,6 +144,15 @@
   }
 }
 
+/* LiveKit 房间容器默认近黑底（--lk-bg: #111）去掉，跟随主题背景。
+   用双类提升优先级，避免被未分层引入的 livekit 样式盖回。
+   height 从 LiveKit 默认的 100% 改为 auto：页面里容器在 flex 链上会被算出一个
+   比内容更高的确定高度，100% 会让容器比视频框高出一截。auto 则贴着内容（视频框）。 */
+.lk-room-container.lk-room-container {
+  background-color: transparent;
+  height: auto;
+}
+
 @layer components {
   .dashboard-mono {
     --chart-1: oklch(0.3 0 0);

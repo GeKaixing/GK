@@ -20,6 +20,7 @@ import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
 import FeedbackDialog from "./FeedbackDialog";
+import { useVideoAspect } from "./useVideoAspect";
 
 export type QualityOption = {
   label: string;
@@ -53,6 +54,7 @@ export default function PlayerControls({
 }: PlayerControlsProps) {
   const t = useTranslations("ImitationX.Live");
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoAspect = useVideoAspect(videoRef);
 
   // 视频初始为静音以允许自动播放，故 muted 初始为 true；playing 初始 false，
   // 播放事件触发后更新
@@ -190,10 +192,11 @@ export default function PlayerControls({
       <div
         ref={containerRef}
         className={cn(
-          "group relative aspect-video w-full overflow-hidden rounded-2xl bg-black",
+          "group relative aspect-video w-full overflow-hidden rounded-2xl bg-background",
           cinema && "max-w-[1200px]",
           className
         )}
+        style={videoAspect ? { aspectRatio: String(videoAspect) } : undefined}
       >
         {children}
 
