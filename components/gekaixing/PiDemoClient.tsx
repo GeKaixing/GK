@@ -41,6 +41,7 @@ export default function PiDemoClient() {
   const [input, setInput] = useState("");
   const [running, setRunning] = useState(false);
   const bufferRef = useRef("");
+  const sessionIdRef = useRef<string | null>(null);
 
   const run = async () => {
     const text = input.trim();
@@ -67,7 +68,10 @@ export default function PiDemoClient() {
       const res = await fetch("/api/pi-demo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [{ role: "user", content: text }] }),
+        body: JSON.stringify({
+          messages: [{ role: "user", content: text }],
+          sessionId: sessionIdRef.current,
+        }),
       });
 
       if (!res.ok) {
@@ -75,6 +79,9 @@ export default function PiDemoClient() {
         throw new Error(errText || `Request failed (HTTP ${res.status})`);
       }
       if (!res.body) throw new Error("No response body");
+
+      const nextSessionId = res.headers.get("X-Session-Id");
+      if (nextSessionId) sessionIdRef.current = nextSessionId;
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();

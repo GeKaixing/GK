@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "eslint .",
     "init:storage": "tsx scripts/init-storage.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:integration": "RUN_DB_TESTS=1 vitest run lib/ai/pi-session.test.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.36",

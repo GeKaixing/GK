@@ -1,5 +1,5 @@
 import { Agent } from "@earendil-works/pi-agent-core";
-import type { AgentTool } from "@earendil-works/pi-agent-core";
+import type { AgentMessage, AgentTool } from "@earendil-works/pi-agent-core";
 import { createModels, createProvider, Type } from "@earendil-works/pi-ai";
 import type { Api, Model, Provider, ProviderStreams } from "@earendil-works/pi-ai";
 import { anthropicMessagesApi } from "@earendil-works/pi-ai/api/anthropic-messages.lazy";
@@ -137,7 +137,10 @@ export function createPiTools(): AgentTool[] {
 }
 
 /** A ready-to-prompt Agent bound to the user's provider/model and tools. */
-export function createPiAgent(config: AiUserConfig) {
+export function createPiAgent(
+  config: AiUserConfig,
+  options: { initialMessages?: AgentMessage[] } = {}
+) {
   const models = createModels();
   models.setProvider(buildPiProvider(config));
 
@@ -152,6 +155,7 @@ export function createPiAgent(config: AiUserConfig) {
       systemPrompt: PI_SYSTEM_PROMPT,
       model,
       tools: createPiTools(),
+      messages: options.initialMessages ?? [],
     },
     streamFn: models.streamSimple.bind(models),
     getApiKey: () => config.apiKey,

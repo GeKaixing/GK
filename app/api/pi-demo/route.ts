@@ -2,12 +2,21 @@ import { NextRequest } from "next/server";
 
 import { getUserAiConfig } from "@/lib/ai/config";
 import { createPiAgent, PI_SYSTEM_PROMPT } from "@/lib/ai/pi";
+import {
+  createPiSessionRepo,
+  getOrCreatePiSession,
+  loadPiSessionMessages,
+} from "@/lib/ai/pi-session";
 import { createClient } from "@/utils/supabase/server";
 
 /**
  * Demo route: run the @earendil-works/pi agent harness with the user's
  * configured provider/model and the existing webSearch/fetchUrl tools,
  * streaming Pi's lifecycle events over SSE.
+ *
+ * Conversations persist to Supabase Postgres via Pi's JSONL session backend
+ * (lib/ai/pi-session.ts + lib/ai/pi-fs.ts). Pass a `sessionId` (returned in
+ * `X-Session-Id`) to continue a conversation; omit it to start a new one.
  *
  * Independent of app/api/chat/route.ts (production chat is untouched).
  */
@@ -44,7 +53,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: { messages?: DemoMessage[] };
+  let body: { messages?: DemoMessage[]; sessionId?: string };
   try {
     body = await req.json();
   } catch {
@@ -56,7 +65,13 @@ export async function POST(req: NextRequest) {
     return new Response("messages required", { status: 400 });
   }
 
-  const { agent } = createPiAgent(config);
+  const sessionId = body.sessionId || crypto.randomUUID();
+  const repo = createPiSessionRepo();
+  const session = await getOrCreatePiSession(repo, sessionId, user.id);
+  const history = await loadPiSessionMessages(session);
+
+  const { agent } = createPiAgent(config, { initialMessages: history });
+  const seededCount = history.length;
   const lastUserText = messages[messages.length - 1].content;
 
   const encoder = new TextEncoder();
@@ -91,6 +106,14 @@ export async function POST(req: NextRequest) {
 
       try {
         await agent.prompt(lastUserText);
+
+        // Persist the messages this turn produced (user prompt, tool results,
+        // assistant reply) back to the Postgres-backed session.
+        const newMessages = agent.state.messages.slice(seededCount);
+        for (const message of newMessages) {
+          await session.appendMessage(message);
+        }
+
         controller.close();
       } catch (error) {
         console.error("Pi agent demo failed:", error);
@@ -108,6 +131,7 @@ export async function POST(req: NextRequest) {
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
       "X-Accel-Buffering": "no",
+      "X-Session-Id": sessionId,
     },
   });
 }
