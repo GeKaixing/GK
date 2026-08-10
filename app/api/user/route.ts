@@ -107,7 +107,7 @@ export async function PATCH(request: Request) {
 export async function DELETE(req: Request) {
   const supabaseAdmin = createClientROLE(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
   const body = await req.json();
   const { userId } = body;

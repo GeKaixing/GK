@@ -157,7 +157,7 @@ export default function LivePlayer({
     >
       <video
         ref={videoRef}
-        className="h-full w-full object-contain"
+        className="absolute inset-0 h-full w-full object-contain"
         src={isHls ? undefined : normalizedUrl}
         poster={poster ?? undefined}
         controls={false}

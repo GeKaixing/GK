@@ -171,12 +171,14 @@ function RoomContent({
     }
   };
 
+  // 视频绝对定位填满容器：避免 aspect-video 容器里 h-full 未生效露出黑底
+  // 初始静音以允许浏览器自动播放（主播为回声消除，观众可随时用音量键开声）
   const videoElement = (
     <video
       ref={videoRef}
-      className="h-full w-full object-cover"
+      className="absolute inset-0 h-full w-full object-cover"
       autoPlay
-      muted={isHost}
+      muted
       playsInline
     />
   );

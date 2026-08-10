@@ -54,8 +54,10 @@ export default function PlayerControls({
   const t = useTranslations("ImitationX.Live");
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [playing, setPlaying] = useState(true);
-  const [muted, setMuted] = useState(false);
+  // 视频初始为静音以允许自动播放，故 muted 初始为 true；playing 初始 false，
+  // 播放事件触发后更新
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
   const [volume, setVolume] = useState(1);
   const [cinema, setCinema] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
