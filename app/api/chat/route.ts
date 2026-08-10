@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 
 import { getUserAiConfig } from "@/lib/ai/config";
 import { createPiAgent } from "@/lib/ai/pi";
-import { getOrCreateChatSession } from "@/lib/ai/pi-chat";
+import { appendChatMessage, openOrResetChatSession } from "@/lib/ai/pi-chat";
 import { createPiSessionRepo, loadPiSessionMessages } from "@/lib/ai/pi-session";
 import { createClient } from "@/utils/supabase/server";
 
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
   const sessionId = body.sessionId || crypto.randomUUID();
   const repo = createPiSessionRepo();
-  const session = await getOrCreateChatSession(repo, sessionId, user.id);
+  const session = await openOrResetChatSession(repo, sessionId, user.id);
 
   // The persisted Pi session is the authoritative transcript; seed the agent
   // from it so multi-turn context survives serverless restarts.
@@ -83,6 +83,12 @@ export async function POST(req: NextRequest) {
           const delta = event.assistantMessageEvent.delta;
           fullText += delta;
           controller.enqueue(encoder.encode(delta));
+        } else if (event.type === "tool_execution_start") {
+          // Inline markers let the client show tool activity while text
+          // pauses between tool calls (see ChatUI's marker parser).
+          controller.enqueue(encoder.encode(`⟪tool_start:${event.toolName}⟫`));
+        } else if (event.type === "tool_execution_end") {
+          controller.enqueue(encoder.encode(`⟪tool_end:${event.toolName}⟫`));
         }
       });
 
@@ -92,7 +98,7 @@ export async function POST(req: NextRequest) {
         // Persist the messages this turn produced back to the Pi session.
         const newMessages = agent.state.messages.slice(seededCount);
         for (const message of newMessages) {
-          await session.appendMessage(message);
+          await appendChatMessage(session, message);
         }
 
         if (!fullText.trim()) {

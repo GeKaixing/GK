@@ -11,20 +11,32 @@ import { useTranslations } from "next-intl"
 
 type MessageRole = "user" | "assistant" | "system"
 
+export type ChatToolActivity = { name: string; done: boolean }
+
 interface MessageBubbleProps {
   role: MessageRole
   content: string
   loading?: boolean
+  /** Tool activity (search etc.) surfaced by the live stream. */
+  tools?: ChatToolActivity[]
+}
+
+function toolLabel(name: string): string {
+  if (name === "webSearch") return "搜索"
+  if (name === "fetchUrl") return "读取网页"
+  return name
 }
 
 export function MessageBubble({
   role,
   content,
   loading = false,
+  tools = [],
 }: MessageBubbleProps) {
   const t = useTranslations("ImitationX.Gkx")
   const [copied, setCopied] = React.useState(false)
   const isUser = role === "user"
+  const activeTools = tools.filter((tool) => !tool.done)
 
   async function handleCopy(): Promise<void> {
     if (!content.trim()) return
@@ -65,8 +77,17 @@ export function MessageBubble({
               : "bg-muted text-foreground"
           )}
         >
-          {/* loading 状态 */}
-          {loading ? <TypingIndicator /> : <MarkdownContent content={content} />}
+          {/* 尚未出正文：灰显「思考中 / 正在执行工具」，正文出现后即被替换 */}
+          {loading ? (
+            <ThinkingStatus activeTools={activeTools} />
+          ) : (
+            <MarkdownContent content={content} />
+          )}
+
+          {/* 正文进行中又触发了工具（如二次搜索）：正文下方灰显执行状态 */}
+          {!loading && activeTools.length > 0 && (
+            <RunningToolStatus activeTools={activeTools} />
+          )}
 
           {!loading && content.trim() && (
             <button
@@ -182,15 +203,29 @@ function CodeBlock({
 }
 
 // =======================
-// 打字动画（AI生成中）
+// 灰色状态提示（思考 / 执行工具）
 // =======================
 
-function TypingIndicator() {
+function toolStatusText(activeTools: ChatToolActivity[]): string {
+  return activeTools.length > 0
+    ? `正在执行：${activeTools.map((tool) => toolLabel(tool.name)).join("、")}…`
+    : "思考中…"
+}
+
+function ThinkingStatus({ activeTools }: { activeTools: ChatToolActivity[] }) {
   return (
-    <div className="flex gap-1 items-center h-5">
-      <span className="w-2 h-2 rounded-full bg-current animate-bounce" />
-      <span className="w-2 h-2 rounded-full bg-current animate-bounce delay-150" />
-      <span className="w-2 h-2 rounded-full bg-current animate-bounce delay-300" />
+    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-muted-foreground/60" />
+      <span className="animate-pulse">{toolStatusText(activeTools)}</span>
+    </div>
+  )
+}
+
+function RunningToolStatus({ activeTools }: { activeTools: ChatToolActivity[] }) {
+  return (
+    <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-muted-foreground/60" />
+      <span className="animate-pulse">{toolStatusText(activeTools)}</span>
     </div>
   )
 }

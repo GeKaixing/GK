@@ -39,11 +39,47 @@ function providerLabelOf(provider: AiProvider): string {
   return "AI"
 }
 
+type ChatToolActivity = { name: string; done: boolean }
+
 type Message = {
   id: string
   role: "user" | "assistant"
   content: string
   sessionId?: string
+  /** Tool activity surfaced by the live stream's inline markers. */
+  tools?: ChatToolActivity[]
+}
+
+/** Markers the server injects around tool calls so the UI can show activity. */
+const TOOL_MARKER_RE = /⟪tool_start:([^⟫]+)⟫|⟪tool_end:([^⟫]+)⟫/g
+
+function stripToolMarkers(raw: string): string {
+  return raw.replace(TOOL_MARKER_RE, "")
+}
+
+function parseToolActivity(raw: string): ChatToolActivity[] {
+  const tools: ChatToolActivity[] = []
+  let match
+  TOOL_MARKER_RE.lastIndex = 0
+  while ((match = TOOL_MARKER_RE.exec(raw))) {
+    if (match[1]) {
+      tools.push({ name: match[1], done: false })
+    } else if (match[2]) {
+      for (let i = tools.length - 1; i >= 0; i--) {
+        if (tools[i].name === match[2] && !tools[i].done) {
+          tools[i].done = true
+          break
+        }
+      }
+    }
+  }
+  return tools
+}
+
+function toolLabel(name: string): string {
+  if (name === "webSearch") return "搜索"
+  if (name === "fetchUrl") return "读取网页"
+  return name
 }
 
 export default function ChatUI({
@@ -293,18 +329,21 @@ useEffect(() => {
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
 
+      let rawBuffer = ""
       let fullText = ""
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
 
-        fullText += decoder.decode(value)
+        rawBuffer += decoder.decode(value)
+        fullText = stripToolMarkers(rawBuffer)
+        const tools = parseToolActivity(rawBuffer)
 
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === assistantId
-              ? { ...msg, content: fullText }
+              ? { ...msg, content: fullText, tools: tools.length > 0 ? tools : msg.tools }
               : msg
           )
         )
@@ -541,6 +580,7 @@ useEffect(() => {
                   role={msg.role}
                   content={msg.content}
                   loading={loading && msg.role === "assistant" && !msg.content}
+                  tools={msg.tools}
                 />
               ))}
               <div ref={bottomRef} />

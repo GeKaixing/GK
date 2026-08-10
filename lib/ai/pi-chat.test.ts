@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, it } from "vitest";
 
 import {
+  appendChatMessage,
   deleteChatSession,
   getChatMessages,
   getOrCreateChatSession,
@@ -77,6 +78,26 @@ describe.skipIf(!runDbTests)("pi-chat adapter", () => {
 
       await deleteChatSession("s1", "u1", repo);
       expect(await getChatMessages("s1", "u1", repo)).toHaveLength(0);
+    }
+  );
+
+  it(
+    "persists agent-produced messages with undefined optional fields",
+    { timeout: 30_000 },
+    async () => {
+      const repo = testRepo();
+      const session = await getOrCreateChatSession(repo, "s1", "u1");
+      // Pi agent messages carry optional fields set to undefined, which the
+      // JSONL codec rejects; appendChatMessage must strip them.
+      const agentMessage = {
+        ...assistantText("hi"),
+        responseId: undefined,
+        diagnostics: undefined,
+      };
+      await appendChatMessage(session, agentMessage);
+
+      const messages = await getChatMessages("s1", "u1", repo);
+      expect(messages[0].content).toBe("hi");
     }
   );
 
