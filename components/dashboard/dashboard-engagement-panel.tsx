@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
@@ -8,7 +8,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import type { DashboardTrendPoint } from "@/lib/dashboard/types";
+import type { DashboardEngagementData } from "@/lib/dashboard/types";
 
 type DashboardEngagementPanelLabels = {
   title: string;
@@ -20,14 +20,9 @@ type DashboardEngagementPanelLabels = {
 };
 
 type DashboardEngagementPanelProps = {
-  trend: DashboardTrendPoint[];
+  engagement: DashboardEngagementData;
   locale: string;
   labels: DashboardEngagementPanelLabels;
-};
-
-type EngagementPoint = {
-  day: string;
-  impressions: number;
 };
 
 const chartConfig = {
@@ -54,38 +49,20 @@ function percentDelta(current: number, previous: number): string {
   return `${normalized >= 0 ? "+" : ""}${normalized.toFixed(1)}%`;
 }
 
-function toEngagementData(trend: DashboardTrendPoint[], locale: string): EngagementPoint[] {
-  const recent = trend.slice(-7);
-
-  return recent.map((item) => ({
-    day: new Date(item.date).toLocaleDateString(locale, { weekday: "short" }),
-    impressions: item.posts * 42000 + item.replies * 22000,
-  }));
+function formatWeekday(dateKey: string, locale: string): string {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString(locale, { weekday: "short" });
 }
 
 export function DashboardEngagementPanel({
-  trend,
+  engagement,
   locale,
   labels,
 }: DashboardEngagementPanelProps): React.JSX.Element {
-  const recent = trend.slice(-7);
-  const previous = trend.slice(-14, -7);
-
-  const currentImpressions = recent.reduce((sum, item) => sum + item.posts * 42000 + item.replies * 22000, 0);
-  const previousImpressions = previous.reduce((sum, item) => sum + item.posts * 42000 + item.replies * 22000, 0);
-
-  const currentEngagementRate = recent.length
-    ? (recent.reduce((sum, item) => sum + item.replies, 0) /
-        Math.max(recent.reduce((sum, item) => sum + item.posts, 0), 1)) *
-      100
-    : 0;
-  const previousEngagementRate = previous.length
-    ? (previous.reduce((sum, item) => sum + item.replies, 0) /
-        Math.max(previous.reduce((sum, item) => sum + item.posts, 0), 1)) *
-      100
-    : 0;
-
-  const chartData = toEngagementData(trend, locale);
+  const chartData = engagement.dailyImpressions.map((item) => ({
+    day: formatWeekday(item.date, locale),
+    impressions: item.impressions,
+  }));
 
   return (
     <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-gradient-to-b from-white via-zinc-50 to-white px-5 py-5 text-zinc-900 shadow-sm [--eng-line:#18181b] [--eng-fill:#18181b] [--eng-grid:rgba(39,39,42,0.18)] [--eng-axis:#52525b] dark:border-white/10 dark:bg-gradient-to-b dark:from-black dark:via-zinc-950 dark:to-black dark:text-zinc-100 dark:shadow-lg dark:[--eng-line:#fafafa] dark:[--eng-fill:#ffffff] dark:[--eng-grid:rgba(161,161,170,0.2)] dark:[--eng-axis:#a1a1aa]">
@@ -95,15 +72,15 @@ export function DashboardEngagementPanel({
         <div>
           <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{labels.impressions}</p>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-3xl font-bold">{compactNumber(currentImpressions, locale)}</span>
-            <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">{percentDelta(currentImpressions, previousImpressions)}</span>
+            <span className="text-3xl font-bold">{compactNumber(engagement.impressions, locale)}</span>
+            <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">{percentDelta(engagement.impressions, engagement.impressionsPrev)}</span>
           </div>
         </div>
         <div>
           <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{labels.engagementRate}</p>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-3xl font-bold">{currentEngagementRate.toFixed(1)}%</span>
-            <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">{percentDelta(currentEngagementRate, previousEngagementRate)}</span>
+            <span className="text-3xl font-bold">{engagement.engagementRate.toFixed(1)}%</span>
+            <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">{percentDelta(engagement.engagementRate, engagement.engagementRatePrev)}</span>
           </div>
         </div>
       </div>
@@ -120,6 +97,7 @@ export function DashboardEngagementPanel({
             <CartesianGrid stroke="var(--eng-grid)" vertical={false} />
             <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={10} stroke="var(--eng-axis)" />
             <YAxis
+              allowDecimals={false}
               tickLine={false}
               axisLine={false}
               width={42}
@@ -146,19 +124,19 @@ export function DashboardEngagementPanel({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">{labels.impressions}</p>
-            <p className="mt-1 text-2xl font-semibold">{currentImpressions.toLocaleString(locale)}</p>
+            <p className="mt-1 text-2xl font-semibold">{engagement.impressions.toLocaleString(locale)}</p>
           </div>
           <div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">{labels.replies}</p>
-            <p className="mt-1 text-2xl font-semibold">{recent.reduce((sum, item) => sum + item.replies, 0).toLocaleString(locale)}</p>
+            <p className="mt-1 text-2xl font-semibold">{engagement.replies.toLocaleString(locale)}</p>
           </div>
           <div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">{labels.posts}</p>
-            <p className="mt-1 text-2xl font-semibold">{recent.reduce((sum, item) => sum + item.posts, 0).toLocaleString(locale)}</p>
+            <p className="mt-1 text-2xl font-semibold">{engagement.posts.toLocaleString(locale)}</p>
           </div>
           <div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">{labels.growth}</p>
-            <p className="mt-1 text-2xl font-semibold text-zinc-700 dark:text-zinc-300">{percentDelta(currentImpressions, previousImpressions)}</p>
+            <p className="mt-1 text-2xl font-semibold text-zinc-700 dark:text-zinc-300">{percentDelta(engagement.impressions, engagement.impressionsPrev)}</p>
           </div>
         </div>
       </div>

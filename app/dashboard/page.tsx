@@ -2,12 +2,10 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { DashboardEngagementPanel } from "@/components/dashboard/dashboard-engagement-panel";
-import { TrendPill } from "@/components/dashboard/trend-pill";
 import { DashboardTrendChart } from "@/components/dashboard/dashboard-trend-chart";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  CardAction,
   Card,
   CardContent,
   CardDescription,
@@ -68,7 +66,7 @@ export default async function DashboardPage({
     getTranslations("Dashboard.engagement"),
   ]);
 
-  const { summary, rates, trend, recentPosts } = await getDashboardHomeData(userId);
+  const { summary, rates, trend, recentPosts, engagement } = await getDashboardHomeData(userId);
 
   const formatMetricPair = (uvValue: number, uvBase: number, pvValue: number, pvBase: number): string => {
     return uvMode ? `UV ${uvValue}/${uvBase}` : `PV ${pvValue}/${pvBase}`;
@@ -81,18 +79,12 @@ export default async function DashboardPage({
           <CardHeader>
             <CardDescription>{t("stats.totalUsers")}</CardDescription>
             <CardTitle>{summary.totalUsers}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.totalUsers} previous={summary.totalPremiumUsers} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.premiumUsers")}</CardDescription>
             <CardTitle>{summary.totalPremiumUsers}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.totalPremiumUsers} previous={summary.totalUsers} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
@@ -101,9 +93,6 @@ export default async function DashboardPage({
             <CardTitle>
               {summary.totalPosts} / {summary.totalReplies}
             </CardTitle>
-            <CardAction>
-              <TrendPill current={summary.totalPosts} previous={summary.totalReplies} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
@@ -112,16 +101,13 @@ export default async function DashboardPage({
             <CardTitle>
               {summary.weeklyNewUsers} / {summary.weeklyNewPosts}
             </CardTitle>
-            <CardAction>
-              <TrendPill current={summary.weeklyNewUsers} previous={summary.weeklyNewPosts} />
-            </CardAction>
           </CardHeader>
         </Card>
       </div>
 
       <div className="px-4 lg:px-6">
         <DashboardEngagementPanel
-          trend={trend}
+          engagement={engagement}
           locale={locale}
           labels={{
             title: te("title"),

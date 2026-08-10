@@ -24,6 +24,7 @@ model User {
   premiumExpiresAt         DateTime?
   premiumGraceEndsAt       DateTime?
   stripePriceId            String?
+  role                     UserRole                  @default(STANDARD)
   bookmarks                Bookmark[]
   conversationParticipants ConversationParticipant[]
   conversationReads        ConversationRead[]
@@ -227,6 +228,18 @@ model ChatAIMessage {
   @@index([sessionId, createdAt])
 }
 
+// Pi agent session storage: a virtual file system persisted in Postgres.
+// `JsonlSessionRepo` (pi-agent-core) writes each session as an append-only
+// JSONL "file" through the JsonlSessionRepoFileSystem seam (lib/ai/pi-fs.ts).
+model PiSessionFile {
+  path      String    @id // absolute virtual path, e.g. /sessions/<userId>/<sessionId>.jsonl
+  content   String?   @db.Text // file content (JSONL lines); null for implicit directories
+  size      Int       @default(0) // content length in bytes
+  mtimeMs   BigInt    @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
 model JobPosting {
   id             String   @id @default(cuid())
   authorId       String
@@ -290,6 +303,11 @@ enum SubscriptionStatus {
   GRACE
   EXPIRED
   CANCELED
+}
+
+enum UserRole {
+  ADMIN
+  STANDARD
 }
 
 model LiveStream {

@@ -2,7 +2,6 @@
 
 import { Badge } from "@/components/ui/badge";
 import {
-  CardAction,
   Card,
   CardContent,
   CardDescription,
@@ -19,7 +18,6 @@ import {
 } from "@/components/ui/table";
 import { getDashboardSettingsData } from "@/lib/dashboard/service";
 import { getDashboardViewer } from "@/lib/dashboard/viewer";
-import { TrendPill } from "@/components/dashboard/trend-pill";
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("zh-CN", {
@@ -45,18 +43,12 @@ export default async function SettingsPage(): Promise<React.JSX.Element> {
           <CardHeader>
             <CardDescription>{t("stats.totalLogs")}</CardDescription>
             <CardTitle>{summary.totalActions}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.totalActions} previous={summary.actionsToday} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.logsToday")}</CardDescription>
             <CardTitle>{summary.actionsToday}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.actionsToday} previous={summary.totalActions} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>

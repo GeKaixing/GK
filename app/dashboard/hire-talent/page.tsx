@@ -5,7 +5,6 @@ import { JobPostPublisher } from "@/components/dashboard/job-post-publisher";
 import { JobPostManager } from "@/components/dashboard/job-post-manager";
 import { Button } from "@/components/ui/button";
 import {
-  CardAction,
   Card,
   CardContent,
   CardDescription,
@@ -14,7 +13,6 @@ import {
 } from "@/components/ui/card";
 import { getDashboardHireTalentData } from "@/lib/dashboard/service";
 import { getDashboardViewer } from "@/lib/dashboard/viewer";
-import { TrendPill } from "@/components/dashboard/trend-pill";
 import { Input } from "@/components/ui/input";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -51,27 +49,18 @@ export default async function HireTalentPage({
           <CardHeader>
             <CardDescription>{t("stats.totalJobPosts")}</CardDescription>
             <CardTitle>{summary.totalJobPosts}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.totalJobPosts} previous={summary.remoteJobPosts} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.remoteJobPosts")}</CardDescription>
             <CardTitle>{summary.remoteJobPosts}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.remoteJobPosts} previous={summary.hybridJobPosts} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.hybridJobPosts")}</CardDescription>
             <CardTitle>{summary.hybridJobPosts}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.hybridJobPosts} previous={summary.totalJobPosts} />
-            </CardAction>
           </CardHeader>
         </Card>
       </div>

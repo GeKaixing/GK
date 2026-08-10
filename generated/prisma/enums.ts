@@ -45,3 +45,11 @@ export const SubscriptionStatus = {
 } as const
 
 export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus]
+
+
+export const UserRole = {
+  ADMIN: 'ADMIN',
+  STANDARD: 'STANDARD'
+} as const
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]

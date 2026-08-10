@@ -2,7 +2,6 @@
 
 import { DashboardPremiumRateChart } from "@/components/dashboard/dashboard-premium-rate-chart";
 import {
-  CardAction,
   Card,
   CardContent,
   CardDescription,
@@ -19,7 +18,6 @@ import {
 } from "@/components/ui/table";
 import { getDashboardBillingData } from "@/lib/dashboard/service";
 import { getDashboardViewer } from "@/lib/dashboard/viewer";
-import { TrendPill } from "@/components/dashboard/trend-pill";
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("zh-CN", {
@@ -43,36 +41,24 @@ export default async function BillingPage(): Promise<React.JSX.Element> {
           <CardHeader>
             <CardDescription>{t("stats.totalUsers")}</CardDescription>
             <CardTitle>{summary.totalUsers}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.totalUsers} previous={1} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.premiumUsers")}</CardDescription>
             <CardTitle>{summary.premiumUsers}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.premiumUsers} previous={summary.totalUsers} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.premiumRate")}</CardDescription>
             <CardTitle>{summary.premiumRate}%</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.premiumRate} previous={50} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.newPremium7d")}</CardDescription>
             <CardTitle>{summary.newPremiumUsers7d}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.newPremiumUsers7d} previous={summary.premiumUsers} />
-            </CardAction>
           </CardHeader>
         </Card>
       </div>

@@ -64,6 +64,7 @@ export const ModelName = {
   WorkTask: 'WorkTask',
   ChatAISession: 'ChatAISession',
   ChatAIMessage: 'ChatAIMessage',
+  PiSessionFile: 'PiSessionFile',
   JobPosting: 'JobPosting',
   UserAction: 'UserAction',
   LiveStream: 'LiveStream',
@@ -103,7 +104,8 @@ export const UserScalarFieldEnum = {
   subscriptionStatus: 'subscriptionStatus',
   premiumExpiresAt: 'premiumExpiresAt',
   premiumGraceEndsAt: 'premiumGraceEndsAt',
-  stripePriceId: 'stripePriceId'
+  stripePriceId: 'stripePriceId',
+  role: 'role'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -259,6 +261,18 @@ export const ChatAIMessageScalarFieldEnum = {
 } as const
 
 export type ChatAIMessageScalarFieldEnum = (typeof ChatAIMessageScalarFieldEnum)[keyof typeof ChatAIMessageScalarFieldEnum]
+
+
+export const PiSessionFileScalarFieldEnum = {
+  path: 'path',
+  content: 'content',
+  size: 'size',
+  mtimeMs: 'mtimeMs',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PiSessionFileScalarFieldEnum = (typeof PiSessionFileScalarFieldEnum)[keyof typeof PiSessionFileScalarFieldEnum]
 
 
 export const JobPostingScalarFieldEnum = {

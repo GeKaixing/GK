@@ -2,7 +2,6 @@
 
 import { Badge } from "@/components/ui/badge";
 import {
-  CardAction,
   Card,
   CardContent,
   CardDescription,
@@ -19,7 +18,6 @@ import {
 } from "@/components/ui/table";
 import { getDashboardAffiliationsData } from "@/lib/dashboard/service";
 import { getDashboardViewer } from "@/lib/dashboard/viewer";
-import { TrendPill } from "@/components/dashboard/trend-pill";
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("zh-CN", {
@@ -45,36 +43,24 @@ export default async function AffiliationsPage(): Promise<React.JSX.Element> {
           <CardHeader>
             <CardDescription>{t("stats.totalLinks")}</CardDescription>
             <CardTitle>{summary.totalLinks}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.totalLinks} previous={summary.followingLinks} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.following")}</CardDescription>
             <CardTitle>{summary.followingLinks}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.followingLinks} previous={summary.requestedLinks} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.requested")}</CardDescription>
             <CardTitle>{summary.requestedLinks}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.requestedLinks} previous={summary.blockedLinks} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.blocked")}</CardDescription>
             <CardTitle>{summary.blockedLinks}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.blockedLinks} previous={summary.totalLinks} inverse />
-            </CardAction>
           </CardHeader>
         </Card>
       </div>

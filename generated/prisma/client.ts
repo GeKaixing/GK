@@ -108,6 +108,11 @@ export type ChatAISession = Prisma.ChatAISessionModel
  */
 export type ChatAIMessage = Prisma.ChatAIMessageModel
 /**
+ * Model PiSessionFile
+ * 
+ */
+export type PiSessionFile = Prisma.PiSessionFileModel
+/**
  * Model JobPosting
  * 
  */

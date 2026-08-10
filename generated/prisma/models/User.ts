@@ -41,6 +41,7 @@ export type UserMinAggregateOutputType = {
   premiumExpiresAt: Date | null
   premiumGraceEndsAt: Date | null
   stripePriceId: string | null
+  role: $Enums.UserRole | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -60,6 +61,7 @@ export type UserMaxAggregateOutputType = {
   premiumExpiresAt: Date | null
   premiumGraceEndsAt: Date | null
   stripePriceId: string | null
+  role: $Enums.UserRole | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -79,6 +81,7 @@ export type UserCountAggregateOutputType = {
   premiumExpiresAt: number
   premiumGraceEndsAt: number
   stripePriceId: number
+  role: number
   _all: number
 }
 
@@ -100,6 +103,7 @@ export type UserMinAggregateInputType = {
   premiumExpiresAt?: true
   premiumGraceEndsAt?: true
   stripePriceId?: true
+  role?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -119,6 +123,7 @@ export type UserMaxAggregateInputType = {
   premiumExpiresAt?: true
   premiumGraceEndsAt?: true
   stripePriceId?: true
+  role?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -138,6 +143,7 @@ export type UserCountAggregateInputType = {
   premiumExpiresAt?: true
   premiumGraceEndsAt?: true
   stripePriceId?: true
+  role?: true
   _all?: true
 }
 
@@ -230,6 +236,7 @@ export type UserGroupByOutputType = {
   premiumExpiresAt: Date | null
   premiumGraceEndsAt: Date | null
   stripePriceId: string | null
+  role: $Enums.UserRole
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -270,6 +277,7 @@ export type UserWhereInput = {
   premiumExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   premiumGraceEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   stripePriceId?: Prisma.StringNullableFilter<"User"> | string | null
+  role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   bookmarks?: Prisma.BookmarkListRelationFilter
   conversationParticipants?: Prisma.ConversationParticipantListRelationFilter
   conversationReads?: Prisma.ConversationReadListRelationFilter
@@ -305,6 +313,7 @@ export type UserOrderByWithRelationInput = {
   premiumExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   premiumGraceEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   stripePriceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  role?: Prisma.SortOrder
   bookmarks?: Prisma.BookmarkOrderByRelationAggregateInput
   conversationParticipants?: Prisma.ConversationParticipantOrderByRelationAggregateInput
   conversationReads?: Prisma.ConversationReadOrderByRelationAggregateInput
@@ -343,6 +352,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   premiumExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   premiumGraceEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   stripePriceId?: Prisma.StringNullableFilter<"User"> | string | null
+  role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   bookmarks?: Prisma.BookmarkListRelationFilter
   conversationParticipants?: Prisma.ConversationParticipantListRelationFilter
   conversationReads?: Prisma.ConversationReadListRelationFilter
@@ -378,6 +388,7 @@ export type UserOrderByWithAggregationInput = {
   premiumExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   premiumGraceEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   stripePriceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  role?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -403,6 +414,7 @@ export type UserScalarWhereWithAggregatesInput = {
   premiumExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   premiumGraceEndsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   stripePriceId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
 }
 
 export type UserCreateInput = {
@@ -422,6 +434,7 @@ export type UserCreateInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -457,6 +470,7 @@ export type UserUncheckedCreateInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -492,6 +506,7 @@ export type UserUpdateInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -527,6 +542,7 @@ export type UserUncheckedUpdateInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -562,6 +578,7 @@ export type UserCreateManyInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
 }
 
 export type UserUpdateManyMutationInput = {
@@ -581,6 +598,7 @@ export type UserUpdateManyMutationInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -600,6 +618,7 @@ export type UserUncheckedUpdateManyInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -619,6 +638,7 @@ export type UserCountOrderByAggregateInput = {
   premiumExpiresAt?: Prisma.SortOrder
   premiumGraceEndsAt?: Prisma.SortOrder
   stripePriceId?: Prisma.SortOrder
+  role?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -638,6 +658,7 @@ export type UserMaxOrderByAggregateInput = {
   premiumExpiresAt?: Prisma.SortOrder
   premiumGraceEndsAt?: Prisma.SortOrder
   stripePriceId?: Prisma.SortOrder
+  role?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -657,6 +678,7 @@ export type UserMinOrderByAggregateInput = {
   premiumExpiresAt?: Prisma.SortOrder
   premiumGraceEndsAt?: Prisma.SortOrder
   stripePriceId?: Prisma.SortOrder
+  role?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -691,6 +713,10 @@ export type EnumSubscriptionStatusFieldUpdateOperationsInput = {
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type EnumUserRoleFieldUpdateOperationsInput = {
+  set?: $Enums.UserRole
 }
 
 export type UserCreateNestedOneWithoutFollowingInput = {
@@ -936,6 +962,7 @@ export type UserCreateWithoutFollowingInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -970,6 +997,7 @@ export type UserUncheckedCreateWithoutFollowingInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -1009,6 +1037,7 @@ export type UserCreateWithoutFollowersInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -1043,6 +1072,7 @@ export type UserUncheckedCreateWithoutFollowersInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -1093,6 +1123,7 @@ export type UserUpdateWithoutFollowingInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -1127,6 +1158,7 @@ export type UserUncheckedUpdateWithoutFollowingInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -1172,6 +1204,7 @@ export type UserUpdateWithoutFollowersInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -1206,6 +1239,7 @@ export type UserUncheckedUpdateWithoutFollowersInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -1240,6 +1274,7 @@ export type UserCreateWithoutPostsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -1274,6 +1309,7 @@ export type UserUncheckedCreateWithoutPostsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -1324,6 +1360,7 @@ export type UserUpdateWithoutPostsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -1358,6 +1395,7 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -1392,6 +1430,7 @@ export type UserCreateWithoutLikesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -1426,6 +1465,7 @@ export type UserUncheckedCreateWithoutLikesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -1476,6 +1516,7 @@ export type UserUpdateWithoutLikesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -1510,6 +1551,7 @@ export type UserUncheckedUpdateWithoutLikesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -1544,6 +1586,7 @@ export type UserCreateWithoutBookmarksInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
   following?: Prisma.FollowCreateNestedManyWithoutFollowerInput
@@ -1578,6 +1621,7 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
   following?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowerInput
@@ -1628,6 +1672,7 @@ export type UserUpdateWithoutBookmarksInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUpdateManyWithoutFollowerNestedInput
@@ -1662,6 +1707,7 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUncheckedUpdateManyWithoutFollowerNestedInput
@@ -1696,6 +1742,7 @@ export type UserCreateWithoutSharesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -1730,6 +1777,7 @@ export type UserUncheckedCreateWithoutSharesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -1780,6 +1828,7 @@ export type UserUpdateWithoutSharesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -1814,6 +1863,7 @@ export type UserUncheckedUpdateWithoutSharesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -1848,6 +1898,7 @@ export type UserCreateWithoutConversationParticipantsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
   following?: Prisma.FollowCreateNestedManyWithoutFollowerInput
@@ -1882,6 +1933,7 @@ export type UserUncheckedCreateWithoutConversationParticipantsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
   following?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowerInput
@@ -1932,6 +1984,7 @@ export type UserUpdateWithoutConversationParticipantsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUpdateManyWithoutFollowerNestedInput
@@ -1966,6 +2019,7 @@ export type UserUncheckedUpdateWithoutConversationParticipantsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUncheckedUpdateManyWithoutFollowerNestedInput
@@ -2000,6 +2054,7 @@ export type UserCreateWithoutMessagesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -2034,6 +2089,7 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -2084,6 +2140,7 @@ export type UserUpdateWithoutMessagesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -2118,6 +2175,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -2152,6 +2210,7 @@ export type UserCreateWithoutConversationReadsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   following?: Prisma.FollowCreateNestedManyWithoutFollowerInput
@@ -2186,6 +2245,7 @@ export type UserUncheckedCreateWithoutConversationReadsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   following?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowerInput
@@ -2236,6 +2296,7 @@ export type UserUpdateWithoutConversationReadsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUpdateManyWithoutFollowerNestedInput
@@ -2270,6 +2331,7 @@ export type UserUncheckedUpdateWithoutConversationReadsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUncheckedUpdateManyWithoutFollowerNestedInput
@@ -2304,6 +2366,7 @@ export type UserCreateWithoutAssignedWorkTasksInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -2338,6 +2401,7 @@ export type UserUncheckedCreateWithoutAssignedWorkTasksInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -2377,6 +2441,7 @@ export type UserCreateWithoutCreatedWorkTasksInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -2411,6 +2476,7 @@ export type UserUncheckedCreateWithoutCreatedWorkTasksInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -2461,6 +2527,7 @@ export type UserUpdateWithoutAssignedWorkTasksInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -2495,6 +2562,7 @@ export type UserUncheckedUpdateWithoutAssignedWorkTasksInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -2540,6 +2608,7 @@ export type UserUpdateWithoutCreatedWorkTasksInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -2574,6 +2643,7 @@ export type UserUncheckedUpdateWithoutCreatedWorkTasksInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -2608,6 +2678,7 @@ export type UserCreateWithoutJobPostsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -2642,6 +2713,7 @@ export type UserUncheckedCreateWithoutJobPostsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -2692,6 +2764,7 @@ export type UserUpdateWithoutJobPostsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -2726,6 +2799,7 @@ export type UserUncheckedUpdateWithoutJobPostsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -2760,6 +2834,7 @@ export type UserCreateWithoutActionsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -2794,6 +2869,7 @@ export type UserUncheckedCreateWithoutActionsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -2844,6 +2920,7 @@ export type UserUpdateWithoutActionsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -2878,6 +2955,7 @@ export type UserUncheckedUpdateWithoutActionsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -2912,6 +2990,7 @@ export type UserCreateWithoutLiveStreamsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -2946,6 +3025,7 @@ export type UserUncheckedCreateWithoutLiveStreamsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -2996,6 +3076,7 @@ export type UserUpdateWithoutLiveStreamsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -3030,6 +3111,7 @@ export type UserUncheckedUpdateWithoutLiveStreamsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -3064,6 +3146,7 @@ export type UserCreateWithoutLiveChatMessagesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -3098,6 +3181,7 @@ export type UserUncheckedCreateWithoutLiveChatMessagesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -3148,6 +3232,7 @@ export type UserUpdateWithoutLiveChatMessagesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -3182,6 +3267,7 @@ export type UserUncheckedUpdateWithoutLiveChatMessagesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -3216,6 +3302,7 @@ export type UserCreateWithoutLiveFeedbackInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -3250,6 +3337,7 @@ export type UserUncheckedCreateWithoutLiveFeedbackInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -3300,6 +3388,7 @@ export type UserUpdateWithoutLiveFeedbackInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -3334,6 +3423,7 @@ export type UserUncheckedUpdateWithoutLiveFeedbackInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -3534,6 +3624,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   premiumExpiresAt?: boolean
   premiumGraceEndsAt?: boolean
   stripePriceId?: boolean
+  role?: boolean
   bookmarks?: boolean | Prisma.User$bookmarksArgs<ExtArgs>
   conversationParticipants?: boolean | Prisma.User$conversationParticipantsArgs<ExtArgs>
   conversationReads?: boolean | Prisma.User$conversationReadsArgs<ExtArgs>
@@ -3570,6 +3661,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   premiumExpiresAt?: boolean
   premiumGraceEndsAt?: boolean
   stripePriceId?: boolean
+  role?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -3589,6 +3681,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   premiumExpiresAt?: boolean
   premiumGraceEndsAt?: boolean
   stripePriceId?: boolean
+  role?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -3608,9 +3701,10 @@ export type UserSelectScalar = {
   premiumExpiresAt?: boolean
   premiumGraceEndsAt?: boolean
   stripePriceId?: boolean
+  role?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "avatar" | "backgroundImage" | "briefIntroduction" | "createdAt" | "updatedAt" | "userid" | "isPremium" | "stripeCustomerId" | "stripeSubId" | "subscriptionStatus" | "premiumExpiresAt" | "premiumGraceEndsAt" | "stripePriceId", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "name" | "avatar" | "backgroundImage" | "briefIntroduction" | "createdAt" | "updatedAt" | "userid" | "isPremium" | "stripeCustomerId" | "stripeSubId" | "subscriptionStatus" | "premiumExpiresAt" | "premiumGraceEndsAt" | "stripePriceId" | "role", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bookmarks?: boolean | Prisma.User$bookmarksArgs<ExtArgs>
   conversationParticipants?: boolean | Prisma.User$conversationParticipantsArgs<ExtArgs>
@@ -3670,6 +3764,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     premiumExpiresAt: Date | null
     premiumGraceEndsAt: Date | null
     stripePriceId: string | null
+    role: $Enums.UserRole
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -4125,6 +4220,7 @@ export interface UserFieldRefs {
   readonly premiumExpiresAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly premiumGraceEndsAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly stripePriceId: Prisma.FieldRef<"User", 'String'>
+  readonly role: Prisma.FieldRef<"User", 'UserRole'>
 }
     
 

@@ -47,6 +47,15 @@ const DEFAULT_HOME_DATA: DashboardHomeData = {
     interactions7d: 0,
     activeUsers7d: 0,
   },
+  engagement: {
+    impressions: 0,
+    impressionsPrev: 0,
+    engagementRate: 0,
+    engagementRatePrev: 0,
+    replies: 0,
+    posts: 0,
+    dailyImpressions: [],
+  },
   dauTrend: [],
   retentionCohorts: [],
   retentionWeeklyCohorts: [],
@@ -75,10 +84,6 @@ function startOfDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
-function formatDayKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
 function formatLocalDayKey(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -101,7 +106,7 @@ function getRecentDayKeys(days: number): string[] {
   for (let index = days - 1; index >= 0; index -= 1) {
     const current = new Date(today);
     current.setDate(today.getDate() - index);
-    keys.push(formatDayKey(current));
+    keys.push(formatLocalDayKey(current));
   }
 
   return keys;
@@ -312,6 +317,8 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
     tomorrowStart.setDate(todayStart.getDate() + 1);
     const weekAgo = new Date(now);
     weekAgo.setDate(weekAgo.getDate() - 7);
+    const fourteenDaysAgo = new Date(now);
+    fourteenDaysAgo.setDate(now.getDate() - 14);
     const monthAgo = new Date(now);
     monthAgo.setDate(monthAgo.getDate() - 30);
     const yesterdayStart = new Date(todayStart);
@@ -322,12 +329,8 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
     sevenDaysAgoStart.setDate(todayStart.getDate() - 7);
     const eightDaysAgoStart = new Date(todayStart);
     eightDaysAgoStart.setDate(todayStart.getDate() - 8);
-    const sixDaysAgoStart = new Date(todayStart);
-    sixDaysAgoStart.setDate(todayStart.getDate() - 6);
-    const thirteenDaysAgo = new Date(now);
-    thirteenDaysAgo.setDate(now.getDate() - 13);
-    const twentyDaysAgo = new Date(todayStart);
-    twentyDaysAgo.setDate(todayStart.getDate() - 20);
+    const twentyTwoDaysAgo = new Date(now);
+    twentyTwoDaysAgo.setDate(now.getDate() - 22);
     const twentyOneDaysAgo = new Date(todayStart);
     twentyOneDaysAgo.setDate(todayStart.getDate() - 21);
     const nonSelfActionWhere = {
@@ -344,6 +347,23 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
       UserActionType.FOLLOW,
       UserActionType.POST_CREATE,
     ];
+    const dashboardPostSelect = {
+      id: true,
+      content: true,
+      createdAt: true,
+      parentId: true,
+      likeCount: true,
+      replyCount: true,
+      shareCount: true,
+      videoUrl: true,
+      audioUrl: true,
+      author: {
+        select: {
+          name: true,
+          userid: true,
+        },
+      },
+    } as const;
 
     const [
       followingCount,
@@ -359,6 +379,8 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
       interactionCountRows,
       trendActionRows,
       cohortUserRows,
+      prevInteractionRows,
+      engagedPostRows,
     ] = await Promise.all([
       prisma.follow.count({ where: { followerId: userId, status: "FOLLOWING" } }),
       prisma.follow.count({ where: { followingId: userId, status: "FOLLOWING" } }),
@@ -381,31 +403,16 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
           userId: true,
           targetPostId: true,
           metadata: true,
+          createdAt: true,
         },
       }),
       prisma.post.findMany({
         where: {
           authorId: userId,
-          createdAt: { gte: thirteenDaysAgo },
+          createdAt: { gte: monthAgo },
         },
         orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          content: true,
-          createdAt: true,
-          parentId: true,
-          likeCount: true,
-          replyCount: true,
-          shareCount: true,
-          videoUrl: true,
-          audioUrl: true,
-          author: {
-            select: {
-              name: true,
-              userid: true,
-            },
-          },
-        },
+        select: dashboardPostSelect,
       }),
       prisma.userAction.groupBy({
         by: ["userId"],
@@ -427,7 +434,7 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
       }),
       prisma.userAction.findMany({
         where: {
-          createdAt: { gte: twentyDaysAgo },
+          createdAt: { gte: twentyTwoDaysAgo },
         },
         select: {
           userId: true,
@@ -446,13 +453,39 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
           createdAt: true,
         },
       }),
+      prisma.userAction.findMany({
+        where: {
+          ...nonSelfActionWhere,
+          targetAuthorId: userId,
+          createdAt: { gte: fourteenDaysAgo, lt: weekAgo },
+          actionType: {
+            in: ["FEED_IMPRESSION", "POST_CLICK", "REPLY_CREATE"],
+          },
+        },
+        select: {
+          actionType: true,
+          createdAt: true,
+        },
+      }),
+      prisma.userAction.groupBy({
+        by: ["targetPostId"],
+        where: {
+          ...nonSelfActionWhere,
+          targetAuthorId: userId,
+          targetPostId: { not: null },
+          createdAt: { gte: weekAgo },
+          actionType: {
+            in: ["FEED_IMPRESSION", "POST_CLICK", "REPLY_CREATE"],
+          },
+        },
+      }),
     ]);
 
     const keys = getRecentDayKeys(14);
     const trendMap = toTrendMap(keys);
 
     recentPostRows.forEach((item) => {
-      const dayKey = formatDayKey(item.createdAt);
+      const dayKey = formatLocalDayKey(item.createdAt);
       const target = trendMap.get(dayKey);
 
       if (!target) {
@@ -466,10 +499,30 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
       }
     });
 
-    const contentSegmentPosts = recentPostRows.filter(
-      (item) => item.parentId === null && item.createdAt >= weekAgo
+    const engagedPostIdSet = new Set(
+      engagedPostRows
+        .map((row) => row.targetPostId)
+        .filter((id): id is string => !!id)
     );
-    const recentPosts = recentPostRows
+    const recentPostIdSet = new Set(recentPostRows.map((item) => item.id));
+    const extraPostIds = Array.from(engagedPostIdSet).filter((id) => !recentPostIdSet.has(id));
+    const extraPostRows = extraPostIds.length
+      ? await prisma.post.findMany({
+          where: {
+            id: { in: extraPostIds },
+            authorId: userId,
+          },
+          orderBy: { createdAt: "desc" },
+          select: dashboardPostSelect,
+        })
+      : [];
+    const relevantPostRows = [...recentPostRows, ...extraPostRows].sort(
+      (left, right) => right.createdAt.getTime() - left.createdAt.getTime()
+    );
+    const contentSegmentPosts = relevantPostRows.filter(
+      (item) => item.parentId === null && (item.createdAt >= weekAgo || engagedPostIdSet.has(item.id))
+    );
+    const recentPosts = relevantPostRows
       .filter((item) => item.parentId === null)
       .slice(0, 8)
       .map((item) => ({
@@ -700,6 +753,38 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
     const repliesReceivedPv = metricBucket.repliesPv;
     const profileEntersPv = metricBucket.profileEntersPv;
 
+    // Real 7-day engagement for the home engagement panel.
+    const dailyImpressionMap = new Map<string, number>();
+    interactionRows.forEach((action) => {
+      if (action.actionType !== "FEED_IMPRESSION") {
+        return;
+      }
+      const day = formatLocalDayKey(action.createdAt);
+      dailyImpressionMap.set(day, (dailyImpressionMap.get(day) ?? 0) + 1);
+    });
+    const dailyImpressions = keys.slice(-7).map((date) => ({
+      date,
+      impressions: dailyImpressionMap.get(date) ?? 0,
+    }));
+    const currentInteractionsPv = metricBucket.postClicksPv + metricBucket.profileEntersPv + metricBucket.repliesPv;
+    const currentEngagementRate = toRate(currentInteractionsPv, metricBucket.impressionsPv);
+    let prevImpressionsPv = 0;
+    let prevInteractionsPv = 0;
+    prevInteractionRows.forEach((action) => {
+      if (action.actionType === "FEED_IMPRESSION") {
+        prevImpressionsPv += 1;
+      } else {
+        prevInteractionsPv += 1;
+      }
+    });
+    const prevEngagementRate = toRate(prevInteractionsPv, prevImpressionsPv);
+    const recentTrend = keys
+      .slice(-7)
+      .map((key) => trendMap.get(key))
+      .filter((trend): trend is DashboardTrendPoint => !!trend);
+    const engagementReplies = recentTrend.reduce((sum, item) => sum + item.replies, 0);
+    const engagementPosts = recentTrend.reduce((sum, item) => sum + item.posts, 0);
+
     const trafficSources: DashboardTrafficSourceItem[] = Array.from(trafficMap.entries())
       .map(([source, bucket]) => bucketToTrafficItem(source, bucket))
       .sort((left, right) => right.impressionsPv - left.impressionsPv)
@@ -734,7 +819,7 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
         step: "reply",
         users: funnelSets.repliesUsers.size,
         events: funnelSets.repliesPv,
-        conversionFromPrev: toRate(funnelSets.repliesUsers.size, funnelSets.impressionsUsers.size),
+        conversionFromPrev: toRate(funnelSets.repliesUsers.size, funnelSets.followUsers.size),
       },
     ];
 
@@ -936,7 +1021,7 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
       if (row.createdAt >= yesterdayStart && row.createdAt < todayStart) {
         d1RetainedSet.add(row.userId);
       }
-      if (row.createdAt >= sixDaysAgoStart && row.createdAt < yesterdayStart) {
+      if (row.createdAt >= twoDaysAgoStart && row.createdAt < yesterdayStart) {
         d7RetainedSet.add(row.userId);
       }
       const current = actionDaysByUser.get(row.userId) ?? new Set<string>();
@@ -1046,6 +1131,15 @@ export const getDashboardHomeData = cache(async (userId: string | null): Promise
         postClickRate: toRate(postClicks, impressions),
         replyRate: toRate(repliesReceived, impressions),
         profileEnterRate: toRate(profileEnters, impressions),
+      },
+      engagement: {
+        impressions: metricBucket.impressionsPv,
+        impressionsPrev: prevImpressionsPv,
+        engagementRate: currentEngagementRate,
+        engagementRatePrev: prevEngagementRate,
+        replies: engagementReplies,
+        posts: engagementPosts,
+        dailyImpressions,
       },
       trend: keys.map((key) => trendMap.get(key) as DashboardTrendPoint),
       recentPosts: recentPostsWithMetrics,
@@ -1185,7 +1279,7 @@ export const getDashboardRadarData = cache(async (userId: string | null): Promis
     );
 
     recentActions.forEach((item) => {
-      const dayKey = formatDayKey(item.createdAt);
+      const dayKey = formatLocalDayKey(item.createdAt);
       const target = trendMap.get(dayKey);
 
       if (!target) {

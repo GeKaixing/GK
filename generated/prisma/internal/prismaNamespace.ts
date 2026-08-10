@@ -410,6 +410,7 @@ export const ModelName = {
   WorkTask: 'WorkTask',
   ChatAISession: 'ChatAISession',
   ChatAIMessage: 'ChatAIMessage',
+  PiSessionFile: 'PiSessionFile',
   JobPosting: 'JobPosting',
   UserAction: 'UserAction',
   LiveStream: 'LiveStream',
@@ -430,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "follow" | "post" | "like" | "bookmark" | "share" | "conversation" | "conversationParticipant" | "message" | "conversationRead" | "workTask" | "chatAISession" | "chatAIMessage" | "jobPosting" | "userAction" | "liveStream" | "liveChatMessage" | "liveFeedback"
+    modelProps: "user" | "follow" | "post" | "like" | "bookmark" | "share" | "conversation" | "conversationParticipant" | "message" | "conversationRead" | "workTask" | "chatAISession" | "chatAIMessage" | "piSessionFile" | "jobPosting" | "userAction" | "liveStream" | "liveChatMessage" | "liveFeedback"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1396,6 +1397,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PiSessionFile: {
+      payload: Prisma.$PiSessionFilePayload<ExtArgs>
+      fields: Prisma.PiSessionFileFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PiSessionFileFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PiSessionFilePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PiSessionFileFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PiSessionFilePayload>
+        }
+        findFirst: {
+          args: Prisma.PiSessionFileFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PiSessionFilePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PiSessionFileFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PiSessionFilePayload>
+        }
+        findMany: {
+          args: Prisma.PiSessionFileFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PiSessionFilePayload>[]
+        }
+        create: {
+          args: Prisma.PiSessionFileCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PiSessionFilePayload>
+        }
+        createMany: {
+          args: Prisma.PiSessionFileCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PiSessionFileCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PiSessionFilePayload>[]
+        }
+        delete: {
+          args: Prisma.PiSessionFileDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PiSessionFilePayload>
+        }
+        update: {
+          args: Prisma.PiSessionFileUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PiSessionFilePayload>
+        }
+        deleteMany: {
+          args: Prisma.PiSessionFileDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PiSessionFileUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PiSessionFileUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PiSessionFilePayload>[]
+        }
+        upsert: {
+          args: Prisma.PiSessionFileUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PiSessionFilePayload>
+        }
+        aggregate: {
+          args: Prisma.PiSessionFileAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePiSessionFile>
+        }
+        groupBy: {
+          args: Prisma.PiSessionFileGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PiSessionFileGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PiSessionFileCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PiSessionFileCountAggregateOutputType> | number
+        }
+      }
+    }
     JobPosting: {
       payload: Prisma.$JobPostingPayload<ExtArgs>
       fields: Prisma.JobPostingFieldRefs
@@ -1821,7 +1896,8 @@ export const UserScalarFieldEnum = {
   subscriptionStatus: 'subscriptionStatus',
   premiumExpiresAt: 'premiumExpiresAt',
   premiumGraceEndsAt: 'premiumGraceEndsAt',
-  stripePriceId: 'stripePriceId'
+  stripePriceId: 'stripePriceId',
+  role: 'role'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -1979,6 +2055,18 @@ export const ChatAIMessageScalarFieldEnum = {
 export type ChatAIMessageScalarFieldEnum = (typeof ChatAIMessageScalarFieldEnum)[keyof typeof ChatAIMessageScalarFieldEnum]
 
 
+export const PiSessionFileScalarFieldEnum = {
+  path: 'path',
+  content: 'content',
+  size: 'size',
+  mtimeMs: 'mtimeMs',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PiSessionFileScalarFieldEnum = (typeof PiSessionFileScalarFieldEnum)[keyof typeof PiSessionFileScalarFieldEnum]
+
+
 export const JobPostingScalarFieldEnum = {
   id: 'id',
   authorId: 'authorId',
@@ -2132,6 +2220,20 @@ export type ListEnumSubscriptionStatusFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'UserRole'
+ */
+export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
+    
+
+
+/**
+ * Reference to a field of type 'UserRole[]'
+ */
+export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
+    
+
+
+/**
  * Reference to a field of type 'FollowStatus'
  */
 export type EnumFollowStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FollowStatus'>
@@ -2156,6 +2258,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt'
+ */
+export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt[]'
+ */
+export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
     
 
 
@@ -2350,6 +2466,7 @@ export type GlobalOmitConfig = {
   workTask?: Prisma.WorkTaskOmit
   chatAISession?: Prisma.ChatAISessionOmit
   chatAIMessage?: Prisma.ChatAIMessageOmit
+  piSessionFile?: Prisma.PiSessionFileOmit
   jobPosting?: Prisma.JobPostingOmit
   userAction?: Prisma.UserActionOmit
   liveStream?: Prisma.LiveStreamOmit

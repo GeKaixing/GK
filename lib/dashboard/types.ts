@@ -133,6 +133,16 @@ export interface DashboardActionLogItem {
   targetPostId: string | null;
 }
 
+export interface DashboardEngagementData {
+  impressions: number;
+  impressionsPrev: number;
+  engagementRate: number;
+  engagementRatePrev: number;
+  replies: number;
+  posts: number;
+  dailyImpressions: Array<{ date: string; impressions: number }>;
+}
+
 export interface DashboardHomeData {
   summary: DashboardSummary;
   coreMetrics: {
@@ -146,6 +156,7 @@ export interface DashboardHomeData {
     interactions7d: number;
     activeUsers7d: number;
   };
+  engagement: DashboardEngagementData;
   dauTrend: DashboardDauTrendPoint[];
   retentionCohorts: DashboardRetentionCohortItem[];
   retentionWeeklyCohorts: DashboardRetentionCohortItem[];

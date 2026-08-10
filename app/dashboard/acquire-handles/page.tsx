@@ -2,7 +2,6 @@
 
 import { Badge } from "@/components/ui/badge";
 import {
-  CardAction,
   Card,
   CardContent,
   CardDescription,
@@ -19,7 +18,6 @@ import {
 } from "@/components/ui/table";
 import { getDashboardAcquireHandlesData } from "@/lib/dashboard/service";
 import { getDashboardViewer } from "@/lib/dashboard/viewer";
-import { TrendPill } from "@/components/dashboard/trend-pill";
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("zh-CN", {
@@ -43,27 +41,18 @@ export default async function AcquireHandlesPage(): Promise<React.JSX.Element> {
           <CardHeader>
             <CardDescription>{t("stats.totalUsers")}</CardDescription>
             <CardTitle>{summary.totalUsers}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.totalUsers} previous={summary.premiumUsers} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.premiumUsers")}</CardDescription>
             <CardTitle>{summary.premiumUsers}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.premiumUsers} previous={summary.totalUsers} />
-            </CardAction>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("stats.activeCreators")}</CardDescription>
             <CardTitle>{summary.activeCreators}</CardTitle>
-            <CardAction>
-              <TrendPill current={summary.activeCreators} previous={summary.totalUsers} />
-            </CardAction>
           </CardHeader>
         </Card>
       </div>
