@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Calendar,
@@ -35,9 +35,9 @@ import {
 import {
   addDays,
   daysBetween,
+  isoDateOnly,
   monthCells,
   monthLabel,
-  parseISO,
   sameDay,
   startOfDay,
   weekdayLabels,
@@ -60,6 +60,7 @@ type ViewMode = "calendar" | "gantt" | "kanban" | "list" | "table";
 
 interface FormState {
   title: string;
+  description: string;
   assigneeId: string;
   status: string;
   startDate: string;
@@ -82,6 +83,7 @@ function emptyForm(): FormState {
   const today = new Date();
   return {
     title: "",
+    description: "",
     assigneeId: "",
     status: "planned",
     startDate: toDateInputValue(today),
@@ -92,10 +94,11 @@ function emptyForm(): FormState {
 function formFromTask(t: WorkTask): FormState {
   return {
     title: t.title,
+    description: t.description ?? "",
     assigneeId: t.assigneeId ?? "",
     status: t.status,
-    startDate: toDateInputValue(parseISO(t.startDate)),
-    endDate: toDateInputValue(parseISO(t.endDate)),
+    startDate: toDateInputValue(isoDateOnly(t.startDate)),
+    endDate: toDateInputValue(isoDateOnly(t.endDate)),
   };
 }
 
@@ -103,12 +106,14 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   conversationId: string;
+  currentUserId: string | undefined;
 }
 
 export default function WorkCalendarDialog({
   open,
   onOpenChange,
   conversationId,
+  currentUserId,
 }: Props) {
   const t = useTranslations("ImitationX.ChatPage");
   const locale = useLocale();
@@ -129,6 +134,31 @@ export default function WorkCalendarDialog({
 
   const isAdmin = callerRole === "admin";
 
+  const canManage = (task: WorkTask) =>
+    isAdmin || (currentUserId != null && task.assigneeId === currentUserId);
+
+  const isOverdue = (task: WorkTask) =>
+    task.status !== "done" &&
+    isoDateOnly(task.endDate) < startOfDay(new Date());
+
+  const [search, setSearch] = useState("");
+  const [filterAssignee, setFilterAssignee] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+
+  const filteredTasks = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return tasks.filter((t) => {
+      if (q && !t.title.toLowerCase().includes(q)) return false;
+      if (filterAssignee === "unassigned") {
+        if (t.assigneeId) return false;
+      } else if (filterAssignee !== "all" && t.assigneeId !== filterAssignee) {
+        return false;
+      }
+      if (filterStatus !== "all" && t.status !== filterStatus) return false;
+      return true;
+    });
+  }, [tasks, search, filterAssignee, filterStatus]);
+
   const reloadTasks = async () => {
     try {
       const res = await fetch(`/api/chat/conversations/${conversationId}/tasks`);
@@ -147,6 +177,9 @@ export default function WorkCalendarDialog({
     let cancelled = false;
     const load = async () => {
       setLoading(true);
+      setSearch("");
+      setFilterAssignee("all");
+      setFilterStatus("all");
       try {
         const [tRes, mRes] = await Promise.all([
           fetch(`/api/chat/conversations/${conversationId}/tasks`),
@@ -185,6 +218,13 @@ export default function WorkCalendarDialog({
     setFormOpen(true);
   };
 
+  const openCreateOnDay = (day: Date) => {
+    const iso = toDateInputValue(day);
+    setEditing(null);
+    setForm({ ...emptyForm(), startDate: iso, endDate: iso });
+    setFormOpen(true);
+  };
+
   const saveTask = async () => {
     if (!form.title.trim()) {
       toast.error(t("taskTitleRequired"));
@@ -204,6 +244,7 @@ export default function WorkCalendarDialog({
     try {
       const payload = {
         title: form.title.trim(),
+        description: form.description.trim() || null,
         assigneeId: form.assigneeId || null,
         status: form.status,
         startDate: start.toISOString(),
@@ -281,7 +322,7 @@ export default function WorkCalendarDialog({
     new Intl.DateTimeFormat(locale === "zh-CN" ? "zh-CN" : "en", {
       month: "short",
       day: "numeric",
-    }).format(parseISO(iso));
+    }).format(isoDateOnly(iso));
 
   const statusLabel = (s: string) =>
     s === "in_progress"
@@ -289,9 +330,6 @@ export default function WorkCalendarDialog({
       : s === "done"
         ? t("statusDone")
         : t("statusPlanned");
-
-  const cellTasks = (cell: Date) =>
-    tasks.filter((t) => sameDay(parseISO(t.endDate), cell));
 
   const handleCalMonthChange = ({
     year,
@@ -314,7 +352,13 @@ export default function WorkCalendarDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog
+        open={open}
+        onOpenChange={(o) => {
+          if (!o) setFormOpen(false);
+          onOpenChange(o);
+        }}
+      >
         <DialogContent className="gap-0 p-0 sm:max-w-4xl">
           <DialogHeader className="border-b border-border/60 px-4 py-3">
             <div className="flex items-center justify-between gap-2">
@@ -359,90 +403,139 @@ export default function WorkCalendarDialog({
               <Loader2 className="size-4 animate-spin" />
               {t("loading")}
             </div>
-          ) : formOpen ? (
-            <div className="border-b border-border/60 p-4">
-              <TaskForm
-                members={members}
-                form={form}
-                setForm={setForm}
-                onSave={() => void saveTask()}
-                onCancel={() => {
-                  setFormOpen(false);
-                  setEditing(null);
-                }}
-                saving={saving}
-                statusLabel={statusLabel}
-              />
-            </div>
-          ) : tasks.length === 0 ? (
-            <div className="px-4 py-16 text-center">
-              <Calendar className="mx-auto mb-3 size-8 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{t("noTasks")}</p>
-              {isAdmin && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-3 rounded-full"
-                  onClick={openCreate}
-                >
-                  <Plus className="size-4" />
-                  {t("newTask")}
-                </Button>
-              )}
-            </div>
           ) : (
-            <div className="max-h-[65vh] overflow-auto p-4">
-              {view === "calendar" && (
-                <CalendarView
-                  year={calYear}
-                  month={calMonth}
-                  setMonth={handleCalMonthChange}
-                  tasks={tasks}
-                  cellTasks={cellTasks}
-                  isAdmin={isAdmin}
-                  onEdit={openEdit}
-                  dotStyle={STATUS_STYLE}
-                />
-              )}
-              {view === "gantt" && (
-                <GanttView
-                  tasks={tasks}
-                  statusLabel={statusLabel}
-                  barStyle={STATUS_STYLE}
-                />
-              )}
-              {view === "kanban" && (
-                <KanbanView
-                  tasks={tasks}
-                  isAdmin={isAdmin}
-                  onEdit={openEdit}
-                  onDelete={setDeleting}
-                  onChangeStatus={changeStatus}
-                  fmt={fmt}
+            <>
+              {tasks.length > 0 && (
+                <SummaryToolbar
+                  tasks={filteredTasks}
+                  members={members}
+                  search={search}
+                  onSearch={setSearch}
+                  filterAssignee={filterAssignee}
+                  onFilterAssignee={setFilterAssignee}
+                  filterStatus={filterStatus}
+                  onFilterStatus={setFilterStatus}
                   statusLabel={statusLabel}
                 />
               )}
-              {view === "list" && (
-                <ListView
-                  tasks={tasks}
-                  fmt={fmt}
-                  statusLabel={statusLabel}
-                  badgeStyle={STATUS_STYLE}
-                />
+              {tasks.length === 0 ? (
+                <div className="px-4 py-16 text-center">
+                  <Calendar className="mx-auto mb-3 size-8 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">{t("noTasks")}</p>
+                  {isAdmin && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-3 rounded-full"
+                      onClick={openCreate}
+                    >
+                      <Plus className="size-4" />
+                      {t("newTask")}
+                    </Button>
+                  )}
+                </div>
+              ) : filteredTasks.length === 0 ? (
+                <div className="px-4 py-16 text-center text-sm text-muted-foreground">
+                  {t("noFilterResults")}
+                </div>
+              ) : (
+                <div className="max-h-[65vh] overflow-auto p-4">
+                  {view === "calendar" && (
+                    <CalendarView
+                      year={calYear}
+                      month={calMonth}
+                      setMonth={handleCalMonthChange}
+                      tasks={filteredTasks}
+                      isAdmin={isAdmin}
+                      onEdit={openEdit}
+                      onCreateDay={openCreateOnDay}
+                      isOverdue={isOverdue}
+                      dotStyle={STATUS_STYLE}
+                    />
+                  )}
+                  {view === "gantt" && (
+                    <GanttView
+                      tasks={filteredTasks}
+                      statusLabel={statusLabel}
+                      barStyle={STATUS_STYLE}
+                    />
+                  )}
+                  {view === "kanban" && (
+                    <KanbanView
+                      tasks={filteredTasks}
+                      isAdmin={isAdmin}
+                      canManage={canManage}
+                      onEdit={openEdit}
+                      onDelete={setDeleting}
+                      onChangeStatus={changeStatus}
+                      isOverdue={isOverdue}
+                      fmt={fmt}
+                      statusLabel={statusLabel}
+                    />
+                  )}
+                  {view === "list" && (
+                    <ListView
+                      tasks={filteredTasks}
+                      canManage={canManage}
+                      onChangeStatus={changeStatus}
+                      isOverdue={isOverdue}
+                      fmt={fmt}
+                      statusLabel={statusLabel}
+                      badgeStyle={STATUS_STYLE}
+                    />
+                  )}
+                  {view === "table" && (
+                    <TableView
+                      tasks={filteredTasks}
+                      isAdmin={isAdmin}
+                      canManage={canManage}
+                      onEdit={openEdit}
+                      onDelete={setDeleting}
+                      onChangeStatus={changeStatus}
+                      isOverdue={isOverdue}
+                      fmt={fmt}
+                      statusLabel={statusLabel}
+                      badgeStyle={STATUS_STYLE}
+                    />
+                  )}
+                </div>
               )}
-              {view === "table" && (
-                <TableView
-                  tasks={tasks}
-                  isAdmin={isAdmin}
-                  onEdit={openEdit}
-                  onDelete={setDeleting}
-                  fmt={fmt}
-                  statusLabel={statusLabel}
-                  badgeStyle={STATUS_STYLE}
-                />
-              )}
-            </div>
+            </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* 新建 / 编辑任务表单：嵌套在视图之上，保持上下文 */}
+      <Dialog
+        open={formOpen}
+        onOpenChange={(o) => {
+          if (!o) {
+            setFormOpen(false);
+            setEditing(null);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold tracking-tight">
+              {editing ? t("editTask") : t("newTask")}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {editing ? t("editTask") : t("newTask")}
+            </DialogDescription>
+          </DialogHeader>
+          <TaskForm
+            members={members}
+            form={form}
+            setForm={setForm}
+            onSave={() => void saveTask()}
+            onCancel={() => {
+              setFormOpen(false);
+              setEditing(null);
+            }}
+            saving={saving}
+            statusLabel={statusLabel}
+          />
         </DialogContent>
       </Dialog>
 
@@ -466,6 +559,93 @@ export default function WorkCalendarDialog({
         </AlertDialogContent>
       </AlertDialog>
     </>
+  );
+}
+
+function SummaryToolbar({
+  tasks,
+  members,
+  search,
+  onSearch,
+  filterAssignee,
+  onFilterAssignee,
+  filterStatus,
+  onFilterStatus,
+  statusLabel,
+}: {
+  tasks: WorkTask[];
+  members: GroupMember[];
+  search: string;
+  onSearch: (v: string) => void;
+  filterAssignee: string;
+  onFilterAssignee: (v: string) => void;
+  filterStatus: string;
+  onFilterStatus: (v: string) => void;
+  statusLabel: (s: string) => string;
+}) {
+  const t = useTranslations("ImitationX.ChatPage");
+  const done = tasks.filter((task) => task.status === "done").length;
+  const total = tasks.length;
+  const overdue = tasks.filter(
+    (task) =>
+      task.status !== "done" &&
+      isoDateOnly(task.endDate) < startOfDay(new Date())
+  ).length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  return (
+    <div className="border-b border-border/60 px-4 py-3">
+      <div className="mb-2 flex flex-wrap items-center gap-3">
+        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-all"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <span className="text-xs tabular-nums text-muted-foreground">
+          {t("taskProgress", { done, total })}
+        </span>
+        {overdue > 0 && (
+          <span className="flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">
+            <span className="size-1.5 rounded-full bg-destructive" />
+            {t("overdue")} {overdue}
+          </span>
+        )}
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          value={search}
+          onChange={(e) => onSearch(e.target.value)}
+          placeholder={t("searchTasks")}
+          className="h-8 w-48"
+        />
+        <select
+          value={filterAssignee}
+          onChange={(e) => onFilterAssignee(e.target.value)}
+          className="h-8 rounded-md border border-input bg-background px-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <option value="all">{t("allAssignees")}</option>
+          {members.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.name}
+            </option>
+          ))}
+          <option value="unassigned">{t("unassigned")}</option>
+        </select>
+        <select
+          value={filterStatus}
+          onChange={(e) => onFilterStatus(e.target.value)}
+          className="h-8 rounded-md border border-input bg-background px-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <option value="all">{t("allStatuses")}</option>
+          {WORK_STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {statusLabel(s)}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
   );
 }
 
@@ -500,6 +680,16 @@ function TaskForm({
           onChange={(e) => setForm({ ...form, title: e.target.value })}
           placeholder={t("taskTitlePlaceholder")}
           className="h-9"
+        />
+      </div>
+      <div>
+        <label className={labelCls}>{t("taskDescription")}</label>
+        <textarea
+          value={form.description}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          placeholder={t("taskDescriptionPlaceholder")}
+          rows={3}
+          className={`${inputCls} h-auto min-h-20 resize-y py-2`}
         />
       </div>
       <div className="grid grid-cols-2 gap-3">
@@ -569,24 +759,33 @@ function CalendarView({
   month,
   setMonth,
   tasks,
-  cellTasks,
   isAdmin,
   onEdit,
+  onCreateDay,
+  isOverdue,
   dotStyle,
 }: {
   year: number;
   month: number;
   setMonth: (m: { year: number; month: number }) => void;
   tasks: WorkTask[];
-  cellTasks: (cell: Date) => WorkTask[];
   isAdmin: boolean;
   onEdit: (task: WorkTask) => void;
+  onCreateDay: (day: Date) => void;
+  isOverdue: (task: WorkTask) => boolean;
   dotStyle: Record<WorkStatus, { dot: string }>;
 }) {
   const t = useTranslations("ImitationX.ChatPage");
   const locale = useLocale();
   const cells = monthCells(year, month);
   const labels = weekdayLabels(locale);
+
+  const coveredTasks = (cell: Date) =>
+    tasks.filter((t) => {
+      const s = isoDateOnly(t.startDate);
+      const e = isoDateOnly(t.endDate);
+      return startOfDay(cell) >= s && startOfDay(cell) <= e;
+    });
 
   const shift = (delta: number) => {
     const m = month + delta;
@@ -635,29 +834,65 @@ function CalendarView({
           cell ? (
             <div
               key={cell.getTime()}
-              className="min-h-[64px] bg-background p-1 text-left align-top"
+              onClick={() => isAdmin && onCreateDay(cell)}
+              className={
+                "group relative min-h-[64px] bg-background p-1 text-left align-top " +
+                (isAdmin ? "cursor-pointer" : "")
+              }
             >
+              {isAdmin && (
+                <Plus className="absolute right-1 top-1 size-3 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+              )}
               <span className="text-[11px] text-muted-foreground">
                 {cell.getDate()}
               </span>
-              <div className="mt-0.5 space-y-0.5">
-                {cellTasks(cell).map((task) => (
-                  <button
-                    key={task.id}
-                    type="button"
-                    disabled={!isAdmin}
-                    onClick={() => onEdit(task)}
-                    className="flex w-full items-center gap-1 rounded px-1 py-0.5 text-left text-[10px] leading-tight hover:bg-muted disabled:hover:bg-transparent"
-                  >
-                    <span
+              <div className="mt-0.5 max-h-[64px] space-y-0.5 overflow-y-auto pr-0.5">
+                {coveredTasks(cell).map((task) => {
+                  const first = sameDay(cell, isoDateOnly(task.startDate));
+                  if (first) {
+                    return (
+                      <button
+                        key={task.id}
+                        type="button"
+                        disabled={!isAdmin}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(task);
+                        }}
+                        className="flex w-full items-center gap-1 rounded px-1 py-0.5 text-left text-[10px] leading-tight hover:bg-muted disabled:hover:bg-transparent"
+                      >
+                        <span
+                          className={
+                            "size-1.5 shrink-0 rounded-full " +
+                            (isOverdue(task)
+                              ? "bg-destructive"
+                              : dotStyle[task.status as WorkStatus]?.dot ?? dotStyle.planned.dot)
+                          }
+                        />
+                        <span
+                          className={
+                            "truncate " +
+                            (isOverdue(task)
+                              ? "font-semibold text-destructive"
+                              : "text-foreground")
+                          }
+                        >
+                          {task.title}
+                        </span>
+                      </button>
+                    );
+                  }
+                  return (
+                    <div
+                      key={task.id}
+                      title={task.title}
                       className={
-                        "size-1.5 shrink-0 rounded-full " +
+                        "h-1 w-full rounded-full " +
                         (dotStyle[task.status as WorkStatus]?.dot ?? dotStyle.planned.dot)
                       }
                     />
-                    <span className="truncate text-foreground">{task.title}</span>
-                  </button>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ) : (
@@ -678,14 +913,16 @@ function GanttView({
   statusLabel: (s: string) => string;
   barStyle: Record<WorkStatus, { bar: string }>;
 }) {
+  const t = useTranslations("ImitationX.ChatPage");
   const today = startOfDay(new Date());
-  const starts = tasks.map((t) => parseISO(t.startDate).getTime());
-  const ends = tasks.map((t) => parseISO(t.endDate).getTime());
+  const starts = tasks.map((t) => isoDateOnly(t.startDate).getTime());
+  const ends = tasks.map((t) => isoDateOnly(t.endDate).getTime());
   const rangeStart =
     starts.length > 0 ? startOfDay(new Date(Math.min(...starts))) : today;
   const rangeEnd =
     ends.length > 0 ? startOfDay(new Date(Math.max(...ends))) : addDays(today, 30);
   const totalDays = daysBetween(rangeStart, rangeEnd) + 1;
+  const todayOff = daysBetween(rangeStart, today);
 
   const weekTicks: number[] = [];
   for (let i = 0; i < totalDays; i++) {
@@ -709,6 +946,14 @@ function GanttView({
                 {addDays(rangeStart, i).getDate()}
               </span>
             ))}
+            {todayOff >= 0 && todayOff < totalDays && (
+              <span
+                className="absolute top-3 -translate-x-1/2 rounded-full bg-destructive/10 px-1.5 text-[9px] font-medium text-destructive"
+                style={{ left: todayOff * COL_W }}
+              >
+                {t("dateToday")}
+              </span>
+            )}
           </div>
         </div>
         <div className="flex">
@@ -717,13 +962,19 @@ function GanttView({
             className="relative border-l border-border/60"
             style={{ width: totalDays * COL_W, height: tasks.length * 34 }}
           >
+            {todayOff >= 0 && todayOff < totalDays && (
+              <div
+                className="absolute top-0 z-10 h-full w-px bg-destructive/70"
+                style={{ left: todayOff * COL_W }}
+              />
+            )}
             {tasks.map((task, idx) => {
-              const off = daysBetween(rangeStart, parseISO(task.startDate));
-              const span = daysBetween(parseISO(task.startDate), parseISO(task.endDate)) + 1;
+              const off = daysBetween(rangeStart, isoDateOnly(task.startDate));
+              const span = daysBetween(isoDateOnly(task.startDate), isoDateOnly(task.endDate)) + 1;
               return (
                 <div
                   key={task.id}
-                  className="absolute rounded-md px-1.5 text-[10px] leading-[20px] text-primary-foreground"
+                  className="absolute overflow-hidden whitespace-nowrap rounded-md px-1.5 text-[10px] leading-[20px] text-primary-foreground"
                   style={{
                     top: idx * 34 + 7,
                     left: off * COL_W,
@@ -733,11 +984,31 @@ function GanttView({
                   }}
                   title={`${task.title} — ${statusLabel(task.status)}`}
                 >
-                  {span * COL_W > 40 ? task.title : ""}
+                  {span * COL_W > 40 ? (
+                    <span className="block truncate">
+                      {task.assignee ? `${task.assignee.name.slice(0, 1)} ` : ""}
+                      {task.title}
+                    </span>
+                  ) : (
+                    ""
+                  )}
                 </div>
               );
             })}
           </div>
+        </div>
+        <div className="mt-2 flex items-center gap-4 text-[10px] text-muted-foreground">
+          {WORK_STATUSES.map((s) => (
+            <span key={s} className="flex items-center gap-1.5">
+              <span
+                className={
+                  "size-2 rounded-full " +
+                  (barStyle[s]?.bar ?? "bg-muted")
+                }
+              />
+              {statusLabel(s)}
+            </span>
+          ))}
         </div>
       </div>
     </div>
@@ -747,17 +1018,21 @@ function GanttView({
 function KanbanView({
   tasks,
   isAdmin,
+  canManage,
   onEdit,
   onDelete,
   onChangeStatus,
+  isOverdue,
   fmt,
   statusLabel,
 }: {
   tasks: WorkTask[];
   isAdmin: boolean;
+  canManage: (task: WorkTask) => boolean;
   onEdit: (task: WorkTask) => void;
   onDelete: (task: WorkTask) => void;
   onChangeStatus: (task: WorkTask, status: string) => void;
+  isOverdue: (task: WorkTask) => boolean;
   fmt: (iso: string) => string;
   statusLabel: (s: string) => string;
 }) {
@@ -783,10 +1058,15 @@ function KanbanView({
                   key={task.id}
                   className="rounded-lg border border-border/60 bg-background p-2.5 shadow-sm"
                 >
-                  <p className="mb-2 text-sm font-medium leading-snug">
+                  <p className="text-sm font-medium leading-snug">
                     {task.title}
                   </p>
-                  <div className="flex items-center justify-between gap-2">
+                  {task.description && (
+                    <p className="mt-1 line-clamp-2 text-xs leading-snug text-muted-foreground">
+                      {task.description}
+                    </p>
+                  )}
+                  <div className="mt-2 flex items-center justify-between gap-2">
                     <span className="flex min-w-0 items-center gap-1.5">
                       {task.assignee ? (
                         <>
@@ -807,11 +1087,24 @@ function KanbanView({
                         <span className="text-[11px] text-muted-foreground">—</span>
                       )}
                     </span>
-                    <span className="shrink-0 text-[10px] tabular-nums text-muted-foreground">
+                    <span
+                      className={
+                        "shrink-0 text-[10px] tabular-nums " +
+                        (isOverdue(task)
+                          ? "font-medium text-destructive"
+                          : "text-muted-foreground")
+                      }
+                    >
                       {fmt(task.startDate)} – {fmt(task.endDate)}
                     </span>
                   </div>
-                  {isAdmin && (
+                  {isOverdue(task) && (
+                    <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
+                      <span className="size-1 rounded-full bg-destructive" />
+                      {t("overdue")}
+                    </span>
+                  )}
+                  {canManage(task) && (
                     <div className="mt-2 flex items-center justify-between border-t border-border/50 pt-2">
                       <select
                         value={task.status}
@@ -824,26 +1117,28 @@ function KanbanView({
                           </option>
                         ))}
                       </select>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 rounded-full text-muted-foreground"
-                          onClick={() => onEdit(task)}
-                          aria-label={t("editTask")}
-                        >
-                          <Pencil className="size-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 rounded-full text-destructive"
-                          onClick={() => onDelete(task)}
-                          aria-label={t("deleteTask")}
-                        >
-                          <Trash2 className="size-3.5" />
-                        </Button>
-                      </div>
+                      {isAdmin && (
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-7 rounded-full text-muted-foreground"
+                            onClick={() => onEdit(task)}
+                            aria-label={t("editTask")}
+                          >
+                            <Pencil className="size-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-7 rounded-full text-destructive"
+                            onClick={() => onDelete(task)}
+                            aria-label={t("deleteTask")}
+                          >
+                            <Trash2 className="size-3.5" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -858,15 +1153,24 @@ function KanbanView({
 
 function ListView({
   tasks,
+  canManage,
+  onChangeStatus,
+  isOverdue,
   fmt,
   statusLabel,
   badgeStyle,
 }: {
   tasks: WorkTask[];
+  canManage: (task: WorkTask) => boolean;
+  onChangeStatus: (task: WorkTask, status: string) => void;
+  isOverdue: (task: WorkTask) => boolean;
   fmt: (iso: string) => string;
   statusLabel: (s: string) => string;
   badgeStyle: Record<WorkStatus, { badge: string }>;
 }) {
+  const t = useTranslations("ImitationX.ChatPage");
+  const selectCls =
+    "h-7 rounded-md border border-input bg-background px-2 text-xs focus-visible:outline-none";
   return (
     <div className="space-y-4">
       {WORK_STATUSES.map((s) => {
@@ -895,13 +1199,41 @@ function ListView({
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{task.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {task.assignee
-                        ? task.assignee.name
-                        : "—"}{" "}
-                      · {fmt(task.startDate)} – {fmt(task.endDate)}
+                    {task.description && (
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                        {task.description}
+                      </p>
+                    )}
+                    <p
+                      className={
+                        "text-xs " +
+                        (isOverdue(task)
+                          ? "font-medium text-destructive"
+                          : "text-muted-foreground")
+                      }
+                    >
+                      {task.assignee ? task.assignee.name : "—"} ·{" "}
+                      {fmt(task.startDate)} – {fmt(task.endDate)}
+                      {isOverdue(task) && (
+                        <span className="ml-1.5 rounded bg-destructive/10 px-1 py-0.5 text-[10px] font-medium">
+                          {t("overdue")}
+                        </span>
+                      )}
                     </p>
                   </div>
+                  {canManage(task) && (
+                    <select
+                      value={task.status}
+                      onChange={(e) => onChangeStatus(task, e.target.value)}
+                      className={selectCls}
+                    >
+                      {WORK_STATUSES.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {statusLabel(opt)}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               ))}
             </div>
@@ -915,21 +1247,29 @@ function ListView({
 function TableView({
   tasks,
   isAdmin,
+  canManage,
   onEdit,
   onDelete,
+  onChangeStatus,
+  isOverdue,
   fmt,
   statusLabel,
   badgeStyle,
 }: {
   tasks: WorkTask[];
   isAdmin: boolean;
+  canManage: (task: WorkTask) => boolean;
   onEdit: (task: WorkTask) => void;
   onDelete: (task: WorkTask) => void;
+  onChangeStatus: (task: WorkTask, status: string) => void;
+  isOverdue: (task: WorkTask) => boolean;
   fmt: (iso: string) => string;
   statusLabel: (s: string) => string;
   badgeStyle: Record<WorkStatus, { badge: string }>;
 }) {
   const t = useTranslations("ImitationX.ChatPage");
+  const selectCls =
+    "h-7 rounded-md border border-input bg-background px-2 text-xs focus-visible:outline-none";
   return (
     <div className="overflow-x-auto rounded-lg border border-border/60">
       <table className="w-full min-w-[560px] text-sm">
@@ -946,25 +1286,58 @@ function TableView({
         <tbody className="divide-y divide-border/60">
           {tasks.map((task) => (
             <tr key={task.id}>
-              <td className="px-3 py-2 font-medium">{task.title}</td>
+              <td className="px-3 py-2">
+                <p className="font-medium">{task.title}</p>
+                {task.description && (
+                  <p className="max-w-[240px] truncate text-xs text-muted-foreground">
+                    {task.description}
+                  </p>
+                )}
+              </td>
               <td className="px-3 py-2 text-muted-foreground">
                 {task.assignee ? task.assignee.name : "—"}
               </td>
               <td className="px-3 py-2">
-                <span
-                  className={
-                    "rounded-full px-2 py-0.5 text-[11px] font-medium " +
-                    badgeStyle[task.status as WorkStatus].badge
-                  }
-                >
-                  {statusLabel(task.status)}
-                </span>
+                {canManage(task) ? (
+                  <select
+                    value={task.status}
+                    onChange={(e) => onChangeStatus(task, e.target.value)}
+                    className={selectCls}
+                  >
+                    {WORK_STATUSES.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {statusLabel(opt)}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <span
+                    className={
+                      "rounded-full px-2 py-0.5 text-[11px] font-medium " +
+                      badgeStyle[task.status as WorkStatus].badge
+                    }
+                  >
+                    {statusLabel(task.status)}
+                  </span>
+                )}
               </td>
               <td className="px-3 py-2 tabular-nums text-muted-foreground">
                 {fmt(task.startDate)}
               </td>
-              <td className="px-3 py-2 tabular-nums text-muted-foreground">
+              <td
+                className={
+                  "px-3 py-2 tabular-nums " +
+                  (isOverdue(task)
+                    ? "font-medium text-destructive"
+                    : "text-muted-foreground")
+                }
+              >
                 {fmt(task.endDate)}
+                {isOverdue(task) && (
+                  <span className="ml-1.5 rounded bg-destructive/10 px-1 py-0.5 text-[10px] font-medium">
+                    {t("overdue")}
+                  </span>
+                )}
               </td>
               {isAdmin && (
                 <td className="px-3 py-2">

@@ -16,6 +16,15 @@ export function parseISO(iso: string): Date {
   return new Date(iso);
 }
 
+/** 取 ISO 文本中的日历日（y-m-d）构造本地零点，跨时区显示稳定。
+ *  存储值均来自 toISOString()，格式固定为 YYYY-MM-DDTHH:mm:ss.sssZ。 */
+export function isoDateOnly(iso: string): Date {
+  const y = Number(iso.slice(0, 4));
+  const m = Number(iso.slice(5, 7));
+  const d = Number(iso.slice(8, 10));
+  return new Date(y, m - 1, d);
+}
+
 export function sameDay(a: Date, b: Date): boolean {
   return (
     a.getFullYear() === b.getFullYear() &&

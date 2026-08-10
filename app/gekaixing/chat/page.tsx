@@ -986,6 +986,7 @@ export default function ChatPage() {
         open={workCalendarOpen}
         onOpenChange={setWorkCalendarOpen}
         conversationId={selectedContactId}
+        currentUserId={currentUser?.id}
       />
 
       <AlertDialog
