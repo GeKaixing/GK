@@ -60,7 +60,7 @@ export async function POST(req: Request) {
         data: { status: "PAID", paidAt: new Date() },
       });
     } else if (session.customer) {
-      const sub = session.subscription;
+      const sub = session.subscription as string | { id?: string } | undefined;
       const subId = typeof sub === "string" ? sub : sub?.id;
       await prisma.user.updateMany({
         where: {
