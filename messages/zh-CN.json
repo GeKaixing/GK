@@ -215,7 +215,9 @@
       "allLoaded": "已显示全部内容",
       "forYou": "为你推荐",
       "following": "正在关注",
-      "followingEmpty": "关注一些人，在这里查看他们的动态"
+      "followingEmpty": "关注一些人，在这里查看他们的动态",
+      "sponsored": "赞助",
+      "learnMore": "了解更多"
     },
     "Hot": {
       "title": "今日头条",
@@ -253,7 +255,8 @@
         "directMessage": "私聊用户",
         "followUser": "关注用户",
         "copyLink": "复制链接",
-        "viewUser": "查看用户"
+        "viewUser": "查看用户",
+        "promotePost": "推广这条帖子"
       },
       "confirm": {
         "title": "请确认",
@@ -266,6 +269,37 @@
         "deleteFailedRollback": "删除失败，已回滚",
         "reportThanks": "感谢您的反馈"
       }
+    },
+    "Ads": {
+      "title": "广告投放",
+      "createNew": "新建投放",
+      "empty": "还没有投放单。推广你的帖子，让更多人看到。",
+      "successBanner": "投放单已创建，完成付款后生效。",
+      "selectPost": "选择要推广的帖子",
+      "noPosts": "你还没有帖子，先发一条帖子。",
+      "duration": "投放时长",
+      "durationDays": "{days} 天",
+      "price": "价格",
+      "pricePerDay": "每日 {price}",
+      "ctaUrl": "落地页 URL（可选）",
+      "ctaUrlPlaceholder": "https://example.com",
+      "ctaLabel": "按钮文案（可选）",
+      "submitPay": "付款并提交",
+      "submitting": "正在跳转付款...",
+      "status": "状态",
+      "statusPENDING_PAYMENT": "待付款",
+      "statusPAID": "已付款 · 待审核",
+      "statusACTIVE": "投放中",
+      "statusPAUSED": "已暂停",
+      "statusENDED": "已结束",
+      "statusREJECTED": "已拒绝",
+      "statusCANCELLED": "已取消",
+      "impressions": "曝光",
+      "clicks": "点击",
+      "ctr": "点击率",
+      "cancel": "取消投放",
+      "cancelConfirm": "确定取消这条投放吗？",
+      "cancelSuccess": "投放已取消"
     },
     "Help": {
       "heroTitle": "帮助中心",

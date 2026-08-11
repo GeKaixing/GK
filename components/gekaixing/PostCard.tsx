@@ -10,8 +10,9 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Heart, MessageCircleMore, Share2, ShieldCheck, Star } from "lucide-react"
+import { Heart, MessageCircleMore, Share2, ShieldCheck, Star, ArrowUpRight } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import PostDropdownMenu from "./PostDropdownMenu"
 import Link from "next/link"
 import { Post } from "@/app/gekaixing/page"
@@ -37,9 +38,14 @@ function PostCard({
     likedByMe,
     bookmarkedByMe,
     metrics,
-    isPremium
+    isPremium,
+    isSponsored,
+    sponsoredBy,
+    ctaUrl,
+    ctaLabel
 }: Post) {
     const te = useTranslations("Dashboard.engagement")
+    const tf = useTranslations("ImitationX.Feed")
     const router = useRouter()
     const [liked, setLiked] = useState(likedByMe)
     const [bookmarked, setBookmarked] = useState(bookmarkedByMe)
@@ -232,6 +238,7 @@ function PostCard({
                     targetAuthorId: user_id,
                     actionType,
                     source: "post_card",
+                    isSponsored,
                 }),
                 keepalive: true,
             })
@@ -264,6 +271,11 @@ function PostCard({
                         <CardDescription className="font-semibold text-foreground flex items-center">
                             {user_name}
                             {isPremium && <ShieldCheck className="w-4 h-4 text-blue-500" />}
+                            {isSponsored && (
+                                <Badge variant="outline" className="ml-2 text-xs">
+                                    {tf("sponsored")}
+                                </Badge>
+                            )}
                         </CardDescription>
                         <span className="text-sm text-muted-foreground">
                             @{user_userid}
@@ -309,6 +321,19 @@ function PostCard({
                         <div className="mt-2">
                             {metrics.postClicks}/{metrics.impressions} | {metrics.repliesReceived}/{metrics.impressions} | {metrics.profileEnters}/{metrics.impressions}
                         </div>
+                    </div>
+                ) : null}
+                {isSponsored && ctaUrl ? (
+                    <div className="mt-3" onClick={(event) => event.stopPropagation()}>
+                        <a
+                            href={ctaUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                        >
+                            {ctaLabel || tf("learnMore")}
+                            <ArrowUpRight className="w-4 h-4" />
+                        </a>
                     </div>
                 ) : null}
             </CardContent>
@@ -377,6 +402,10 @@ function arePostCardPropsEqual(prev: Post, next: Post): boolean {
         prev.bookmarkedByMe === next.bookmarkedByMe &&
         prev.sharedByMe === next.sharedByMe &&
         prev.isPremium === next.isPremium &&
+        prev.isSponsored === next.isSponsored &&
+        prev.sponsoredBy === next.sponsoredBy &&
+        prev.ctaUrl === next.ctaUrl &&
+        prev.ctaLabel === next.ctaLabel &&
         prev.metrics?.impressions === next.metrics?.impressions &&
         prev.metrics?.postClicks === next.metrics?.postClicks &&
         prev.metrics?.repliesReceived === next.metrics?.repliesReceived &&

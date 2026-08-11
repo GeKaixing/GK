@@ -91,6 +91,7 @@ export async function POST(req: NextRequest) {
       actionType?: 'POST_CLICK' | 'DWELL' | 'PROFILE_ENTER'
       dwellMs?: number
       source?: string
+      isSponsored?: boolean
     }
 
     if (!body.postId || !body.actionType) {
@@ -102,7 +103,7 @@ export async function POST(req: NextRequest) {
       body.actionType === 'PROFILE_ENTER'
         ? JSON.stringify({ kind: 'profile_enter', source: body.source ?? 'unknown' })
         : body.actionType === 'POST_CLICK'
-          ? JSON.stringify({ kind: 'post_click', source: body.source ?? 'unknown' })
+          ? JSON.stringify({ kind: 'post_click', source: body.source ?? 'unknown', ad: body.isSponsored ? true : undefined })
           : null
 
     await logUserAction({

@@ -9,6 +9,12 @@ export const AD_DAILY_PRICE_CENTS = 1000;
 /** 可选投放时长（天）。 */
 export const AD_DURATION_DAYS = [1, 3, 7] as const;
 
+export type AdDurationDay = (typeof AD_DURATION_DAYS)[number];
+
+export function isValidAdDuration(days: number): days is AdDurationDay {
+  return (AD_DURATION_DAYS as readonly number[]).includes(days);
+}
+
 export const AD_CURRENCY = "usd";
 
 export function adPriceCents(days: number): number {

@@ -281,6 +281,10 @@ export default function PostList({
         >
           <PostCard
             isPremium={item.isPremium}
+            isSponsored={item.isSponsored}
+            sponsoredBy={item.sponsoredBy}
+            ctaUrl={item.ctaUrl}
+            ctaLabel={item.ctaLabel}
             id={item.id}
             createdAt={item.createdAt}
             user_id={item.user_id}

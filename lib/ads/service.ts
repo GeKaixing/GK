@@ -2,6 +2,22 @@ import type { FeedPostItem } from "@/lib/feed/types";
 import { prisma } from "@/lib/prisma";
 import { AD_STRIDE } from "@/lib/ads/config";
 
+/** 规范化 CTA 落地页 URL：仅接受 http/https，返回 null 表示缺失或非法。 */
+export function normalizeCtaUrl(value: unknown): string | null {
+  if (typeof value !== "string" || value.trim() === "") {
+    return null;
+  }
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return null;
+    }
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 /**
  * 拉取当前可投放的广告（status=ACTIVE 且未到期），映射为信息流条目。
  * 广告渲染时实时查询，因此广告启停无需失效任何用户信息流缓存。

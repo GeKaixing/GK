@@ -215,7 +215,9 @@
       "allLoaded": "You've reached the end",
       "forYou": "For you",
       "following": "Following",
-      "followingEmpty": "Follow people to see their posts"
+      "followingEmpty": "Follow people to see their posts",
+      "sponsored": "Sponsored",
+      "learnMore": "Learn more"
     },
     "Hot": {
       "title": "Trending",
@@ -253,7 +255,8 @@
         "directMessage": "Message user",
         "followUser": "Follow user",
         "copyLink": "Copy link",
-        "viewUser": "View user"
+        "viewUser": "View user",
+        "promotePost": "Promote this post"
       },
       "confirm": {
         "title": "Please confirm",
@@ -266,6 +269,37 @@
         "deleteFailedRollback": "Delete failed, rollback applied",
         "reportThanks": "Thanks for your feedback"
       }
+    },
+    "Ads": {
+      "title": "Promotions",
+      "createNew": "New promotion",
+      "empty": "No promotions yet. Promote your post to reach more people.",
+      "successBanner": "Campaign created. Complete payment to activate it.",
+      "selectPost": "Select a post to promote",
+      "noPosts": "You don't have any posts yet. Create one first.",
+      "duration": "Duration",
+      "durationDays": "{days} day",
+      "price": "Price",
+      "pricePerDay": "{price} / day",
+      "ctaUrl": "Destination URL (optional)",
+      "ctaUrlPlaceholder": "https://example.com",
+      "ctaLabel": "Button text (optional)",
+      "submitPay": "Pay & submit",
+      "submitting": "Redirecting to payment...",
+      "status": "Status",
+      "statusPENDING_PAYMENT": "Pending payment",
+      "statusPAID": "Paid · pending review",
+      "statusACTIVE": "Active",
+      "statusPAUSED": "Paused",
+      "statusENDED": "Ended",
+      "statusREJECTED": "Rejected",
+      "statusCANCELLED": "Cancelled",
+      "impressions": "Impressions",
+      "clicks": "Clicks",
+      "ctr": "CTR",
+      "cancel": "Cancel promotion",
+      "cancelConfirm": "Cancel this promotion?",
+      "cancelSuccess": "Promotion cancelled"
     },
     "Help": {
       "heroTitle": "Help Center",

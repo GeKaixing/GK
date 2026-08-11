@@ -381,6 +381,7 @@ model SponsoredAd {
   status          AdStatus  @default(PENDING_PAYMENT)
   priceCents      Int
   currency        String    @default("usd")
+  durationDays    Int       @default(1) // 投放时长（天），审核通过时起算
   ctaUrl          String?
   ctaLabel        String?
   startsAt        DateTime?

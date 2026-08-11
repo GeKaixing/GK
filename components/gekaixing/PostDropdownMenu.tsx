@@ -151,6 +151,11 @@ export default function PostDropdownMenu({ post_id, id, reply_id, user_id, type 
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuItem onClick={report}>{t("menu.reportPost")}</DropdownMenuItem>
+                {isCurrentUser && type === "post" && (
+                    <DropdownMenuItem onClick={() => router.push(`/gekaixing/ads/new?postId=${id}`)}>
+                        {t("menu.promotePost")}
+                    </DropdownMenuItem>
+                )}
                 {isCurrentUser && <DropdownMenuItem
                     onClick={() => setAlertDialogOpen(true)}
                 >{t("menu.deletePost")}</DropdownMenuItem>}

@@ -28,10 +28,12 @@ export type AggregateSponsoredAd = {
 
 export type SponsoredAdAvgAggregateOutputType = {
   priceCents: number | null
+  durationDays: number | null
 }
 
 export type SponsoredAdSumAggregateOutputType = {
   priceCents: number | null
+  durationDays: number | null
 }
 
 export type SponsoredAdMinAggregateOutputType = {
@@ -41,6 +43,7 @@ export type SponsoredAdMinAggregateOutputType = {
   status: $Enums.AdStatus | null
   priceCents: number | null
   currency: string | null
+  durationDays: number | null
   ctaUrl: string | null
   ctaLabel: string | null
   startsAt: Date | null
@@ -58,6 +61,7 @@ export type SponsoredAdMaxAggregateOutputType = {
   status: $Enums.AdStatus | null
   priceCents: number | null
   currency: string | null
+  durationDays: number | null
   ctaUrl: string | null
   ctaLabel: string | null
   startsAt: Date | null
@@ -75,6 +79,7 @@ export type SponsoredAdCountAggregateOutputType = {
   status: number
   priceCents: number
   currency: number
+  durationDays: number
   ctaUrl: number
   ctaLabel: number
   startsAt: number
@@ -89,10 +94,12 @@ export type SponsoredAdCountAggregateOutputType = {
 
 export type SponsoredAdAvgAggregateInputType = {
   priceCents?: true
+  durationDays?: true
 }
 
 export type SponsoredAdSumAggregateInputType = {
   priceCents?: true
+  durationDays?: true
 }
 
 export type SponsoredAdMinAggregateInputType = {
@@ -102,6 +109,7 @@ export type SponsoredAdMinAggregateInputType = {
   status?: true
   priceCents?: true
   currency?: true
+  durationDays?: true
   ctaUrl?: true
   ctaLabel?: true
   startsAt?: true
@@ -119,6 +127,7 @@ export type SponsoredAdMaxAggregateInputType = {
   status?: true
   priceCents?: true
   currency?: true
+  durationDays?: true
   ctaUrl?: true
   ctaLabel?: true
   startsAt?: true
@@ -136,6 +145,7 @@ export type SponsoredAdCountAggregateInputType = {
   status?: true
   priceCents?: true
   currency?: true
+  durationDays?: true
   ctaUrl?: true
   ctaLabel?: true
   startsAt?: true
@@ -240,6 +250,7 @@ export type SponsoredAdGroupByOutputType = {
   status: $Enums.AdStatus
   priceCents: number
   currency: string
+  durationDays: number
   ctaUrl: string | null
   ctaLabel: string | null
   startsAt: Date | null
@@ -280,6 +291,7 @@ export type SponsoredAdWhereInput = {
   status?: Prisma.EnumAdStatusFilter<"SponsoredAd"> | $Enums.AdStatus
   priceCents?: Prisma.IntFilter<"SponsoredAd"> | number
   currency?: Prisma.StringFilter<"SponsoredAd"> | string
+  durationDays?: Prisma.IntFilter<"SponsoredAd"> | number
   ctaUrl?: Prisma.StringNullableFilter<"SponsoredAd"> | string | null
   ctaLabel?: Prisma.StringNullableFilter<"SponsoredAd"> | string | null
   startsAt?: Prisma.DateTimeNullableFilter<"SponsoredAd"> | Date | string | null
@@ -299,6 +311,7 @@ export type SponsoredAdOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   priceCents?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  durationDays?: Prisma.SortOrder
   ctaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   ctaLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   startsAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -321,6 +334,7 @@ export type SponsoredAdWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumAdStatusFilter<"SponsoredAd"> | $Enums.AdStatus
   priceCents?: Prisma.IntFilter<"SponsoredAd"> | number
   currency?: Prisma.StringFilter<"SponsoredAd"> | string
+  durationDays?: Prisma.IntFilter<"SponsoredAd"> | number
   ctaUrl?: Prisma.StringNullableFilter<"SponsoredAd"> | string | null
   ctaLabel?: Prisma.StringNullableFilter<"SponsoredAd"> | string | null
   startsAt?: Prisma.DateTimeNullableFilter<"SponsoredAd"> | Date | string | null
@@ -340,6 +354,7 @@ export type SponsoredAdOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   priceCents?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  durationDays?: Prisma.SortOrder
   ctaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   ctaLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   startsAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -365,6 +380,7 @@ export type SponsoredAdScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumAdStatusWithAggregatesFilter<"SponsoredAd"> | $Enums.AdStatus
   priceCents?: Prisma.IntWithAggregatesFilter<"SponsoredAd"> | number
   currency?: Prisma.StringWithAggregatesFilter<"SponsoredAd"> | string
+  durationDays?: Prisma.IntWithAggregatesFilter<"SponsoredAd"> | number
   ctaUrl?: Prisma.StringNullableWithAggregatesFilter<"SponsoredAd"> | string | null
   ctaLabel?: Prisma.StringNullableWithAggregatesFilter<"SponsoredAd"> | string | null
   startsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SponsoredAd"> | Date | string | null
@@ -380,6 +396,7 @@ export type SponsoredAdCreateInput = {
   status?: $Enums.AdStatus
   priceCents: number
   currency?: string
+  durationDays?: number
   ctaUrl?: string | null
   ctaLabel?: string | null
   startsAt?: Date | string | null
@@ -399,6 +416,7 @@ export type SponsoredAdUncheckedCreateInput = {
   status?: $Enums.AdStatus
   priceCents: number
   currency?: string
+  durationDays?: number
   ctaUrl?: string | null
   ctaLabel?: string | null
   startsAt?: Date | string | null
@@ -414,6 +432,7 @@ export type SponsoredAdUpdateInput = {
   status?: Prisma.EnumAdStatusFieldUpdateOperationsInput | $Enums.AdStatus
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  durationDays?: Prisma.IntFieldUpdateOperationsInput | number
   ctaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ctaLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -433,6 +452,7 @@ export type SponsoredAdUncheckedUpdateInput = {
   status?: Prisma.EnumAdStatusFieldUpdateOperationsInput | $Enums.AdStatus
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  durationDays?: Prisma.IntFieldUpdateOperationsInput | number
   ctaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ctaLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -450,6 +470,7 @@ export type SponsoredAdCreateManyInput = {
   status?: $Enums.AdStatus
   priceCents: number
   currency?: string
+  durationDays?: number
   ctaUrl?: string | null
   ctaLabel?: string | null
   startsAt?: Date | string | null
@@ -465,6 +486,7 @@ export type SponsoredAdUpdateManyMutationInput = {
   status?: Prisma.EnumAdStatusFieldUpdateOperationsInput | $Enums.AdStatus
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  durationDays?: Prisma.IntFieldUpdateOperationsInput | number
   ctaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ctaLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -482,6 +504,7 @@ export type SponsoredAdUncheckedUpdateManyInput = {
   status?: Prisma.EnumAdStatusFieldUpdateOperationsInput | $Enums.AdStatus
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  durationDays?: Prisma.IntFieldUpdateOperationsInput | number
   ctaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ctaLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -514,6 +537,7 @@ export type SponsoredAdCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   priceCents?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  durationDays?: Prisma.SortOrder
   ctaUrl?: Prisma.SortOrder
   ctaLabel?: Prisma.SortOrder
   startsAt?: Prisma.SortOrder
@@ -526,6 +550,7 @@ export type SponsoredAdCountOrderByAggregateInput = {
 
 export type SponsoredAdAvgOrderByAggregateInput = {
   priceCents?: Prisma.SortOrder
+  durationDays?: Prisma.SortOrder
 }
 
 export type SponsoredAdMaxOrderByAggregateInput = {
@@ -535,6 +560,7 @@ export type SponsoredAdMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   priceCents?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  durationDays?: Prisma.SortOrder
   ctaUrl?: Prisma.SortOrder
   ctaLabel?: Prisma.SortOrder
   startsAt?: Prisma.SortOrder
@@ -552,6 +578,7 @@ export type SponsoredAdMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   priceCents?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  durationDays?: Prisma.SortOrder
   ctaUrl?: Prisma.SortOrder
   ctaLabel?: Prisma.SortOrder
   startsAt?: Prisma.SortOrder
@@ -564,6 +591,7 @@ export type SponsoredAdMinOrderByAggregateInput = {
 
 export type SponsoredAdSumOrderByAggregateInput = {
   priceCents?: Prisma.SortOrder
+  durationDays?: Prisma.SortOrder
 }
 
 export type SponsoredAdCreateNestedManyWithoutAdvertiserInput = {
@@ -649,6 +677,7 @@ export type SponsoredAdCreateWithoutAdvertiserInput = {
   status?: $Enums.AdStatus
   priceCents: number
   currency?: string
+  durationDays?: number
   ctaUrl?: string | null
   ctaLabel?: string | null
   startsAt?: Date | string | null
@@ -666,6 +695,7 @@ export type SponsoredAdUncheckedCreateWithoutAdvertiserInput = {
   status?: $Enums.AdStatus
   priceCents: number
   currency?: string
+  durationDays?: number
   ctaUrl?: string | null
   ctaLabel?: string | null
   startsAt?: Date | string | null
@@ -712,6 +742,7 @@ export type SponsoredAdScalarWhereInput = {
   status?: Prisma.EnumAdStatusFilter<"SponsoredAd"> | $Enums.AdStatus
   priceCents?: Prisma.IntFilter<"SponsoredAd"> | number
   currency?: Prisma.StringFilter<"SponsoredAd"> | string
+  durationDays?: Prisma.IntFilter<"SponsoredAd"> | number
   ctaUrl?: Prisma.StringNullableFilter<"SponsoredAd"> | string | null
   ctaLabel?: Prisma.StringNullableFilter<"SponsoredAd"> | string | null
   startsAt?: Prisma.DateTimeNullableFilter<"SponsoredAd"> | Date | string | null
@@ -727,6 +758,7 @@ export type SponsoredAdCreateWithoutPostInput = {
   status?: $Enums.AdStatus
   priceCents: number
   currency?: string
+  durationDays?: number
   ctaUrl?: string | null
   ctaLabel?: string | null
   startsAt?: Date | string | null
@@ -744,6 +776,7 @@ export type SponsoredAdUncheckedCreateWithoutPostInput = {
   status?: $Enums.AdStatus
   priceCents: number
   currency?: string
+  durationDays?: number
   ctaUrl?: string | null
   ctaLabel?: string | null
   startsAt?: Date | string | null
@@ -775,6 +808,7 @@ export type SponsoredAdUpdateWithoutPostInput = {
   status?: Prisma.EnumAdStatusFieldUpdateOperationsInput | $Enums.AdStatus
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  durationDays?: Prisma.IntFieldUpdateOperationsInput | number
   ctaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ctaLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -792,6 +826,7 @@ export type SponsoredAdUncheckedUpdateWithoutPostInput = {
   status?: Prisma.EnumAdStatusFieldUpdateOperationsInput | $Enums.AdStatus
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  durationDays?: Prisma.IntFieldUpdateOperationsInput | number
   ctaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ctaLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -808,6 +843,7 @@ export type SponsoredAdCreateManyAdvertiserInput = {
   status?: $Enums.AdStatus
   priceCents: number
   currency?: string
+  durationDays?: number
   ctaUrl?: string | null
   ctaLabel?: string | null
   startsAt?: Date | string | null
@@ -823,6 +859,7 @@ export type SponsoredAdUpdateWithoutAdvertiserInput = {
   status?: Prisma.EnumAdStatusFieldUpdateOperationsInput | $Enums.AdStatus
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  durationDays?: Prisma.IntFieldUpdateOperationsInput | number
   ctaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ctaLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -840,6 +877,7 @@ export type SponsoredAdUncheckedUpdateWithoutAdvertiserInput = {
   status?: Prisma.EnumAdStatusFieldUpdateOperationsInput | $Enums.AdStatus
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  durationDays?: Prisma.IntFieldUpdateOperationsInput | number
   ctaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ctaLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -856,6 +894,7 @@ export type SponsoredAdUncheckedUpdateManyWithoutAdvertiserInput = {
   status?: Prisma.EnumAdStatusFieldUpdateOperationsInput | $Enums.AdStatus
   priceCents?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  durationDays?: Prisma.IntFieldUpdateOperationsInput | number
   ctaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ctaLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -875,6 +914,7 @@ export type SponsoredAdSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   status?: boolean
   priceCents?: boolean
   currency?: boolean
+  durationDays?: boolean
   ctaUrl?: boolean
   ctaLabel?: boolean
   startsAt?: boolean
@@ -894,6 +934,7 @@ export type SponsoredAdSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   status?: boolean
   priceCents?: boolean
   currency?: boolean
+  durationDays?: boolean
   ctaUrl?: boolean
   ctaLabel?: boolean
   startsAt?: boolean
@@ -913,6 +954,7 @@ export type SponsoredAdSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   status?: boolean
   priceCents?: boolean
   currency?: boolean
+  durationDays?: boolean
   ctaUrl?: boolean
   ctaLabel?: boolean
   startsAt?: boolean
@@ -932,6 +974,7 @@ export type SponsoredAdSelectScalar = {
   status?: boolean
   priceCents?: boolean
   currency?: boolean
+  durationDays?: boolean
   ctaUrl?: boolean
   ctaLabel?: boolean
   startsAt?: boolean
@@ -942,7 +985,7 @@ export type SponsoredAdSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SponsoredAdOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "postId" | "advertiserId" | "status" | "priceCents" | "currency" | "ctaUrl" | "ctaLabel" | "startsAt" | "endsAt" | "stripeSessionId" | "paidAt" | "createdAt" | "updatedAt", ExtArgs["result"]["sponsoredAd"]>
+export type SponsoredAdOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "postId" | "advertiserId" | "status" | "priceCents" | "currency" | "durationDays" | "ctaUrl" | "ctaLabel" | "startsAt" | "endsAt" | "stripeSessionId" | "paidAt" | "createdAt" | "updatedAt", ExtArgs["result"]["sponsoredAd"]>
 export type SponsoredAdInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   post?: boolean | Prisma.PostDefaultArgs<ExtArgs>
   advertiser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -969,6 +1012,7 @@ export type $SponsoredAdPayload<ExtArgs extends runtime.Types.Extensions.Interna
     status: $Enums.AdStatus
     priceCents: number
     currency: string
+    durationDays: number
     ctaUrl: string | null
     ctaLabel: string | null
     startsAt: Date | null
@@ -1408,6 +1452,7 @@ export interface SponsoredAdFieldRefs {
   readonly status: Prisma.FieldRef<"SponsoredAd", 'AdStatus'>
   readonly priceCents: Prisma.FieldRef<"SponsoredAd", 'Int'>
   readonly currency: Prisma.FieldRef<"SponsoredAd", 'String'>
+  readonly durationDays: Prisma.FieldRef<"SponsoredAd", 'Int'>
   readonly ctaUrl: Prisma.FieldRef<"SponsoredAd", 'String'>
   readonly ctaLabel: Prisma.FieldRef<"SponsoredAd", 'String'>
   readonly startsAt: Prisma.FieldRef<"SponsoredAd", 'DateTime'>

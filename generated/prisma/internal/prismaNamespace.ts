@@ -2222,6 +2222,7 @@ export const SponsoredAdScalarFieldEnum = {
   status: 'status',
   priceCents: 'priceCents',
   currency: 'currency',
+  durationDays: 'durationDays',
   ctaUrl: 'ctaUrl',
   ctaLabel: 'ctaLabel',
   startsAt: 'startsAt',
