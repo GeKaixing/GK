@@ -236,7 +236,8 @@ export async function getAuthorQualityScores(authorIds: string[]): Promise<Map<s
 // =====================
 // Stage 4 — re-ranking (visibility-filters analog)
 // Interleave in-network / out-of-network ~50/50 (preserving score order within
-// each pool) and cap consecutive same-author posts.
+// each pool) and cap CONSECUTIVE same-author posts (break long runs without
+// gutting the feed when few authors exist).
 // =====================
 export function rerankWithDiversity(
   scored: RankedCandidate[],
@@ -247,8 +248,14 @@ export function rerankWithDiversity(
   const outNetwork = scored.filter((c) => !c.isInNetwork);
 
   const result: RankedCandidate[] = [];
-  const recentAuthors: string[] = [];
-  const allowed = (authorId: string) => recentAuthors.filter((a) => a === authorId).length < maxConsecutiveSameAuthor;
+  const allowed = (authorId: string): boolean => {
+    // count the trailing run of this author; reject if it already hits the cap
+    for (let back = result.length - 1; back >= 0; back--) {
+      if (result[back].authorId !== authorId) break;
+      if (result.length - back >= maxConsecutiveSameAuthor) return false;
+    }
+    return true;
+  };
 
   let i = 0;
   let o = 0;
@@ -263,8 +270,6 @@ export function rerankWithDiversity(
     if (!allowed(candidate.authorId)) continue;
 
     result.push(candidate);
-    recentAuthors.push(candidate.authorId);
-    if (recentAuthors.length > 8) recentAuthors.shift();
     takeIn = !takeIn;
   }
   return result;
