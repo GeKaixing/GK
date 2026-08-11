@@ -16,7 +16,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -44,6 +44,7 @@ export default function SignupForm() {
     const [showPassword, setShowPassword] = useState(false);
 
     const [status, setStatus] = useState(false)
+    const submittingRef = useRef(false)
     const formSchema = z.object({
         email: z.string().email({
             message: t('validation.email'),
@@ -62,14 +63,17 @@ export default function SignupForm() {
 
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        // 防重入：请求中禁止再次提交（双击 / 回车）
+        if (submittingRef.current) return
+        submittingRef.current = true
         setStatus(true)
         const result = await SignupFetch(values.email, values.password)
         const data = await result.json()
+        submittingRef.current = false
+        setStatus(false)
         if (data.success) {
-            setStatus(false)
             setOpen(true);
         } else {
-            setStatus(false)
             toast.error(
                 data.code === 'ALREADY_REGISTERED'
                     ? t('alreadyRegistered')

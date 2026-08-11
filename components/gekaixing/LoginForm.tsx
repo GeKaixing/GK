@@ -9,7 +9,7 @@ import Spin from './Spin'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import z from 'zod'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 export async function LoginFetch(email: string, password: string) {
     const result = await fetch('/api/login', {
@@ -30,6 +30,7 @@ export default function LoginForm() {
     const t = useTranslations('Account.LoginForm')
     const router = useRouter();
     const [status, setStatus] = useState(false)
+    const submittingRef = useRef(false)
     const formSchema = z.object({
         email: z.string().email({
             message: t('validation.email'),
@@ -47,10 +48,13 @@ export default function LoginForm() {
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        // 防重入：请求中或跳转中禁止再次提交（双击 / 回车）
+        if (submittingRef.current) return
+        submittingRef.current = true
         setStatus(true)
 
         const result = await LoginFetch(values.email, values.password)
-    
+
         const text = await result.text()
 
         let data;
@@ -59,16 +63,20 @@ export default function LoginForm() {
         } catch {
             toast.error(t('serverError'))
             console.error("Non-JSON response:", text)
+            submittingRef.current = false
             setStatus(false)
             return
         }
 
         if (data.success) {
+            // 成功：保持禁用，直到跳转卸载组件，避免慢跳转期间重复点击
             router.replace("/gekaixing")
-        } else {
-            toast.error(data.error || t('loginFailed'))
+            return
         }
+        // 失败：恢复可点
+        submittingRef.current = false
         setStatus(false)
+        toast.error(data.error || t('loginFailed'))
     }
 
     return (
