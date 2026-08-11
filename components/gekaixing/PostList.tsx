@@ -28,7 +28,8 @@ type FeedApiResponse = {
 const PAGE_SIZE = 20
 const DEFAULT_ROW_HEIGHT = 280
 const OVERSCAN_PX = 900
-const LOAD_MORE_THRESHOLD_PX = 1200
+/** 滚动到距底部 80% 时预加载下一页，实现无缝滚动。 */
+const LOAD_MORE_SCROLL_RATIO = 0.8
 
 function findItemIndexByOffset(offsets: number[], target: number): number {
   if (offsets.length <= 1) {
@@ -259,8 +260,9 @@ export default function PostList({
       return
     }
 
-    const viewportBottom = viewport.top + viewport.height
-    if (totalHeight - viewportBottom <= LOAD_MORE_THRESHOLD_PX) {
+    // 滚动进度 = viewport.top / 可滚动距离；达到 80% 就预加载下一页（无缝）。
+    const scrollable = totalHeight - viewport.height
+    if (scrollable > 0 && viewport.top / scrollable >= LOAD_MORE_SCROLL_RATIO) {
       void loadMore()
     }
   }, [hasMore, isLoading, loadMore, posts.length, totalHeight, viewport.height, viewport.top])
