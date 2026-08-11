@@ -9,3 +9,6 @@
 （用 `supabase db push` 管理应用表会和 Prisma 冲突）。
 
 命名示例：`20260101000000_enable_rls.sql`
+
+**模板**：`_templates/` 目录放参考模板（不会被 CLI 执行），
+RLS 策略模板见 `_templates/rls_policy.sql`。
