@@ -7,6 +7,7 @@ import {
   BriefcaseBusiness,
   Feather,
   Heart,
+  History,
   House,
   LogIn,
   MessageSquare,
@@ -165,6 +166,7 @@ function MobileDrawer({
               badge={mentionCount > 0 ? (mentionCount > 99 ? "99+" : String(mentionCount)) : undefined}
             />
             <DrawerItem href="/gekaixing/jobs" icon={<BriefcaseBusiness className="h-5 w-5" />} label={t("jobs")} />
+            <DrawerItem href="/gekaixing/history" icon={<History className="h-5 w-5" />} label={t("history")} />
             {user?.id ? (
               <>
                 <DrawerItem href="/gekaixing/settings" icon={<Settings className="h-5 w-5" />} label={labels.settings} />

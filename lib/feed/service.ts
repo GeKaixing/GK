@@ -1,5 +1,9 @@
 import { UserActionType } from "@/generated/prisma/enums";
 import {
+  getActiveSponsoredAds,
+  interleaveSponsoredPosts,
+} from "@/lib/ads/service";
+import {
   deleteFeedCache,
   getFeedCache,
   getFeedPageCache,
@@ -486,6 +490,8 @@ export async function getHomeFeed(options: FeedQueryOptions): Promise<FeedPage> 
   }
 
   let posts = await hydratePostsForPage(options.userId, pageCache.postIds);
+  // 广告在分页后插入（渲染时实时查询），不影响游标与页面缓存。
+  const sponsoredAds = await getActiveSponsoredAds();
 
   // If cached IDs no longer exist (deleted/filtered), recompute once to avoid blank feed pages.
   if (posts.length === 0 && pageCache.postIds.length > 0) {
@@ -500,7 +506,7 @@ export async function getHomeFeed(options: FeedQueryOptions): Promise<FeedPage> 
     posts = await hydratePostsForPage(options.userId, refreshedPagePostIds);
 
     return {
-      data: posts,
+      data: interleaveSponsoredPosts(posts, sponsoredAds),
       page: {
         nextCursor: refreshedNextCursor,
         hasMore: refreshedHasMore,
@@ -509,7 +515,7 @@ export async function getHomeFeed(options: FeedQueryOptions): Promise<FeedPage> 
   }
 
   return {
-    data: posts,
+    data: interleaveSponsoredPosts(posts, sponsoredAds),
     page: {
       nextCursor: pageCache.nextCursor,
       hasMore: pageCache.hasMore,

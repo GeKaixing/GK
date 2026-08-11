@@ -108,6 +108,8 @@ export const postStore = create<PostStore>((set) => ({
 ### Database (Prisma)
 All exports from `lib/prisma.ts`. Handle async with try/catch.
 
+**Prisma is the single source of truth for all app data tables** (portable — the DB may be swapped later, so never add another ORM or a raw driver for app data). Schema changes go through `prisma/schema.prisma`; never manage app tables with Supabase CLI migrations or raw SQL against the shared DB.
+
 ```typescript
 import { prisma } from '@/lib/prisma';
 
@@ -122,6 +124,7 @@ export async function getPost(id: string) {
 ```
 
 ### Supabase
+Supabase is limited to Supabase-specific pieces only: **Auth-related SQL, RLS policies, and Edge Functions**. It does NOT own app data tables.
 - Client: `createClient()` from `@/utils/supabase/client`
 - Server: `createServerClient()` from `@supabase/ssr`
 

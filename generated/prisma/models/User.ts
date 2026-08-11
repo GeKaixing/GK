@@ -289,6 +289,7 @@ export type UserWhereInput = {
   shares?: Prisma.ShareListRelationFilter
   actions?: Prisma.UserActionListRelationFilter
   jobPosts?: Prisma.JobPostingListRelationFilter
+  sponsoredAds?: Prisma.SponsoredAdListRelationFilter
   assignedWorkTasks?: Prisma.WorkTaskListRelationFilter
   createdWorkTasks?: Prisma.WorkTaskListRelationFilter
   liveStreams?: Prisma.LiveStreamListRelationFilter
@@ -325,6 +326,7 @@ export type UserOrderByWithRelationInput = {
   shares?: Prisma.ShareOrderByRelationAggregateInput
   actions?: Prisma.UserActionOrderByRelationAggregateInput
   jobPosts?: Prisma.JobPostingOrderByRelationAggregateInput
+  sponsoredAds?: Prisma.SponsoredAdOrderByRelationAggregateInput
   assignedWorkTasks?: Prisma.WorkTaskOrderByRelationAggregateInput
   createdWorkTasks?: Prisma.WorkTaskOrderByRelationAggregateInput
   liveStreams?: Prisma.LiveStreamOrderByRelationAggregateInput
@@ -364,6 +366,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   shares?: Prisma.ShareListRelationFilter
   actions?: Prisma.UserActionListRelationFilter
   jobPosts?: Prisma.JobPostingListRelationFilter
+  sponsoredAds?: Prisma.SponsoredAdListRelationFilter
   assignedWorkTasks?: Prisma.WorkTaskListRelationFilter
   createdWorkTasks?: Prisma.WorkTaskListRelationFilter
   liveStreams?: Prisma.LiveStreamListRelationFilter
@@ -446,6 +449,7 @@ export type UserCreateInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -482,6 +486,7 @@ export type UserUncheckedCreateInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -518,6 +523,7 @@ export type UserUpdateInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -554,6 +560,7 @@ export type UserUncheckedUpdateInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -945,6 +952,20 @@ export type UserUpdateOneRequiredWithoutLiveFeedbackNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLiveFeedbackInput, Prisma.UserUpdateWithoutLiveFeedbackInput>, Prisma.UserUncheckedUpdateWithoutLiveFeedbackInput>
 }
 
+export type UserCreateNestedOneWithoutSponsoredAdsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSponsoredAdsInput, Prisma.UserUncheckedCreateWithoutSponsoredAdsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSponsoredAdsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSponsoredAdsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSponsoredAdsInput, Prisma.UserUncheckedCreateWithoutSponsoredAdsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSponsoredAdsInput
+  upsert?: Prisma.UserUpsertWithoutSponsoredAdsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSponsoredAdsInput, Prisma.UserUpdateWithoutSponsoredAdsInput>, Prisma.UserUncheckedUpdateWithoutSponsoredAdsInput>
+}
+
 export type UserCreateWithoutFollowingInput = {
   id?: string
   email: string
@@ -973,6 +994,7 @@ export type UserCreateWithoutFollowingInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -1008,6 +1030,7 @@ export type UserUncheckedCreateWithoutFollowingInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -1048,6 +1071,7 @@ export type UserCreateWithoutFollowersInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -1083,6 +1107,7 @@ export type UserUncheckedCreateWithoutFollowersInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -1134,6 +1159,7 @@ export type UserUpdateWithoutFollowingInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -1169,6 +1195,7 @@ export type UserUncheckedUpdateWithoutFollowingInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1215,6 +1242,7 @@ export type UserUpdateWithoutFollowersInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -1250,6 +1278,7 @@ export type UserUncheckedUpdateWithoutFollowersInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1285,6 +1314,7 @@ export type UserCreateWithoutPostsInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -1320,6 +1350,7 @@ export type UserUncheckedCreateWithoutPostsInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -1371,6 +1402,7 @@ export type UserUpdateWithoutPostsInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -1406,6 +1438,7 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1441,6 +1474,7 @@ export type UserCreateWithoutLikesInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -1476,6 +1510,7 @@ export type UserUncheckedCreateWithoutLikesInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -1527,6 +1562,7 @@ export type UserUpdateWithoutLikesInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -1562,6 +1598,7 @@ export type UserUncheckedUpdateWithoutLikesInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1597,6 +1634,7 @@ export type UserCreateWithoutBookmarksInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -1632,6 +1670,7 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -1683,6 +1722,7 @@ export type UserUpdateWithoutBookmarksInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -1718,6 +1758,7 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1753,6 +1794,7 @@ export type UserCreateWithoutSharesInput = {
   posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -1788,6 +1830,7 @@ export type UserUncheckedCreateWithoutSharesInput = {
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -1839,6 +1882,7 @@ export type UserUpdateWithoutSharesInput = {
   posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -1874,6 +1918,7 @@ export type UserUncheckedUpdateWithoutSharesInput = {
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1909,6 +1954,7 @@ export type UserCreateWithoutConversationParticipantsInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -1944,6 +1990,7 @@ export type UserUncheckedCreateWithoutConversationParticipantsInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -1995,6 +2042,7 @@ export type UserUpdateWithoutConversationParticipantsInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -2030,6 +2078,7 @@ export type UserUncheckedUpdateWithoutConversationParticipantsInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2065,6 +2114,7 @@ export type UserCreateWithoutMessagesInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -2100,6 +2150,7 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -2151,6 +2202,7 @@ export type UserUpdateWithoutMessagesInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -2186,6 +2238,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2221,6 +2274,7 @@ export type UserCreateWithoutConversationReadsInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -2256,6 +2310,7 @@ export type UserUncheckedCreateWithoutConversationReadsInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -2307,6 +2362,7 @@ export type UserUpdateWithoutConversationReadsInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -2342,6 +2398,7 @@ export type UserUncheckedUpdateWithoutConversationReadsInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2378,6 +2435,7 @@ export type UserCreateWithoutAssignedWorkTasksInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
@@ -2413,6 +2471,7 @@ export type UserUncheckedCreateWithoutAssignedWorkTasksInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
@@ -2453,6 +2512,7 @@ export type UserCreateWithoutCreatedWorkTasksInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
@@ -2488,6 +2548,7 @@ export type UserUncheckedCreateWithoutCreatedWorkTasksInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
@@ -2539,6 +2600,7 @@ export type UserUpdateWithoutAssignedWorkTasksInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
@@ -2574,6 +2636,7 @@ export type UserUncheckedUpdateWithoutAssignedWorkTasksInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2620,6 +2683,7 @@ export type UserUpdateWithoutCreatedWorkTasksInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
@@ -2655,6 +2719,7 @@ export type UserUncheckedUpdateWithoutCreatedWorkTasksInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2689,6 +2754,7 @@ export type UserCreateWithoutJobPostsInput = {
   posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -2724,6 +2790,7 @@ export type UserUncheckedCreateWithoutJobPostsInput = {
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -2775,6 +2842,7 @@ export type UserUpdateWithoutJobPostsInput = {
   posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -2810,6 +2878,7 @@ export type UserUncheckedUpdateWithoutJobPostsInput = {
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2845,6 +2914,7 @@ export type UserCreateWithoutActionsInput = {
   posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -2880,6 +2950,7 @@ export type UserUncheckedCreateWithoutActionsInput = {
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -2931,6 +3002,7 @@ export type UserUpdateWithoutActionsInput = {
   posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -2966,6 +3038,7 @@ export type UserUncheckedUpdateWithoutActionsInput = {
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -3002,6 +3075,7 @@ export type UserCreateWithoutLiveStreamsInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
@@ -3037,6 +3111,7 @@ export type UserUncheckedCreateWithoutLiveStreamsInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
@@ -3088,6 +3163,7 @@ export type UserUpdateWithoutLiveStreamsInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
@@ -3123,6 +3199,7 @@ export type UserUncheckedUpdateWithoutLiveStreamsInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
@@ -3158,6 +3235,7 @@ export type UserCreateWithoutLiveChatMessagesInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -3193,6 +3271,7 @@ export type UserUncheckedCreateWithoutLiveChatMessagesInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -3244,6 +3323,7 @@ export type UserUpdateWithoutLiveChatMessagesInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -3279,6 +3359,7 @@ export type UserUncheckedUpdateWithoutLiveChatMessagesInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
@@ -3314,6 +3395,7 @@ export type UserCreateWithoutLiveFeedbackInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
@@ -3349,6 +3431,7 @@ export type UserUncheckedCreateWithoutLiveFeedbackInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedCreateNestedManyWithoutAdvertiserInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
   liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
@@ -3400,6 +3483,7 @@ export type UserUpdateWithoutLiveFeedbackInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
@@ -3435,10 +3519,171 @@ export type UserUncheckedUpdateWithoutLiveFeedbackInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  sponsoredAds?: Prisma.SponsoredAdUncheckedUpdateManyWithoutAdvertiserNestedInput
   assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
   createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
   liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
   liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserCreateWithoutSponsoredAdsInput = {
+  id?: string
+  email: string
+  name?: string | null
+  avatar?: string | null
+  backgroundImage?: string | null
+  briefIntroduction?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userid?: string
+  isPremium?: boolean
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  premiumExpiresAt?: Date | string | null
+  premiumGraceEndsAt?: Date | string | null
+  stripePriceId?: string | null
+  role?: $Enums.UserRole
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
+  conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
+  following?: Prisma.FollowCreateNestedManyWithoutFollowerInput
+  followers?: Prisma.FollowCreateNestedManyWithoutFollowingInput
+  likes?: Prisma.LikeCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
+  shares?: Prisma.ShareCreateNestedManyWithoutUserInput
+  actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
+  jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  assignedWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutAssigneeInput
+  createdWorkTasks?: Prisma.WorkTaskCreateNestedManyWithoutCreatedByInput
+  liveStreams?: Prisma.LiveStreamCreateNestedManyWithoutAuthorInput
+  liveChatMessages?: Prisma.LiveChatMessageCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSponsoredAdsInput = {
+  id?: string
+  email: string
+  name?: string | null
+  avatar?: string | null
+  backgroundImage?: string | null
+  briefIntroduction?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userid?: string
+  isPremium?: boolean
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  premiumExpiresAt?: Date | string | null
+  premiumGraceEndsAt?: Date | string | null
+  stripePriceId?: string | null
+  role?: $Enums.UserRole
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
+  following?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowerInput
+  followers?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowingInput
+  likes?: Prisma.LikeUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
+  shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
+  actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
+  jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  assignedWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutAssigneeInput
+  createdWorkTasks?: Prisma.WorkTaskUncheckedCreateNestedManyWithoutCreatedByInput
+  liveStreams?: Prisma.LiveStreamUncheckedCreateNestedManyWithoutAuthorInput
+  liveChatMessages?: Prisma.LiveChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSponsoredAdsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSponsoredAdsInput, Prisma.UserUncheckedCreateWithoutSponsoredAdsInput>
+}
+
+export type UserUpsertWithoutSponsoredAdsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSponsoredAdsInput, Prisma.UserUncheckedUpdateWithoutSponsoredAdsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSponsoredAdsInput, Prisma.UserUncheckedCreateWithoutSponsoredAdsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSponsoredAdsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSponsoredAdsInput, Prisma.UserUncheckedUpdateWithoutSponsoredAdsInput>
+}
+
+export type UserUpdateWithoutSponsoredAdsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  backgroundImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  briefIntroduction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userid?: Prisma.StringFieldUpdateOperationsInput | string
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
+  conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
+  following?: Prisma.FollowUpdateManyWithoutFollowerNestedInput
+  followers?: Prisma.FollowUpdateManyWithoutFollowingNestedInput
+  likes?: Prisma.LikeUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
+  shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
+  actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
+  jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  assignedWorkTasks?: Prisma.WorkTaskUpdateManyWithoutAssigneeNestedInput
+  createdWorkTasks?: Prisma.WorkTaskUpdateManyWithoutCreatedByNestedInput
+  liveStreams?: Prisma.LiveStreamUpdateManyWithoutAuthorNestedInput
+  liveChatMessages?: Prisma.LiveChatMessageUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSponsoredAdsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  backgroundImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  briefIntroduction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userid?: Prisma.StringFieldUpdateOperationsInput | string
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
+  following?: Prisma.FollowUncheckedUpdateManyWithoutFollowerNestedInput
+  followers?: Prisma.FollowUncheckedUpdateManyWithoutFollowingNestedInput
+  likes?: Prisma.LikeUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
+  shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
+  actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
+  jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutAssigneeNestedInput
+  createdWorkTasks?: Prisma.WorkTaskUncheckedUpdateManyWithoutCreatedByNestedInput
+  liveStreams?: Prisma.LiveStreamUncheckedUpdateManyWithoutAuthorNestedInput
+  liveChatMessages?: Prisma.LiveChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  liveFeedback?: Prisma.LiveFeedbackUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -3458,6 +3703,7 @@ export type UserCountOutputType = {
   shares: number
   actions: number
   jobPosts: number
+  sponsoredAds: number
   assignedWorkTasks: number
   createdWorkTasks: number
   liveStreams: number
@@ -3477,6 +3723,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   shares?: boolean | UserCountOutputTypeCountSharesArgs
   actions?: boolean | UserCountOutputTypeCountActionsArgs
   jobPosts?: boolean | UserCountOutputTypeCountJobPostsArgs
+  sponsoredAds?: boolean | UserCountOutputTypeCountSponsoredAdsArgs
   assignedWorkTasks?: boolean | UserCountOutputTypeCountAssignedWorkTasksArgs
   createdWorkTasks?: boolean | UserCountOutputTypeCountCreatedWorkTasksArgs
   liveStreams?: boolean | UserCountOutputTypeCountLiveStreamsArgs
@@ -3574,6 +3821,13 @@ export type UserCountOutputTypeCountJobPostsArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountSponsoredAdsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SponsoredAdWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountAssignedWorkTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.WorkTaskWhereInput
 }
@@ -3636,6 +3890,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   shares?: boolean | Prisma.User$sharesArgs<ExtArgs>
   actions?: boolean | Prisma.User$actionsArgs<ExtArgs>
   jobPosts?: boolean | Prisma.User$jobPostsArgs<ExtArgs>
+  sponsoredAds?: boolean | Prisma.User$sponsoredAdsArgs<ExtArgs>
   assignedWorkTasks?: boolean | Prisma.User$assignedWorkTasksArgs<ExtArgs>
   createdWorkTasks?: boolean | Prisma.User$createdWorkTasksArgs<ExtArgs>
   liveStreams?: boolean | Prisma.User$liveStreamsArgs<ExtArgs>
@@ -3717,6 +3972,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   shares?: boolean | Prisma.User$sharesArgs<ExtArgs>
   actions?: boolean | Prisma.User$actionsArgs<ExtArgs>
   jobPosts?: boolean | Prisma.User$jobPostsArgs<ExtArgs>
+  sponsoredAds?: boolean | Prisma.User$sponsoredAdsArgs<ExtArgs>
   assignedWorkTasks?: boolean | Prisma.User$assignedWorkTasksArgs<ExtArgs>
   createdWorkTasks?: boolean | Prisma.User$createdWorkTasksArgs<ExtArgs>
   liveStreams?: boolean | Prisma.User$liveStreamsArgs<ExtArgs>
@@ -3741,6 +3997,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     shares: Prisma.$SharePayload<ExtArgs>[]
     actions: Prisma.$UserActionPayload<ExtArgs>[]
     jobPosts: Prisma.$JobPostingPayload<ExtArgs>[]
+    sponsoredAds: Prisma.$SponsoredAdPayload<ExtArgs>[]
     assignedWorkTasks: Prisma.$WorkTaskPayload<ExtArgs>[]
     createdWorkTasks: Prisma.$WorkTaskPayload<ExtArgs>[]
     liveStreams: Prisma.$LiveStreamPayload<ExtArgs>[]
@@ -4170,6 +4427,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   shares<T extends Prisma.User$sharesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sharesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   actions<T extends Prisma.User$actionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$actionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   jobPosts<T extends Prisma.User$jobPostsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$jobPostsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sponsoredAds<T extends Prisma.User$sponsoredAdsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sponsoredAdsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SponsoredAdPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignedWorkTasks<T extends Prisma.User$assignedWorkTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedWorkTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdWorkTasks<T extends Prisma.User$createdWorkTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdWorkTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   liveStreams<T extends Prisma.User$liveStreamsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$liveStreamsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LiveStreamPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4875,6 +5133,30 @@ export type User$jobPostsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.JobPostingScalarFieldEnum | Prisma.JobPostingScalarFieldEnum[]
+}
+
+/**
+ * User.sponsoredAds
+ */
+export type User$sponsoredAdsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SponsoredAd
+   */
+  select?: Prisma.SponsoredAdSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SponsoredAd
+   */
+  omit?: Prisma.SponsoredAdOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SponsoredAdInclude<ExtArgs> | null
+  where?: Prisma.SponsoredAdWhereInput
+  orderBy?: Prisma.SponsoredAdOrderByWithRelationInput | Prisma.SponsoredAdOrderByWithRelationInput[]
+  cursor?: Prisma.SponsoredAdWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SponsoredAdScalarFieldEnum | Prisma.SponsoredAdScalarFieldEnum[]
 }
 
 /**

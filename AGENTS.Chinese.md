@@ -8,7 +8,7 @@
 使用Nextjs(App Router)  
 使用tailwindcss  
 使用prisma作为ORM  
-数据库使用supabse (PostgreSQL)  
+数据库：所有数据表/读写只走Prisma（后期可能换库，不要加其他ORM或原生驱动）；Supabase只负责Auth相关SQL、RLS策略、Edge Functions，不管应用数据表，禁止用supabase CLI迁移或裸SQL管理共享库的应用表
 使用ui库使用 shadcn/ui  
 支付使用stripe   
 使用测试库vitest  

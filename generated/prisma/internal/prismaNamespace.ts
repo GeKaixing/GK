@@ -415,7 +415,8 @@ export const ModelName = {
   UserAction: 'UserAction',
   LiveStream: 'LiveStream',
   LiveChatMessage: 'LiveChatMessage',
-  LiveFeedback: 'LiveFeedback'
+  LiveFeedback: 'LiveFeedback',
+  SponsoredAd: 'SponsoredAd'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -431,7 +432,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "follow" | "post" | "like" | "bookmark" | "share" | "conversation" | "conversationParticipant" | "message" | "conversationRead" | "workTask" | "chatAISession" | "chatAIMessage" | "piSessionFile" | "jobPosting" | "userAction" | "liveStream" | "liveChatMessage" | "liveFeedback"
+    modelProps: "user" | "follow" | "post" | "like" | "bookmark" | "share" | "conversation" | "conversationParticipant" | "message" | "conversationRead" | "workTask" | "chatAISession" | "chatAIMessage" | "piSessionFile" | "jobPosting" | "userAction" | "liveStream" | "liveChatMessage" | "liveFeedback" | "sponsoredAd"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1841,6 +1842,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SponsoredAd: {
+      payload: Prisma.$SponsoredAdPayload<ExtArgs>
+      fields: Prisma.SponsoredAdFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SponsoredAdFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SponsoredAdPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SponsoredAdFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SponsoredAdPayload>
+        }
+        findFirst: {
+          args: Prisma.SponsoredAdFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SponsoredAdPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SponsoredAdFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SponsoredAdPayload>
+        }
+        findMany: {
+          args: Prisma.SponsoredAdFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SponsoredAdPayload>[]
+        }
+        create: {
+          args: Prisma.SponsoredAdCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SponsoredAdPayload>
+        }
+        createMany: {
+          args: Prisma.SponsoredAdCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SponsoredAdCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SponsoredAdPayload>[]
+        }
+        delete: {
+          args: Prisma.SponsoredAdDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SponsoredAdPayload>
+        }
+        update: {
+          args: Prisma.SponsoredAdUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SponsoredAdPayload>
+        }
+        deleteMany: {
+          args: Prisma.SponsoredAdDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SponsoredAdUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SponsoredAdUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SponsoredAdPayload>[]
+        }
+        upsert: {
+          args: Prisma.SponsoredAdUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SponsoredAdPayload>
+        }
+        aggregate: {
+          args: Prisma.SponsoredAdAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSponsoredAd>
+        }
+        groupBy: {
+          args: Prisma.SponsoredAdGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SponsoredAdGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SponsoredAdCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SponsoredAdCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2140,6 +2215,26 @@ export const LiveFeedbackScalarFieldEnum = {
 export type LiveFeedbackScalarFieldEnum = (typeof LiveFeedbackScalarFieldEnum)[keyof typeof LiveFeedbackScalarFieldEnum]
 
 
+export const SponsoredAdScalarFieldEnum = {
+  id: 'id',
+  postId: 'postId',
+  advertiserId: 'advertiserId',
+  status: 'status',
+  priceCents: 'priceCents',
+  currency: 'currency',
+  ctaUrl: 'ctaUrl',
+  ctaLabel: 'ctaLabel',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  stripeSessionId: 'stripeSessionId',
+  paidAt: 'paidAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SponsoredAdScalarFieldEnum = (typeof SponsoredAdScalarFieldEnum)[keyof typeof SponsoredAdScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2286,6 +2381,20 @@ export type EnumUserActionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$P
  * Reference to a field of type 'UserActionType[]'
  */
 export type ListEnumUserActionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserActionType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AdStatus'
+ */
+export type EnumAdStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'AdStatus[]'
+ */
+export type ListEnumAdStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdStatus[]'>
     
 
 
@@ -2472,6 +2581,7 @@ export type GlobalOmitConfig = {
   liveStream?: Prisma.LiveStreamOmit
   liveChatMessage?: Prisma.LiveChatMessageOmit
   liveFeedback?: Prisma.LiveFeedbackOmit
+  sponsoredAd?: Prisma.SponsoredAdOmit
 }
 
 /* Types for Logging */

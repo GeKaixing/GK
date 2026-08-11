@@ -6,6 +6,7 @@ import { logUserAction } from "@/lib/feed/actions";
 import { createClient } from "@/utils/supabase/server";
 import { Prisma } from "@/generated/prisma/client";
 import { getHomeFeed } from "@/lib/feed/service";
+import { getHistoryFeed } from "@/lib/feed/history";
 
 type FeedScope =
   | "home"
@@ -13,6 +14,7 @@ type FeedScope =
   | "user-replies"
   | "user-liked"
   | "user-bookmarks"
+  | "user-history"
   | "status-replies";
 
 function buildWhere(scope: FeedScope, targetId: string | null): Prisma.PostWhereInput {
@@ -45,6 +47,9 @@ function buildWhere(scope: FeedScope, targetId: string | null): Prisma.PostWhere
           },
         },
       };
+    case "user-history":
+      // Handled in its own branch in GET (grouped by click, not post query).
+      return { id: "" };
     case "status-replies":
       return {
         parentId: targetId || "",
@@ -102,6 +107,27 @@ export async function GET(req: NextRequest) {
         );
       }
 
+      return NextResponse.json(feed);
+    }
+
+    if (scope === "user-history") {
+      // Browsing history is strictly personal — ignore any client-supplied targetId.
+      const historyUserId = userId ?? "";
+      const offset = Number(cursor) || 0;
+      const feed = await getHistoryFeed(historyUserId, offset, limit);
+      if (historyUserId) {
+        await Promise.allSettled(
+          feed.data.slice(0, 20).map((post) =>
+            logUserAction({
+              userId: historyUserId,
+              actionType: UserActionType.FEED_IMPRESSION,
+              targetPostId: post.id,
+              targetAuthorId: post.user_id,
+              metadata: JSON.stringify({ kind: "feed_impression", source: scope }),
+            })
+          )
+        );
+      }
       return NextResponse.json(feed);
     }
 

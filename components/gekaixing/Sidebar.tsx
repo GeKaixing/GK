@@ -1,7 +1,8 @@
 'use client'
 import { userStore } from "@/store/user";
 import { postModalStore } from "@/store/postModal";
-import { MessageSquare, House, LogIn, Settings, Users, Search, Sparkles, CircleEllipsis, Heart, Bookmark, Feather, User as UserIcon, ShieldCheck, Bell, BriefcaseBusiness, Radio } from "lucide-react";
+import { feedDotStore } from "@/store/feedDot";
+import { MessageSquare, House, LogIn, Settings, Users, Search, Sparkles, CircleEllipsis, Heart, Bookmark, Feather, User as UserIcon, ShieldCheck, Bell, BriefcaseBusiness, Radio, History } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -19,7 +20,7 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Sidebar({ user, mentionCount = 0 }: { user: userResult | null, mentionCount?: number }) {
+export default function Sidebar({ user, mentionCount = 0, hasNewTweets = false }: { user: userResult | null, mentionCount?: number, hasNewTweets?: boolean }) {
     const t = useTranslations("ImitationX.Sidebar");
     const router = useRouter();
     const pathname = usePathname();
@@ -28,9 +29,12 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
     const displayMentionCount = pathname === "/gekaixing/notifications" ? 0 : mentionCount
     const isActivePath = (href: string) => pathname === href || pathname.startsWith(href + "/")
     const homeActive = pathname === "/gekaixing"
+    const polledNewTweets = feedDotStore((s) => s.hasNewTweets)
+    const liveNewTweets = polledNewTweets ?? hasNewTweets
+    const displayNewTweets = homeActive ? false : liveNewTweets
     const profileActive = user?.id ? isActivePath(`/gekaixing/user/${user.id}`) : false
     const moreActive =
-      ["/gekaixing/likes", "/gekaixing/bookmarks", "/gekaixing/notifications", "/gekaixing/jobs"].some(
+      ["/gekaixing/likes", "/gekaixing/bookmarks", "/gekaixing/notifications", "/gekaixing/jobs", "/gekaixing/history"].some(
         (href) => isActivePath(href)
       ) || profileActive
     const settingsActive = user?.id ? isActivePath("/gekaixing/settings") : false
@@ -84,7 +88,12 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
                                     aria-current={item.active ? "page" : undefined}
                                     className={`flex items-center justify-center xl:justify-start gap-0 xl:gap-3 text-xl rounded-full p-3 w-full transition-colors hover:bg-muted/70 ${item.active ? "font-bold" : "font-normal"}`}
                                 >
-                                    <Icon className="w-7 h-7" fill={item.active ? "currentColor" : "none"} />
+                                    <span className="relative inline-flex">
+                                        <Icon className="w-7 h-7" fill={item.active ? "currentColor" : "none"} />
+                                        {item.href === "/gekaixing" && displayNewTweets ? (
+                                            <span aria-hidden className="absolute -top-0.5 -right-1 h-2.5 w-2.5 rounded-full bg-blue-500" />
+                                        ) : null}
+                                    </span>
                                     <span className="hidden xl:inline">{item.label}</span>
                                 </Link>
                             </li>
@@ -141,6 +150,13 @@ export default function Sidebar({ user, mentionCount = 0 }: { user: userResult |
                                 >
                                     <BriefcaseBusiness className="h-5 w-5" fill={isActivePath("/gekaixing/jobs") ? "currentColor" : "none"} />
                                     <span>{t("jobs")}</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onSelect={handleMoreMenuSelect("/gekaixing/history")}
+                                    className={`flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] ${isActivePath("/gekaixing/history") ? "font-bold" : "font-normal"}`}
+                                >
+                                    <History className="h-5 w-5" />
+                                    <span>{t("history")}</span>
                                 </DropdownMenuItem>
                                 {user?.id && (
                                     <DropdownMenuItem

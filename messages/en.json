@@ -106,7 +106,13 @@
       "login": "Login",
       "logout": "Logout",
       "copyProfileLink": "Copy profile link",
-      "jobs": "Jobs"
+      "jobs": "Jobs",
+      "history": "History",
+      "historyEmpty": "No browsing history yet.",
+      "clearHistory": "Clear history",
+      "clearHistoryTitle": "Clear browsing history?",
+      "clearHistoryConfirm": "This removes every post you've clicked and can't be undone.",
+      "cancel": "Cancel"
     },
     "Mobile": {
       "home": "Home",

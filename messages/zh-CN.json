@@ -106,7 +106,13 @@
       "login": "登录",
       "logout": "登出",
       "copyProfileLink": "复制连接",
-      "jobs": "职位"
+      "jobs": "职位",
+      "history": "浏览历史",
+      "historyEmpty": "暂无浏览历史",
+      "clearHistory": "清空历史",
+      "clearHistoryTitle": "清空浏览历史？",
+      "clearHistoryConfirm": "将删除所有浏览记录，此操作无法撤销。",
+      "cancel": "取消"
     },
     "Mobile": {
       "home": "主页",

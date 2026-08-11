@@ -299,6 +299,7 @@ export type PostWhereInput = {
   replies?: Prisma.PostListRelationFilter
   shares?: Prisma.ShareListRelationFilter
   actions?: Prisma.UserActionListRelationFilter
+  sponsoredAd?: Prisma.XOR<Prisma.SponsoredAdNullableScalarRelationFilter, Prisma.SponsoredAdWhereInput> | null
 }
 
 export type PostOrderByWithRelationInput = {
@@ -322,6 +323,7 @@ export type PostOrderByWithRelationInput = {
   replies?: Prisma.PostOrderByRelationAggregateInput
   shares?: Prisma.ShareOrderByRelationAggregateInput
   actions?: Prisma.UserActionOrderByRelationAggregateInput
+  sponsoredAd?: Prisma.SponsoredAdOrderByWithRelationInput
 }
 
 export type PostWhereUniqueInput = Prisma.AtLeast<{
@@ -348,6 +350,7 @@ export type PostWhereUniqueInput = Prisma.AtLeast<{
   replies?: Prisma.PostListRelationFilter
   shares?: Prisma.ShareListRelationFilter
   actions?: Prisma.UserActionListRelationFilter
+  sponsoredAd?: Prisma.XOR<Prisma.SponsoredAdNullableScalarRelationFilter, Prisma.SponsoredAdWhereInput> | null
 }, "id">
 
 export type PostOrderByWithAggregationInput = {
@@ -409,6 +412,7 @@ export type PostCreateInput = {
   replies?: Prisma.PostCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdCreateNestedOneWithoutPostInput
 }
 
 export type PostUncheckedCreateInput = {
@@ -430,6 +434,7 @@ export type PostUncheckedCreateInput = {
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedCreateNestedOneWithoutPostInput
 }
 
 export type PostUpdateInput = {
@@ -451,6 +456,7 @@ export type PostUpdateInput = {
   replies?: Prisma.PostUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUpdateOneWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateInput = {
@@ -472,6 +478,7 @@ export type PostUncheckedUpdateInput = {
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedUpdateOneWithoutPostNestedInput
 }
 
 export type PostCreateManyInput = {
@@ -768,6 +775,20 @@ export type PostUpdateOneWithoutActionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutActionsInput, Prisma.PostUpdateWithoutActionsInput>, Prisma.PostUncheckedUpdateWithoutActionsInput>
 }
 
+export type PostCreateNestedOneWithoutSponsoredAdInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutSponsoredAdInput, Prisma.PostUncheckedCreateWithoutSponsoredAdInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutSponsoredAdInput
+  connect?: Prisma.PostWhereUniqueInput
+}
+
+export type PostUpdateOneRequiredWithoutSponsoredAdNestedInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutSponsoredAdInput, Prisma.PostUncheckedCreateWithoutSponsoredAdInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutSponsoredAdInput
+  upsert?: Prisma.PostUpsertWithoutSponsoredAdInput
+  connect?: Prisma.PostWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutSponsoredAdInput, Prisma.PostUpdateWithoutSponsoredAdInput>, Prisma.PostUncheckedUpdateWithoutSponsoredAdInput>
+}
+
 export type PostCreateWithoutAuthorInput = {
   id?: string
   content: string
@@ -786,6 +807,7 @@ export type PostCreateWithoutAuthorInput = {
   replies?: Prisma.PostCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdCreateNestedOneWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutAuthorInput = {
@@ -806,6 +828,7 @@ export type PostUncheckedCreateWithoutAuthorInput = {
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedCreateNestedOneWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutAuthorInput = {
@@ -871,6 +894,7 @@ export type PostCreateWithoutRepliesInput = {
   parent?: Prisma.PostCreateNestedOneWithoutRepliesInput
   shares?: Prisma.ShareCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdCreateNestedOneWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutRepliesInput = {
@@ -891,6 +915,7 @@ export type PostUncheckedCreateWithoutRepliesInput = {
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedCreateNestedOneWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutRepliesInput = {
@@ -916,6 +941,7 @@ export type PostCreateWithoutParentInput = {
   replies?: Prisma.PostCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdCreateNestedOneWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutParentInput = {
@@ -936,6 +962,7 @@ export type PostUncheckedCreateWithoutParentInput = {
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedCreateNestedOneWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutParentInput = {
@@ -977,6 +1004,7 @@ export type PostUpdateWithoutRepliesInput = {
   parent?: Prisma.PostUpdateOneWithoutRepliesNestedInput
   shares?: Prisma.ShareUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUpdateOneWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutRepliesInput = {
@@ -997,6 +1025,7 @@ export type PostUncheckedUpdateWithoutRepliesInput = {
   likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedUpdateOneWithoutPostNestedInput
 }
 
 export type PostUpsertWithWhereUniqueWithoutParentInput = {
@@ -1033,6 +1062,7 @@ export type PostCreateWithoutLikesInput = {
   replies?: Prisma.PostCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdCreateNestedOneWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutLikesInput = {
@@ -1053,6 +1083,7 @@ export type PostUncheckedCreateWithoutLikesInput = {
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedCreateNestedOneWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutLikesInput = {
@@ -1089,6 +1120,7 @@ export type PostUpdateWithoutLikesInput = {
   replies?: Prisma.PostUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUpdateOneWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutLikesInput = {
@@ -1109,6 +1141,7 @@ export type PostUncheckedUpdateWithoutLikesInput = {
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedUpdateOneWithoutPostNestedInput
 }
 
 export type PostCreateWithoutBookmarksInput = {
@@ -1129,6 +1162,7 @@ export type PostCreateWithoutBookmarksInput = {
   replies?: Prisma.PostCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdCreateNestedOneWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutBookmarksInput = {
@@ -1149,6 +1183,7 @@ export type PostUncheckedCreateWithoutBookmarksInput = {
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutPostInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedCreateNestedOneWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutBookmarksInput = {
@@ -1185,6 +1220,7 @@ export type PostUpdateWithoutBookmarksInput = {
   replies?: Prisma.PostUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUpdateOneWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutBookmarksInput = {
@@ -1205,6 +1241,7 @@ export type PostUncheckedUpdateWithoutBookmarksInput = {
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedUpdateOneWithoutPostNestedInput
 }
 
 export type PostCreateWithoutSharesInput = {
@@ -1225,6 +1262,7 @@ export type PostCreateWithoutSharesInput = {
   parent?: Prisma.PostCreateNestedOneWithoutRepliesInput
   replies?: Prisma.PostCreateNestedManyWithoutParentInput
   actions?: Prisma.UserActionCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdCreateNestedOneWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutSharesInput = {
@@ -1245,6 +1283,7 @@ export type PostUncheckedCreateWithoutSharesInput = {
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedCreateNestedOneWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutSharesInput = {
@@ -1281,6 +1320,7 @@ export type PostUpdateWithoutSharesInput = {
   parent?: Prisma.PostUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.PostUpdateManyWithoutParentNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUpdateOneWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutSharesInput = {
@@ -1301,6 +1341,7 @@ export type PostUncheckedUpdateWithoutSharesInput = {
   likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedUpdateOneWithoutPostNestedInput
 }
 
 export type PostCreateWithoutActionsInput = {
@@ -1321,6 +1362,7 @@ export type PostCreateWithoutActionsInput = {
   parent?: Prisma.PostCreateNestedOneWithoutRepliesInput
   replies?: Prisma.PostCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdCreateNestedOneWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutActionsInput = {
@@ -1341,6 +1383,7 @@ export type PostUncheckedCreateWithoutActionsInput = {
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutPostInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedCreateNestedOneWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutActionsInput = {
@@ -1377,6 +1420,7 @@ export type PostUpdateWithoutActionsInput = {
   parent?: Prisma.PostUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.PostUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUpdateOneWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutActionsInput = {
@@ -1397,6 +1441,107 @@ export type PostUncheckedUpdateWithoutActionsInput = {
   likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedUpdateOneWithoutPostNestedInput
+}
+
+export type PostCreateWithoutSponsoredAdInput = {
+  id?: string
+  content: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rootId?: string | null
+  likeCount?: number
+  replyCount?: number
+  shareCount?: number
+  starCount?: number
+  videoUrl?: string | null
+  audioUrl?: string | null
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeCreateNestedManyWithoutPostInput
+  author: Prisma.UserCreateNestedOneWithoutPostsInput
+  parent?: Prisma.PostCreateNestedOneWithoutRepliesInput
+  replies?: Prisma.PostCreateNestedManyWithoutParentInput
+  shares?: Prisma.ShareCreateNestedManyWithoutPostInput
+  actions?: Prisma.UserActionCreateNestedManyWithoutPostInput
+}
+
+export type PostUncheckedCreateWithoutSponsoredAdInput = {
+  id?: string
+  content: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  authorId: string
+  parentId?: string | null
+  rootId?: string | null
+  likeCount?: number
+  replyCount?: number
+  shareCount?: number
+  starCount?: number
+  videoUrl?: string | null
+  audioUrl?: string | null
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
+  replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
+  shares?: Prisma.ShareUncheckedCreateNestedManyWithoutPostInput
+  actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutPostInput
+}
+
+export type PostCreateOrConnectWithoutSponsoredAdInput = {
+  where: Prisma.PostWhereUniqueInput
+  create: Prisma.XOR<Prisma.PostCreateWithoutSponsoredAdInput, Prisma.PostUncheckedCreateWithoutSponsoredAdInput>
+}
+
+export type PostUpsertWithoutSponsoredAdInput = {
+  update: Prisma.XOR<Prisma.PostUpdateWithoutSponsoredAdInput, Prisma.PostUncheckedUpdateWithoutSponsoredAdInput>
+  create: Prisma.XOR<Prisma.PostCreateWithoutSponsoredAdInput, Prisma.PostUncheckedCreateWithoutSponsoredAdInput>
+  where?: Prisma.PostWhereInput
+}
+
+export type PostUpdateToOneWithWhereWithoutSponsoredAdInput = {
+  where?: Prisma.PostWhereInput
+  data: Prisma.XOR<Prisma.PostUpdateWithoutSponsoredAdInput, Prisma.PostUncheckedUpdateWithoutSponsoredAdInput>
+}
+
+export type PostUpdateWithoutSponsoredAdInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rootId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  replyCount?: Prisma.IntFieldUpdateOperationsInput | number
+  shareCount?: Prisma.IntFieldUpdateOperationsInput | number
+  starCount?: Prisma.IntFieldUpdateOperationsInput | number
+  videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
+  author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
+  parent?: Prisma.PostUpdateOneWithoutRepliesNestedInput
+  replies?: Prisma.PostUpdateManyWithoutParentNestedInput
+  shares?: Prisma.ShareUpdateManyWithoutPostNestedInput
+  actions?: Prisma.UserActionUpdateManyWithoutPostNestedInput
+}
+
+export type PostUncheckedUpdateWithoutSponsoredAdInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rootId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  likeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  replyCount?: Prisma.IntFieldUpdateOperationsInput | number
+  shareCount?: Prisma.IntFieldUpdateOperationsInput | number
+  starCount?: Prisma.IntFieldUpdateOperationsInput | number
+  videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
+  replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
+  shares?: Prisma.ShareUncheckedUpdateManyWithoutPostNestedInput
+  actions?: Prisma.UserActionUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostCreateManyAuthorInput = {
@@ -1432,6 +1577,7 @@ export type PostUpdateWithoutAuthorInput = {
   replies?: Prisma.PostUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUpdateOneWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutAuthorInput = {
@@ -1452,6 +1598,7 @@ export type PostUncheckedUpdateWithoutAuthorInput = {
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedUpdateOneWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateManyWithoutAuthorInput = {
@@ -1502,6 +1649,7 @@ export type PostUpdateWithoutParentInput = {
   replies?: Prisma.PostUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUpdateOneWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutParentInput = {
@@ -1522,6 +1670,7 @@ export type PostUncheckedUpdateWithoutParentInput = {
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutPostNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutPostNestedInput
+  sponsoredAd?: Prisma.SponsoredAdUncheckedUpdateOneWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateManyWithoutParentInput = {
@@ -1627,6 +1776,7 @@ export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   replies?: boolean | Prisma.Post$repliesArgs<ExtArgs>
   shares?: boolean | Prisma.Post$sharesArgs<ExtArgs>
   actions?: boolean | Prisma.Post$actionsArgs<ExtArgs>
+  sponsoredAd?: boolean | Prisma.Post$sponsoredAdArgs<ExtArgs>
   _count?: boolean | Prisma.PostCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["post"]>
 
@@ -1691,6 +1841,7 @@ export type PostInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   replies?: boolean | Prisma.Post$repliesArgs<ExtArgs>
   shares?: boolean | Prisma.Post$sharesArgs<ExtArgs>
   actions?: boolean | Prisma.Post$actionsArgs<ExtArgs>
+  sponsoredAd?: boolean | Prisma.Post$sponsoredAdArgs<ExtArgs>
   _count?: boolean | Prisma.PostCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PostIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1712,6 +1863,7 @@ export type $PostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     replies: Prisma.$PostPayload<ExtArgs>[]
     shares: Prisma.$SharePayload<ExtArgs>[]
     actions: Prisma.$UserActionPayload<ExtArgs>[]
+    sponsoredAd: Prisma.$SponsoredAdPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2128,6 +2280,7 @@ export interface Prisma__PostClient<T, Null = never, ExtArgs extends runtime.Typ
   replies<T extends Prisma.Post$repliesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$repliesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   shares<T extends Prisma.Post$sharesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$sharesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   actions<T extends Prisma.Post$actionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$actionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sponsoredAd<T extends Prisma.Post$sponsoredAdArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$sponsoredAdArgs<ExtArgs>>): Prisma.Prisma__SponsoredAdClient<runtime.Types.Result.GetResult<Prisma.$SponsoredAdPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2707,6 +2860,25 @@ export type Post$actionsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.UserActionScalarFieldEnum | Prisma.UserActionScalarFieldEnum[]
+}
+
+/**
+ * Post.sponsoredAd
+ */
+export type Post$sponsoredAdArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SponsoredAd
+   */
+  select?: Prisma.SponsoredAdSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SponsoredAd
+   */
+  omit?: Prisma.SponsoredAdOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SponsoredAdInclude<ExtArgs> | null
+  where?: Prisma.SponsoredAdWhereInput
 }
 
 /**

@@ -36,6 +36,7 @@ model User {
   shares                   Share[]
   actions                  UserAction[]
   jobPosts                 JobPosting[]
+  sponsoredAds             SponsoredAd[]
   assignedWorkTasks        WorkTask[]   @relation("AssignedWorkTasks")
   createdWorkTasks         WorkTask[]   @relation("CreatedWorkTasks")
   liveStreams              LiveStream[]
@@ -79,6 +80,7 @@ model Post {
   replies    Post[]       @relation("PostToPost")
   shares     Share[]
   actions    UserAction[]
+  sponsoredAd SponsoredAd?
 
   @@index([parentId])
   @@index([rootId, createdAt])
@@ -269,6 +271,7 @@ model UserAction {
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+  @@index([userId, actionType, createdAt])
   @@index([targetAuthorId, createdAt])
   @@index([targetAuthorId, actionType, createdAt])
   @@index([targetPostId, createdAt])
@@ -308,6 +311,16 @@ enum SubscriptionStatus {
 enum UserRole {
   ADMIN
   STANDARD
+}
+
+enum AdStatus {
+  PENDING_PAYMENT // 已创建，待付款
+  PAID            // 已付款，待管理员审核
+  ACTIVE          // 投放中（信息流可见）
+  PAUSED          // 管理员暂停
+  ENDED           // 到期或手动结束
+  REJECTED        // 管理员拒绝
+  CANCELLED       // 广告主取消（未付款时）
 }
 
 model LiveStream {
@@ -359,4 +372,27 @@ model LiveFeedback {
   stream LiveStream @relation(fields: [streamId], references: [id], onDelete: Cascade)
 
   @@index([streamId, createdAt])
+}
+
+model SponsoredAd {
+  id              String    @id @default(cuid())
+  postId          String    @unique
+  advertiserId    String
+  status          AdStatus  @default(PENDING_PAYMENT)
+  priceCents      Int
+  currency        String    @default("usd")
+  ctaUrl          String?
+  ctaLabel        String?
+  startsAt        DateTime?
+  endsAt          DateTime?
+  stripeSessionId String?
+  paidAt          DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  post       Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  advertiser User @relation(fields: [advertiserId], references: [id], onDelete: Cascade)
+
+  @@index([status, endsAt])
+  @@index([advertiserId])
 }

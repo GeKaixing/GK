@@ -1,4 +1,5 @@
 import PostStore from "@/components/gekaixing/PostStore";
+import HomeFeedSeenTracker from "@/components/gekaixing/HomeFeedSeenTracker";
 import { getHomeFeed } from "@/lib/feed/service";
 import type { FeedPage, FeedPostItem as Post, FeedTab } from "@/lib/feed/types";
 import { prisma } from "@/lib/prisma";
@@ -174,6 +175,7 @@ export default async function Page({
 
   return (
     <div>
+      <HomeFeedSeenTracker />
       <div className="sticky top-14 z-10 border-b border-border bg-background/95 backdrop-blur sm:top-0">
         <nav className="grid grid-cols-2" aria-label={tf("following")}>
           <Link

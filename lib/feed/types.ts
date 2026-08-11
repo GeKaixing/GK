@@ -19,6 +19,12 @@ export interface FeedPostItem {
   likedByMe: boolean;
   bookmarkedByMe: boolean;
   sharedByMe: boolean;
+  /** 以下为广告/赞助字段（可选，仅首页信息流中的广告帖会设置）。 */
+  isSponsored?: boolean;
+  /** 展示用广告主/品牌名。 */
+  sponsoredBy?: string | null;
+  ctaUrl?: string | null;
+  ctaLabel?: string | null;
   metrics?: {
     impressions: number;
     postClicks: number;

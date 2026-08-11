@@ -1,10 +1,12 @@
 import Footer from "@/components/gekaixing/Footer";
 import ChatMain from "@/components/gekaixing/ChatMain";
+import HomeFeedPoll from "@/components/gekaixing/HomeFeedPoll";
 import MobileFooter from "@/components/gekaixing/MobileFooter";
 import MobileHeader from "@/components/gekaixing/MobileHeader";
 import RightRail from "@/components/gekaixing/RightRail";
 import Sidebar from "@/components/gekaixing/Sidebar";
 import { prisma } from "@/lib/prisma";
+import { hasNewHomeFeedTweets } from "@/lib/feed/newTweets";
 import { withTimeoutOrNull } from "@/lib/with-timeout";
 import { createClient } from "@/utils/supabase/server";
 import { Prisma } from "@/generated/prisma/client";
@@ -31,6 +33,7 @@ export interface userResult {
 }
 
 const NOTIFICATIONS_LAST_SEEN_COOKIE = "gkx_notifications_last_seen_at";
+const HOME_FEED_LAST_SEEN_COOKIE = "gkx_home_feed_last_seen_at";
 
 function parseSeenAt(raw: string | undefined): Date | null {
   if (!raw) {
@@ -107,8 +110,20 @@ export default async function RootLayout({
     }
   }
 
+  let hasNewTweets = false;
+  if (userInfo?.id) {
+    try {
+      const cookieStore = await cookies();
+      const lastSeenAt = parseSeenAt(cookieStore.get(HOME_FEED_LAST_SEEN_COOKIE)?.value);
+      hasNewTweets = await hasNewHomeFeedTweets(userInfo.id, lastSeenAt);
+    } catch {
+      hasNewTweets = false;
+    }
+  }
+
   return (
     <div className="min-h-screen">
+      {userInfo?.id ? <HomeFeedPoll initialHasNewTweets={hasNewTweets} /> : null}
       <MobileHeader
         user={userInfo}
         mentionCount={mentionCount}
@@ -122,7 +137,7 @@ export default async function RootLayout({
       />
       <div className="flex justify-center w-full mx-auto min-h-screen">
         <header className="hidden sm:flex w-[88px] xl:w-[275px] shrink-0 sticky top-0 h-screen transition-all duration-200">
-          <Sidebar user={userInfo} mentionCount={mentionCount} />
+          <Sidebar user={userInfo} mentionCount={mentionCount} hasNewTweets={hasNewTweets} />
         </header>
         <ChatMain>{children}</ChatMain>
         <RightRail>
@@ -130,6 +145,7 @@ export default async function RootLayout({
         </RightRail>
       </div>
       <MobileFooter
+        hasNewTweets={hasNewTweets}
         labels={{
           home: mobileT("home"),
           search: mobileT("search"),

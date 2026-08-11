@@ -137,3 +137,8 @@ export type LiveChatMessage = Prisma.LiveChatMessageModel
  * 
  */
 export type LiveFeedback = Prisma.LiveFeedbackModel
+/**
+ * Model SponsoredAd
+ * 
+ */
+export type SponsoredAd = Prisma.SponsoredAdModel

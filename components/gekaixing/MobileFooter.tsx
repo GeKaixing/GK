@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
 import { cn } from '@/lib/utils'
+import { feedDotStore } from "@/store/feedDot"
 
 type MobileFooterTranslations = {
     home: string
@@ -15,11 +16,15 @@ type MobileFooterTranslations = {
 
 export default function MobileFooter({
     labels,
+    hasNewTweets = false,
 }: {
     labels: MobileFooterTranslations
+    hasNewTweets?: boolean
 }) {
     const pathname = usePathname()
     const isHome = pathname === "/gekaixing"
+    const polledNewTweets = feedDotStore((s) => s.hasNewTweets)
+    const liveNewTweets = polledNewTweets ?? hasNewTweets
     const isExplore = pathname === "/gekaixing/explore"
     const isNotifications = pathname === "/gekaixing/notifications"
     const isChat = pathname === "/gekaixing/chat"
@@ -31,9 +36,12 @@ export default function MobileFooter({
                 <Link
                     href={'/gekaixing'}
                     data-value={labels.home}
-                    className={cn("rounded-full p-2 transition-colors", isHome && "bg-muted text-primary")}
+                    className={cn("relative rounded-full p-2 transition-colors", isHome && "bg-muted text-primary")}
                 >
                     <House />
+                    {!isHome && liveNewTweets ? (
+                        <span aria-hidden className="absolute top-1 right-1 h-2 w-2 rounded-full bg-blue-500" />
+                    ) : null}
                 </Link>
                 <Link
                     href={'/gekaixing/explore'}

@@ -69,7 +69,8 @@ export const ModelName = {
   UserAction: 'UserAction',
   LiveStream: 'LiveStream',
   LiveChatMessage: 'LiveChatMessage',
-  LiveFeedback: 'LiveFeedback'
+  LiveFeedback: 'LiveFeedback',
+  SponsoredAd: 'SponsoredAd'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -346,6 +347,26 @@ export const LiveFeedbackScalarFieldEnum = {
 } as const
 
 export type LiveFeedbackScalarFieldEnum = (typeof LiveFeedbackScalarFieldEnum)[keyof typeof LiveFeedbackScalarFieldEnum]
+
+
+export const SponsoredAdScalarFieldEnum = {
+  id: 'id',
+  postId: 'postId',
+  advertiserId: 'advertiserId',
+  status: 'status',
+  priceCents: 'priceCents',
+  currency: 'currency',
+  ctaUrl: 'ctaUrl',
+  ctaLabel: 'ctaLabel',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  stripeSessionId: 'stripeSessionId',
+  paidAt: 'paidAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SponsoredAdScalarFieldEnum = (typeof SponsoredAdScalarFieldEnum)[keyof typeof SponsoredAdScalarFieldEnum]
 
 
 export const SortOrder = {
