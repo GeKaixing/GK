@@ -11,6 +11,17 @@ import {
 } from "@/lib/feed/cache";
 import { prisma } from "@/lib/prisma";
 import type { FeedPage, FeedPostItem, FeedTab } from "@/lib/feed/types";
+import {
+  RECOMMEND_FLAGS,
+  addExplorationSlots,
+  contentSimilarity,
+  getAuthorQualityScores,
+  getContentProfile,
+  getNetworkEngagementCandidates,
+  getSimilarUserCandidates,
+  rerankWithDiversity,
+  type RankedCandidate,
+} from "@/lib/feed/recommend";
 
 const FOLLOWING_CANDIDATE_LIMIT = 400;
 const HOT_CANDIDATE_LIMIT = 300;
@@ -31,6 +42,8 @@ interface FeedCandidate {
   replyCount: number;
   shareCount: number;
   authorId: string;
+  /** Author is followed by the viewer (in-network candidates). */
+  isInNetwork: boolean;
 }
 
 function normalizeLimit(rawLimit: number): number {
@@ -63,36 +76,38 @@ function getPageNumber(startIndex: number, limit: number): number {
   return Math.floor(startIndex / limit) + 1;
 }
 
+function sortByScore(a: RankedCandidate, b: RankedCandidate): number {
+  if (b.score !== a.score) return b.score - a.score;
+  if (b.createdAt.getTime() !== a.createdAt.getTime()) return b.createdAt.getTime() - a.createdAt.getTime();
+  return b.id.localeCompare(a.id);
+}
+
 function rankCandidates(
   candidates: FeedCandidate[],
   followingAuthorSet: Set<string>,
-  behaviorBoostMap: Map<string, number>
-): string[] {
-  const scored = candidates.map((candidate) => {
+  behaviorBoostMap: Map<string, number>,
+  authorQualityMap: Map<string, number>
+): RankedCandidate[] {
+  const scored: RankedCandidate[] = candidates.map((candidate) => {
     const engagement =
       Math.log1p(candidate.likeCount) * 1.5 +
       Math.log1p(candidate.replyCount) * 1.3 +
       Math.log1p(candidate.shareCount) * 2.0;
     const socialBonus = followingAuthorSet.has(candidate.authorId) ? 10 : 0;
     const behaviorBonus = behaviorBoostMap.get(candidate.authorId) ?? 0;
-    const score = engagement + decayScore(candidate.createdAt) * 8 + socialBonus + behaviorBonus;
+    const qualityBonus = authorQualityMap.get(candidate.authorId) ?? 0;
+    const score =
+      engagement +
+      decayScore(candidate.createdAt) * 8 +
+      socialBonus +
+      behaviorBonus +
+      qualityBonus;
 
-    return { id: candidate.id, createdAt: candidate.createdAt, score };
+    return { ...candidate, score };
   });
 
-  scored.sort((a, b) => {
-    if (b.score !== a.score) {
-      return b.score - a.score;
-    }
-
-    if (b.createdAt.getTime() !== a.createdAt.getTime()) {
-      return b.createdAt.getTime() - a.createdAt.getTime();
-    }
-
-    return b.id.localeCompare(a.id);
-  });
-
-  return scored.slice(0, MAX_FEED_POST_IDS).map((item) => item.id);
+  scored.sort(sortByScore);
+  return scored;
 }
 
 function getActionWeight(actionType: UserActionType, dwellMs: number | null): number {
@@ -239,11 +254,82 @@ async function buildCandidatePool(userId: string | null, tab: FeedTab = "foryou"
   ]);
 
   const deduped = new Map<string, FeedCandidate>();
-  [...followingPosts, ...hotPosts, ...recentPosts].forEach((candidate) => {
-    deduped.set(candidate.id, candidate);
-  });
+  const addCandidate = (
+    rows: Array<Pick<FeedCandidate, "id" | "createdAt" | "likeCount" | "replyCount" | "shareCount" | "authorId">>,
+    isInNetwork: boolean | ((row: Pick<FeedCandidate, "id" | "authorId">) => boolean)
+  ) => {
+    for (const row of rows) {
+      deduped.set(row.id, {
+        ...row,
+        isInNetwork: typeof isInNetwork === "function" ? isInNetwork(row) : isInNetwork,
+      });
+    }
+  };
 
-  return rankCandidates(Array.from(deduped.values()), followingAuthorSet, behaviorBoostMap);
+  addCandidate(followingPosts, true);
+  addCandidate(hotPosts, (row) => followingAuthorSet.has(row.authorId));
+  addCandidate(recentPosts, (row) => followingAuthorSet.has(row.authorId));
+
+  // Stage 1 — out-of-network candidates (only meaningful for an authed user)
+  if (userId && followingIds.length) {
+    if (RECOMMEND_FLAGS.networkEngagement) {
+      addCandidate(
+        await getNetworkEngagementCandidates(followingIds, followingAuthorSet),
+        false
+      );
+    }
+    if (RECOMMEND_FLAGS.similarUsers) {
+      addCandidate(
+        await getSimilarUserCandidates(userId, followingIds, followingAuthorSet),
+        false
+      );
+    }
+  }
+
+  const candidates = Array.from(deduped.values());
+
+  // Stage 3 — author quality (tweepcred analog)
+  const authorQualityMap = RECOMMEND_FLAGS.authorQuality
+    ? await getAuthorQualityScores(Array.from(new Set(candidates.map((c) => c.authorId))))
+    : new Map<string, number>();
+
+  let ranked = rankCandidates(candidates, followingAuthorSet, behaviorBoostMap, authorQualityMap);
+
+  // Stage 2 — content personalization (representation-scorer analog)
+  let contentProfile: Map<string, number> | null = null;
+  if (RECOMMEND_FLAGS.contentPersonalization && userId) {
+    contentProfile = await getContentProfile(userId);
+  }
+  if (contentProfile && contentProfile.size > 0 && ranked.length > 0) {
+    const top = ranked.slice(0, 400);
+    const rest = ranked.slice(400);
+    const contentRows = await prisma.post.findMany({
+      where: { id: { in: top.map((c) => c.id) } },
+      select: { id: true, content: true },
+    });
+    const contentById = new Map(contentRows.map((row) => [row.id, row.content]));
+    for (const candidate of top) {
+      candidate.score += contentSimilarity(contentProfile, contentById.get(candidate.id) ?? "");
+    }
+    top.sort(sortByScore);
+    ranked = [...top, ...rest];
+  }
+
+  // Stage 4 — diversity re-ranking (visibility-filters analog)
+  if (RECOMMEND_FLAGS.diversityRerank) {
+    ranked = rerankWithDiversity(ranked);
+  }
+
+  // Stage 5 — exploration slots
+  if (RECOMMEND_FLAGS.exploration && userId) {
+    const engagedAuthorIds = new Set<string>([
+      ...followingAuthorSet,
+      ...Array.from(behaviorBoostMap.keys()),
+    ]);
+    ranked = await addExplorationSlots(ranked, engagedAuthorIds);
+  }
+
+  return ranked.slice(0, MAX_FEED_POST_IDS).map((item) => item.id);
 }
 
 async function hydratePostsForPage(userId: string | null, pagePostIds: string[]): Promise<FeedPostItem[]> {
