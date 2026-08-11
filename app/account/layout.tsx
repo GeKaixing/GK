@@ -1,4 +1,5 @@
 import GoogleButton from "@/components/gekaixing/GoogleButton";
+import CookieConsent from "@/components/gekaixing/CookieConsent";
 import { LoginFooter } from "@/components/gekaixing/LoginFooter";
 import RegistrationProtocol from "@/components/gekaixing/RegistrationProtocol";
 import { Separator } from "@/components/ui/separator";
@@ -61,6 +62,8 @@ export default async function layout({ children }: { children: React.ReactNode }
 
       <LoginFooter />
       {children}
+
+      <CookieConsent />
     </div>
   );
 }

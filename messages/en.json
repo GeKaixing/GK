@@ -299,7 +299,9 @@
       "ctr": "CTR",
       "cancel": "Cancel promotion",
       "cancelConfirm": "Cancel this promotion?",
-      "cancelSuccess": "Promotion cancelled"
+      "cancelSuccess": "Promotion cancelled",
+      "cancelFailed": "Failed to cancel promotion",
+      "close": "Close"
     },
     "Help": {
       "heroTitle": "Help Center",
@@ -869,6 +871,11 @@
     "title": "Something went wrong",
     "backButton": "Back"
   },
+  "CookieConsent": {
+    "description": "This website uses cookies to ensure you get the best experience.",
+    "policyLink": "Cookies Policy",
+    "accept": "Got it"
+  },
   "Account": {
     "GoogleButton": {
       "signInWithGoogle": "Sign in with Google"
@@ -1207,91 +1214,6 @@
     "submit": "Reply",
     "loginToReply": "Please log in to reply"
   },
-  "NoirLanding": {
-    "nav": {
-      "center": "GeKaixing",
-      "login": "Log In",
-      "signup": "Sign Up"
-    },
-    "hero": {
-      "badge": "Live globally right now",
-      "titleLine1": "Connect with",
-      "titleLine2": "the world.",
-      "description": "The kinetic pulse of human conversation, refined. Join the high-fidelity ecosystem where information moves at the speed of thought.",
-      "primaryCta": "Get Started",
-      "secondaryCta": "Explore Trends"
-    },
-    "features": {
-      "titlePrefix": "Designed for the",
-      "titleNow": "Now.",
-      "description": "Experience a platform that prioritizes breathability, speed, and meaningful interaction over noise.",
-      "cards": {
-        "realtime": {
-          "title": "Real-time updates",
-          "description": "Watch the pulse of the world as it happens. Zero latency news and personal updates streamed directly to your kinetic broadsheet."
-        },
-        "global": {
-          "title": "Global conversations",
-          "description": "Break the echo chambers. Engage with diverse perspectives across every continent through high-fidelity thread architectures."
-        },
-        "trend": {
-          "title": "Trend discovery",
-          "description": "Sophisticated algorithms that surface what matters, not just what is loud. Discover the hidden currents of culture and tech."
-        }
-      }
-    },
-    "happening": {
-      "title": "WHATS HAPPENING NOW?",
-      "post1": {
-        "author": "Alex Rivers",
-        "handleTime": "@arivers - 4m",
-        "content": "The new design language for #EditorialNoir feels like reading a luxury magazine. No borders, just pure content flow. This is the future of social UX."
-      },
-      "post2": {
-        "author": "Maya Chen",
-        "handleTime": "@mchen_design - 22m",
-        "content": "San Francisco at 3 AM has a different energy.",
-        "imageAlt": "Night bridge scene"
-      }
-    },
-    "cta": {
-      "title": "Ready to change the channel?",
-      "description": "Stop scrolling and start connecting. Gekaixing is where the conversation gets deeper.",
-      "button": "Sign Up for Gekaixing"
-    },
-    "footer": {
-      "about": "About",
-      "helpCenter": "Help Center",
-      "tos": "Terms of Service",
-      "privacy": "Privacy Policy",
-      "cookies": "Cookie Policy",
-      "accessibility": "Accessibility",
-      "ads": "Ads Info",
-      "copyright": "(c) 2026 Gekaixing, Inc."
-    },
-    "faq": {
-      "title": "Frequently Asked Questions",
-      "description": "Four quick answers about setup, content, messaging, and security.",
-      "items": {
-        "1": {
-          "question": "How quickly can I launch this template?",
-          "answer": "You can run locally in minutes after setting environment variables and database credentials."
-        },
-        "2": {
-          "question": "Can I customize the social features?",
-          "answer": "Yes. Posts, replies, likes, sharing, profiles, and messaging are modular and ready to extend."
-        },
-        "3": {
-          "question": "Does it support multilingual content?",
-          "answer": "Yes. It uses next-intl, so you can add or modify locale files in the messages directory."
-        },
-        "4": {
-          "question": "What about authentication and data safety?",
-          "answer": "Supabase SSR auth and Prisma with PostgreSQL provide a reliable baseline for secure access and data consistency."
-        }
-      }
-    }
-  },
   "NoirPages": {
     "common": {
       "backToHome": "Back to Home"
@@ -1387,9 +1309,49 @@
       "hireTalent": "Hire Talent",
       "vipSupport": "VIP Support",
       "billing": "Billing",
+      "ads": "Ads",
       "settings": "Settings",
       "brand": "Gekaixing Premium Business",
       "fallbackTitle": "Dashboard"
+    },
+    "ads": {
+      "title": "Ad Management",
+      "desc": "Review and manage promoted posts.",
+      "noData": "No ads",
+      "table": {
+        "advertiser": "Advertiser",
+        "post": "Post",
+        "status": "Status",
+        "price": "Price",
+        "duration": "Duration",
+        "period": "Period",
+        "impressions": "Impressions",
+        "clicks": "Clicks",
+        "ctr": "CTR",
+        "actions": "Actions"
+      },
+      "status": {
+        "PENDING_PAYMENT": "Pending payment",
+        "PAID": "Paid · review",
+        "ACTIVE": "Active",
+        "PAUSED": "Paused",
+        "ENDED": "Ended",
+        "REJECTED": "Rejected",
+        "CANCELLED": "Cancelled"
+      },
+      "actions": {
+        "approve": "Approve",
+        "pause": "Pause",
+        "resume": "Resume",
+        "end": "End",
+        "reject": "Reject",
+        "approveConfirm": "Approve and activate this ad?",
+        "pauseConfirm": "Pause this ad?",
+        "resumeConfirm": "Resume this ad?",
+        "endConfirm": "End this ad?",
+        "rejectConfirm": "Reject this ad?",
+        "success": "Updated"
+      }
     },
     "common": {
       "anonymousUser": "Anonymous User",

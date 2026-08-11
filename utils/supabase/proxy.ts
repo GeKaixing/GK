@@ -49,7 +49,6 @@ export async function updateSession(request: NextRequest) {
   const user = data?.claims;
 
   if (
-    request.nextUrl.pathname !== "/" &&
     request.nextUrl.pathname !== "/tos" &&
     request.nextUrl.pathname !== "/cookies" &&
     request.nextUrl.pathname !== "/privacy" &&

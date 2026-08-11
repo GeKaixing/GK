@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -19,6 +20,7 @@ function hasConsentCookie(): boolean {
 }
 
 export default function CookieConsent(): React.JSX.Element | null {
+  const t = useTranslations("CookieConsent");
   const [visible, setVisible] = useState(false);
 
   useEffect((): void => {
@@ -37,15 +39,14 @@ export default function CookieConsent(): React.JSX.Element | null {
   return (
     <Card className="fixed bottom-4 left-4 right-4 z-50 border-zinc-200 bg-white text-zinc-900 shadow-lg dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 sm:left-auto sm:max-w-[420px]">
       <CardContent className="pt-6 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-        This website uses cookies to ensure you get the best experience.
-        {" "}
+        {t("description")}{" "}
         <Link href="/cookies" className="font-medium text-zinc-900 underline underline-offset-2 dark:text-zinc-100">
-          Cookies Policy
+          {t("policyLink")}
         </Link>
       </CardContent>
       <CardFooter>
         <Button className="h-9 bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200" onClick={handleAccept}>
-          Got it
+          {t("accept")}
         </Button>
       </CardFooter>
     </Card>

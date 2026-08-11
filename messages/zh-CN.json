@@ -299,7 +299,9 @@
       "ctr": "点击率",
       "cancel": "取消投放",
       "cancelConfirm": "确定取消这条投放吗？",
-      "cancelSuccess": "投放已取消"
+      "cancelSuccess": "投放已取消",
+      "cancelFailed": "取消失败，请重试",
+      "close": "关闭"
     },
     "Help": {
       "heroTitle": "帮助中心",
@@ -869,6 +871,11 @@
     "title": "发生错误",
     "backButton": "返回"
   },
+  "CookieConsent": {
+    "description": "本网站使用 Cookie 以确保您获得最佳体验。",
+    "policyLink": "Cookie 使用政策",
+    "accept": "知道了"
+  },
   "Account": {
     "GoogleButton": {
       "signInWithGoogle": "使用 Google 账号登录"
@@ -1207,91 +1214,6 @@
     "submit": "回复",
     "loginToReply": "请你登录后回复"
   },
-  "NoirLanding": {
-    "nav": {
-      "center": "GeKaixing",
-      "login": "登录",
-      "signup": "注册"
-    },
-    "hero": {
-      "badge": "构建社交 + AI",
-      "titleLine1": "一个可直接落地的",
-      "titleLine2": "社交平台模板",
-      "description": "GKX 是基于 Next.js、Prisma、Supabase 的全栈项目，内置信息流、私信、用户关系和 AI 对话能力，可直接二次开发。",
-      "primaryCta": "进入产品",
-      "secondaryCta": "查看开发日志"
-    },
-    "features": {
-      "titlePrefix": "能力矩阵",
-      "titleNow": "核心能力",
-      "description": "支持发帖、回复、点赞、分享与用户关系，持续驱动内容传播。",
-      "cards": {
-        "realtime": {
-          "title": "信息流",
-          "description": "帖子、回复、点赞、分享"
-        },
-        "global": {
-          "title": "私信系统",
-          "description": "会话与实时消息"
-        },
-        "trend": {
-          "title": "GKX",
-          "description": "流式回复与历史会话"
-        }
-      }
-    },
-    "happening": {
-      "title": "上线路径",
-      "post1": {
-        "author": "Alex Rivers",
-        "handleTime": "@arivers - 4m",
-        "content": "进入账号页后可用邮箱登录，快速进入个人主页与社交流。"
-      },
-      "post2": {
-        "author": "Maya Chen",
-        "handleTime": "@mchen_design - 22m",
-        "content": "发帖、回复、关注他人，形成可持续互动的个人内容网络。",
-        "imageAlt": "在线模块"
-      }
-    },
-    "cta": {
-      "title": "现在开始体验 GKX",
-      "description": "从社交主页到 AI 会话工作区，核心能力已全部打通，你可以直接扩展业务模块。",
-      "button": "打开产品"
-    },
-    "footer": {
-      "about": "关于",
-      "helpCenter": "帮助中心",
-      "tos": "服务条款",
-      "privacy": "隐私政策",
-      "cookies": "Cookie 使用政策",
-      "accessibility": "辅助功能",
-      "ads": "更多",
-      "copyright": "(c) 2026 Gekaixing, Inc."
-    },
-    "faq": {
-      "title": "常见问题",
-      "description": "这里整理了关于部署、功能扩展、多语言和安全能力的 4 个快速解答。",
-      "items": {
-        "1": {
-          "question": "这个模板多久可以跑起来？",
-          "answer": "配置好环境变量和数据库后，通常几分钟内就可以在本地启动。"
-        },
-        "2": {
-          "question": "社交功能可以按业务二次开发吗？",
-          "answer": "可以。帖子、回复、点赞、分享、个人主页和私信模块都可以按需扩展。"
-        },
-        "3": {
-          "question": "支持多语言吗？",
-          "answer": "支持。项目使用 next-intl，你可以直接在 messages 目录维护和新增语言文案。"
-        },
-        "4": {
-          "question": "登录和数据安全怎么保障？",
-          "answer": "默认基于 Supabase SSR 认证和 Prisma + PostgreSQL，提供稳定的鉴权与数据一致性基础。"
-        }
-      }
-    }
-  },
   "NoirPages": {
     "common": {
       "backToHome": "返回"
@@ -1387,9 +1309,49 @@
       "hireTalent": "人才招募",
       "vipSupport": "VIP 支持",
       "billing": "账单中心",
+      "ads": "广告管理",
       "settings": "系统设置",
       "brand": "Gekaixing 高级业务台",
       "fallbackTitle": "数据看板"
+    },
+    "ads": {
+      "title": "广告管理",
+      "desc": "审核与管理赞助推文。",
+      "noData": "暂无广告",
+      "table": {
+        "advertiser": "广告主",
+        "post": "帖子",
+        "status": "状态",
+        "price": "价格",
+        "duration": "时长",
+        "period": "投放期",
+        "impressions": "曝光",
+        "clicks": "点击",
+        "ctr": "点击率",
+        "actions": "操作"
+      },
+      "status": {
+        "PENDING_PAYMENT": "待付款",
+        "PAID": "已付款 · 待审核",
+        "ACTIVE": "投放中",
+        "PAUSED": "已暂停",
+        "ENDED": "已结束",
+        "REJECTED": "已拒绝",
+        "CANCELLED": "已取消"
+      },
+      "actions": {
+        "approve": "审核通过",
+        "pause": "暂停",
+        "resume": "恢复",
+        "end": "结束",
+        "reject": "拒绝",
+        "approveConfirm": "审核通过并开始投放该广告？",
+        "pauseConfirm": "暂停该广告？",
+        "resumeConfirm": "恢复该广告？",
+        "endConfirm": "结束该广告？",
+        "rejectConfirm": "拒绝该广告？",
+        "success": "已更新"
+      }
     },
     "common": {
       "anonymousUser": "匿名用户",
