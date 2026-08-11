@@ -2,6 +2,8 @@
 import { userStore } from "@/store/user";
 import { postModalStore } from "@/store/postModal";
 import { feedDotStore } from "@/store/feedDot";
+import { chatDotStore } from "@/store/chatDot";
+import { liveDotStore } from "@/store/liveDot";
 import { MessageSquare, House, LogIn, Settings, Users, Search, Sparkles, CircleEllipsis, Heart, Bookmark, Feather, User as UserIcon, ShieldCheck, Bell, BriefcaseBusiness, Radio, History } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,7 +22,7 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Sidebar({ user, mentionCount = 0, hasNewTweets = false }: { user: userResult | null, mentionCount?: number, hasNewTweets?: boolean }) {
+export default function Sidebar({ user, mentionCount = 0, hasNewTweets = false, hasUnreadChat = false, hasLive = false }: { user: userResult | null, mentionCount?: number, hasNewTweets?: boolean, hasUnreadChat?: boolean, hasLive?: boolean }) {
     const t = useTranslations("ImitationX.Sidebar");
     const router = useRouter();
     const pathname = usePathname();
@@ -32,6 +34,12 @@ export default function Sidebar({ user, mentionCount = 0, hasNewTweets = false }
     const polledNewTweets = feedDotStore((s) => s.hasNewTweets)
     const liveNewTweets = polledNewTweets ?? hasNewTweets
     const displayNewTweets = homeActive ? false : liveNewTweets
+    const chatActive = isActivePath("/gekaixing/chat")
+    const polledUnreadChat = chatDotStore((s) => s.hasUnreadChat)
+    const liveUnreadChat = polledUnreadChat ?? hasUnreadChat
+    const displayChatDot = chatActive ? false : liveUnreadChat
+    const polledLive = liveDotStore((s) => s.hasLive)
+    const displayLiveDot = polledLive ?? hasLive
     const profileActive = user?.id ? isActivePath(`/gekaixing/user/${user.id}`) : false
     const moreActive =
       ["/gekaixing/likes", "/gekaixing/bookmarks", "/gekaixing/notifications", "/gekaixing/jobs", "/gekaixing/history"].some(
@@ -91,6 +99,12 @@ export default function Sidebar({ user, mentionCount = 0, hasNewTweets = false }
                                     <span className="relative inline-flex">
                                         <Icon className="w-7 h-7" fill={item.active ? "currentColor" : "none"} />
                                         {item.href === "/gekaixing" && displayNewTweets ? (
+                                            <span aria-hidden className="absolute -top-0.5 -right-1 h-2.5 w-2.5 rounded-full bg-blue-500" />
+                                        ) : null}
+                                        {item.href === "/gekaixing/chat" && displayChatDot ? (
+                                            <span aria-hidden className="absolute -top-0.5 -right-1 h-2.5 w-2.5 rounded-full bg-blue-500" />
+                                        ) : null}
+                                        {item.href === "/gekaixing/live" && displayLiveDot ? (
                                             <span aria-hidden className="absolute -top-0.5 -right-1 h-2.5 w-2.5 rounded-full bg-blue-500" />
                                         ) : null}
                                     </span>

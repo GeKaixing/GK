@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import React from 'react'
 import { cn } from '@/lib/utils'
 import { feedDotStore } from "@/store/feedDot"
+import { chatDotStore } from "@/store/chatDot"
 
 type MobileFooterTranslations = {
     home: string
@@ -17,14 +18,18 @@ type MobileFooterTranslations = {
 export default function MobileFooter({
     labels,
     hasNewTweets = false,
+    hasUnreadChat = false,
 }: {
     labels: MobileFooterTranslations
     hasNewTweets?: boolean
+    hasUnreadChat?: boolean
 }) {
     const pathname = usePathname()
     const isHome = pathname === "/gekaixing"
     const polledNewTweets = feedDotStore((s) => s.hasNewTweets)
     const liveNewTweets = polledNewTweets ?? hasNewTweets
+    const polledUnreadChat = chatDotStore((s) => s.hasUnreadChat)
+    const liveUnreadChat = polledUnreadChat ?? hasUnreadChat
     const isExplore = pathname === "/gekaixing/explore"
     const isNotifications = pathname === "/gekaixing/notifications"
     const isChat = pathname === "/gekaixing/chat"
@@ -67,9 +72,12 @@ export default function MobileFooter({
                 <Link
                     href={'/gekaixing/chat'}
                     data-value={labels.chat}
-                    className={cn("rounded-full p-2 transition-colors", isChat && "bg-muted text-primary")}
+                    className={cn("relative rounded-full p-2 transition-colors", isChat && "bg-muted text-primary")}
                 >
                     <MessageSquare />
+                    {!isChat && liveUnreadChat ? (
+                        <span aria-hidden className="absolute top-1 right-1 h-2 w-2 rounded-full bg-blue-500" />
+                    ) : null}
                 </Link>
             </ul>
         </div>

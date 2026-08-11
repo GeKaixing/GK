@@ -1,12 +1,16 @@
 import Footer from "@/components/gekaixing/Footer";
 import ChatMain from "@/components/gekaixing/ChatMain";
+import ChatUnreadPoll from "@/components/gekaixing/ChatUnreadPoll";
 import HomeFeedPoll from "@/components/gekaixing/HomeFeedPoll";
+import LiveDotPoll from "@/components/gekaixing/LiveDotPoll";
 import MobileFooter from "@/components/gekaixing/MobileFooter";
 import MobileHeader from "@/components/gekaixing/MobileHeader";
 import RightRail from "@/components/gekaixing/RightRail";
 import Sidebar from "@/components/gekaixing/Sidebar";
 import { prisma } from "@/lib/prisma";
 import { hasNewHomeFeedTweets } from "@/lib/feed/newTweets";
+import { hasUnreadChatMessages } from "@/lib/chat/unread";
+import { hasFollowedLiveStreams } from "@/lib/live/liveNow";
 import { withTimeoutOrNull } from "@/lib/with-timeout";
 import { createClient } from "@/utils/supabase/server";
 import { Prisma } from "@/generated/prisma/client";
@@ -121,9 +125,29 @@ export default async function RootLayout({
     }
   }
 
+  let hasUnreadChat = false;
+  if (userInfo?.id) {
+    try {
+      hasUnreadChat = await hasUnreadChatMessages(userInfo.id);
+    } catch {
+      hasUnreadChat = false;
+    }
+  }
+
+  let hasLive = false;
+  if (userInfo?.id) {
+    try {
+      hasLive = await hasFollowedLiveStreams(userInfo.id);
+    } catch {
+      hasLive = false;
+    }
+  }
+
   return (
     <div className="min-h-screen">
       {userInfo?.id ? <HomeFeedPoll initialHasNewTweets={hasNewTweets} /> : null}
+      {userInfo?.id ? <ChatUnreadPoll initialHasUnreadChat={hasUnreadChat} /> : null}
+      {userInfo?.id ? <LiveDotPoll initialHasLive={hasLive} /> : null}
       <MobileHeader
         user={userInfo}
         mentionCount={mentionCount}
@@ -137,7 +161,7 @@ export default async function RootLayout({
       />
       <div className="flex justify-center w-full mx-auto min-h-screen">
         <header className="hidden sm:flex w-[88px] xl:w-[275px] shrink-0 sticky top-0 h-screen transition-all duration-200">
-          <Sidebar user={userInfo} mentionCount={mentionCount} hasNewTweets={hasNewTweets} />
+          <Sidebar user={userInfo} mentionCount={mentionCount} hasNewTweets={hasNewTweets} hasUnreadChat={hasUnreadChat} hasLive={hasLive} />
         </header>
         <ChatMain>{children}</ChatMain>
         <RightRail>
@@ -146,6 +170,7 @@ export default async function RootLayout({
       </div>
       <MobileFooter
         hasNewTweets={hasNewTweets}
+        hasUnreadChat={hasUnreadChat}
         labels={{
           home: mobileT("home"),
           search: mobileT("search"),
