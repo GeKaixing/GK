@@ -3,6 +3,7 @@ import { Radio } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { prisma } from "@/lib/prisma";
+import { createClient } from "@/utils/supabase/server";
 import ArrowLeftBack from "@/components/gekaixing/ArrowLeftBack";
 import GoLiveDialog from "@/components/gekaixing/GoLiveDialog";
 import LiveStreamCard, { type LiveStreamListItem } from "@/components/gekaixing/LiveStreamCard";
@@ -12,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-const TABS = ["live", "scheduled", "ended"] as const;
+const TABS = ["live", "following", "scheduled", "ended"] as const;
 type TabKey = (typeof TABS)[number];
 
 function getSingleValue(value: string | string[] | undefined): string {
@@ -25,7 +26,10 @@ function getSingleValue(value: string | string[] | undefined): string {
   return "";
 }
 
-const STATUS_BY_TAB: Record<TabKey, string> = {
+const STATUS_TABS = ["live", "scheduled", "ended"] as const;
+type StatusTabKey = (typeof STATUS_TABS)[number];
+
+const STATUS_BY_TAB: Record<StatusTabKey, string> = {
   live: "LIVE",
   scheduled: "SCHEDULED",
   ended: "ENDED",
@@ -52,21 +56,63 @@ type StreamRow = {
   };
 };
 
-async function queryStreams(tab: TabKey): Promise<StreamRow[]> {
+const AUTHOR_SELECT = {
+  select: {
+    id: true,
+    name: true,
+    avatar: true,
+    userid: true,
+  },
+} as const;
+
+/** 正在关注：展示所关注主播的直播，直播中 → 预告 → 已结束。 */
+async function queryFollowedStreams(userId: string | undefined): Promise<StreamRow[]> {
+  if (!userId) {
+    return [];
+  }
+
+  const follows = await prisma.follow.findMany({
+    where: { followerId: userId, status: "FOLLOWING" },
+    select: { followingId: true },
+  });
+  const followingIds = follows.map((follow) => follow.followingId);
+  if (!followingIds.length) {
+    return [];
+  }
+
+  const [live, scheduled, ended] = await Promise.all([
+    prisma.liveStream.findMany({
+      where: { authorId: { in: followingIds }, status: "LIVE" },
+      orderBy: { startedAt: "desc" },
+      take: 50,
+      include: { author: AUTHOR_SELECT },
+    }),
+    prisma.liveStream.findMany({
+      where: { authorId: { in: followingIds }, status: "SCHEDULED" },
+      orderBy: { scheduledAt: "desc" },
+      take: 50,
+      include: { author: AUTHOR_SELECT },
+    }),
+    prisma.liveStream.findMany({
+      where: { authorId: { in: followingIds }, status: "ENDED" },
+      orderBy: { endedAt: "desc" },
+      take: 50,
+      include: { author: AUTHOR_SELECT },
+    }),
+  ]);
+
+  return [...live, ...scheduled, ...ended];
+}
+
+async function queryStreams(tab: TabKey, userId: string | undefined): Promise<StreamRow[]> {
+  if (tab === "following") {
+    return queryFollowedStreams(userId);
+  }
   return prisma.liveStream.findMany({
     where: { status: STATUS_BY_TAB[tab] },
     orderBy: { startedAt: "desc" },
     take: 100,
-    include: {
-      author: {
-        select: {
-          id: true,
-          name: true,
-          avatar: true,
-          userid: true,
-        },
-      },
-    },
+    include: { author: AUTHOR_SELECT },
   });
 }
 
@@ -99,14 +145,21 @@ export default async function LivePage({
   const rawTab = getSingleValue(params.tab);
   const tab: TabKey = TABS.includes(rawTab as TabKey) ? (rawTab as TabKey) : "live";
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   let streams: Awaited<ReturnType<typeof queryStreams>> = [];
   try {
-    streams = await queryStreams(tab);
+    streams = await queryStreams(tab, user?.id);
   } catch (error) {
     // DB 瞬时连接超时等 → 优雅降级为空列表，避免整页崩溃
     console.error("Failed to load live streams:", error);
     streams = [];
   }
+
+  const isEmptyFollowing = tab === "following" && streams.length === 0;
 
   return (
     <div>
@@ -116,13 +169,13 @@ export default async function LivePage({
         {/* 顶部操作栏 */}
         <div className="flex items-center justify-between gap-2 px-4 pb-3">
           {/* tab 切换 */}
-          <div className="flex items-center gap-1">
+          <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
             {TABS.map((key) => (
               <Link
                 key={key}
                 href={key === "live" ? "/gekaixing/live" : `/gekaixing/live?tab=${key}`}
                 className={cn(
-                  "rounded-full px-4 py-1.5 text-sm font-semibold transition-colors",
+                  "shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-semibold transition-colors",
                   tab === key
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:bg-muted"
@@ -148,10 +201,23 @@ export default async function LivePage({
           <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border/80 bg-muted/20 px-6 py-16 text-center">
             <Radio className="h-10 w-10 text-muted-foreground/50" />
             <div className="space-y-1">
-              <h2 className="text-lg font-semibold">{t("emptyTitle")}</h2>
-              <p className="text-sm text-muted-foreground">{t("emptyDescription")}</p>
+              <h2 className="text-lg font-semibold">
+                {t(isEmptyFollowing ? "emptyFollowingTitle" : "emptyTitle")}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {t(isEmptyFollowing ? "emptyFollowingDescription" : "emptyDescription")}
+              </p>
             </div>
-            <GoLiveDialog />
+            {isEmptyFollowing ? (
+              <Link
+                href="/gekaixing/live"
+                className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                {t("goDiscover")}
+              </Link>
+            ) : (
+              <GoLiveDialog />
+            )}
           </div>
         )}
       </div>

@@ -191,11 +191,23 @@
       }
     },
     "Search": {
-      "placeholder": "搜索"
+      "placeholder": "搜索",
+      "clear": "清空"
     },
     "SearchPage": {
       "empty": "暂无内容",
-      "publish": "发布"
+      "publish": "发布",
+      "title": "搜索",
+      "back": "返回",
+      "heroTitle": "发现人和帖子",
+      "heroHint": "按名字、ID 或关键词搜索…",
+      "peopleSection": "人 · {count}",
+      "postsSection": "帖子 · {count}",
+      "noResultsTitle": "没有找到与“{query}”相关的内容",
+      "noResultsHint": "换个关键词，或检查拼写。",
+      "loading": "搜索中…",
+      "error": "出了点问题。",
+      "retry": "重试"
     },
     "Explore": {
       "title": "探索",
@@ -239,6 +251,11 @@
         "following": "正在关注",
         "followers": "关注者"
       }
+    },
+    "GuestBanner": {
+      "title": "游客模式",
+      "description": "你正在以游客身份浏览。登录后即可发帖、点赞、关注和私信。",
+      "login": "登录"
     },
     "FollowCard": {
       "loading": "加载中...",
@@ -773,10 +790,12 @@
       "title": "直播",
       "tab": {
         "live": "直播中",
+        "following": "正在关注",
         "scheduled": "预告",
         "ended": "已结束"
       },
       "goLive": "开始直播",
+      "goDiscover": "去发现直播",
       "startTitle": "开始一场直播",
       "startDescription": "创建直播房间后，进入观看页打开摄像头即可开播。",
       "formTitle": "标题",
@@ -807,6 +826,8 @@
       "titleRequired": "请输入直播标题",
       "emptyTitle": "这里还没有直播",
       "emptyDescription": "来做第一个开播的人，分享正在发生的事吧！",
+      "emptyFollowingTitle": "关注的主播还没有直播",
+      "emptyFollowingDescription": "去关注一些主播，他们的开播动态会第一时间出现在这里。",
       "liveBadge": "直播中",
       "scheduled": "预告",
       "ended": "已结束",
@@ -1204,8 +1225,6 @@
     "confirmCloseTitle": "确认关闭",
     "confirmCloseSaved": "内容已发布，确认关闭？",
     "confirmCloseUnsaved": "确认删除所有未发布内容吗？此操作无法恢复。",
-    "loginTitle": "请登录",
-    "loginDesc": "登录后才能发布内容。",
     "cancel": "取消",
     "confirm": "确认"
   },
@@ -1220,21 +1239,61 @@
     },
     "about": {
       "badge": "关于",
-      "title": "核心能力",
-      "description": "GKX 是基于 Next.js、Prisma、Supabase 的全栈项目，内置信息流、私信、用户关系和 AI 对话能力，可直接二次开发。",
-      "cards": {
+      "title": "为真实对话打造的社交平台。",
+      "description": "GeKaixing 是一个快速、现代的社交平台，支持发帖、私信与人际连接，并为创作者内置 AI 助手。",
+      "hero": {
+        "ctaStart": "开始使用 GeKaixing",
+        "ctaSource": "在 GitHub 查看源码"
+      },
+      "features": {
+        "label": "核心能力",
+        "title": "为表达与连接而生。",
+        "feed": {
+          "title": "信息流与发帖",
+          "description": "在快速专注的信息流中发帖、回复、点赞、分享与收藏。"
+        },
+        "chat": {
+          "title": "私信",
+          "description": "轻量简洁的一对一实时对话。"
+        },
+        "connect": {
+          "title": "关注与连接",
+          "description": "关注他人、发现新声音，构建你的社交网络。"
+        },
+        "explore": {
+          "title": "探索与搜索",
+          "description": "在平台上发现帖子、话题与人。"
+        },
+        "live": {
+          "title": "直播",
+          "description": "开启直播，与社区实时互动。"
+        },
+        "ai": {
+          "title": "GKX AI 助手",
+          "description": "在 AI 工作区提问、润色想法，并沉淀多轮会话记录。"
+        }
+      },
+      "values": {
+        "label": "为什么选择 GeKaixing",
+        "title": "产品背后的理念。",
         "who": {
-          "title": "登录并创建身份",
-          "description": "进入账号页后可用邮箱登录，快速进入个人主页与社交流。"
+          "title": "我们是谁",
+          "description": "一个专注于有意义、快速、全球化对话体验的社交平台。"
         },
         "build": {
-          "title": "发布内容并建立连接",
-          "description": "发帖、回复、关注他人，形成可持续互动的个人内容网络。"
+          "title": "我们在做什么",
+          "description": "以信息流为核心的产品，集发帖、回复、点赞、分享、私信、直播与 AI 创作辅助于一体。"
         },
         "work": {
-          "title": "使用 GKX AI 协助创作",
-          "description": "在 AI 工作区中快速提问、整理思路并沉淀多轮会话记录。"
+          "title": "我们如何工作",
+          "description": "我们重视可访问性、信任与产品清晰度，让每一次互动都真诚而自然。"
         }
+      },
+      "openSource": {
+        "label": "开源",
+        "title": "开放共建。",
+        "description": "GeKaixing 是基于 Next.js、Prisma 与 Supabase 的开源全栈项目。欢迎查看源码、提交 issue 或参与贡献。",
+        "cta": "在 GitHub 上点赞"
       }
     },
     "help": {

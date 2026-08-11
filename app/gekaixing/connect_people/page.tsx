@@ -8,7 +8,8 @@ import { useTranslations } from 'next-intl'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { userStore } from '@/store/user'
+import { userStore, isLoggedIn } from '@/store/user'
+import { useRouter } from 'next/navigation'
 
 interface UserProfile {
   id: string
@@ -25,6 +26,7 @@ type CurrentUserResponse = { success?: boolean; id?: string; userid?: string; er
 
 export default function ConnectPeoplePage(): ReactElement {
   const t = useTranslations('ImitationX.ConnectPeople')
+  const router = useRouter()
   const storeUserId = userStore((state) => state.id)
   const [activeTab, setActiveTab] = useState<TabType>('recommended')
   const [users, setUsers] = useState<UserProfile[]>([])
@@ -86,6 +88,10 @@ export default function ConnectPeoplePage(): ReactElement {
   }, [fetchUsers])
 
   const handleFollow = async (targetId: string): Promise<void> => {
+    if (!isLoggedIn()) {
+      router.push('/account')
+      return
+    }
     const targetUser = users.find((user: UserProfile) => user.id === targetId)
     if (!targetUser) {
       return

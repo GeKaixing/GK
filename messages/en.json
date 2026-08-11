@@ -191,11 +191,23 @@
       }
     },
     "Search": {
-      "placeholder": "Search"
+      "placeholder": "Search",
+      "clear": "Clear"
     },
     "SearchPage": {
       "empty": "No content yet",
-      "publish": "Post"
+      "publish": "Post",
+      "title": "Search",
+      "back": "Back",
+      "heroTitle": "Find people and posts",
+      "heroHint": "Search by name, handle, or keyword…",
+      "peopleSection": "People · {count}",
+      "postsSection": "Posts · {count}",
+      "noResultsTitle": "No results for “{query}”",
+      "noResultsHint": "Try a different keyword or check the spelling.",
+      "loading": "Searching…",
+      "error": "Something went wrong.",
+      "retry": "Retry"
     },
     "Explore": {
       "title": "Explore",
@@ -239,6 +251,11 @@
         "following": "Following",
         "followers": "Followers"
       }
+    },
+    "GuestBanner": {
+      "title": "Guest mode",
+      "description": "You're browsing as a guest. Log in to post, like, follow, and message.",
+      "login": "Log in"
     },
     "FollowCard": {
       "loading": "Loading...",
@@ -773,10 +790,12 @@
       "title": "Live",
       "tab": {
         "live": "Live now",
+        "following": "Following",
         "scheduled": "Scheduled",
         "ended": "Ended"
       },
       "goLive": "Go live",
+      "goDiscover": "Discover live streams",
       "startTitle": "Start a live stream",
       "startDescription": "Create your live room, then open the watch page to start broadcasting with your camera.",
       "formTitle": "Title",
@@ -807,6 +826,8 @@
       "titleRequired": "Title is required",
       "emptyTitle": "No live streams here yet",
       "emptyDescription": "Be the first to go live and share what's happening!",
+      "emptyFollowingTitle": "No live streams from people you follow",
+      "emptyFollowingDescription": "Follow some streamers and their live updates will show up here.",
       "liveBadge": "LIVE",
       "scheduled": "Scheduled",
       "ended": "Ended",
@@ -1204,8 +1225,6 @@
     "confirmCloseTitle": "Confirm close",
     "confirmCloseSaved": "The content is already published. Close now?",
     "confirmCloseUnsaved": "Delete all unpublished content? This cannot be undone.",
-    "loginTitle": "Please log in",
-    "loginDesc": "You need to log in before publishing.",
     "cancel": "Cancel",
     "confirm": "Confirm"
   },
@@ -1220,21 +1239,61 @@
     },
     "about": {
       "badge": "About",
-      "title": "Built for real conversation.",
-      "description": "GeKaixing connects people across interests and cultures with a fast, modern social experience.",
-      "cards": {
+      "title": "A social home for real conversation.",
+      "description": "GeKaixing is a fast, modern social platform for posting, messaging, and connecting — with AI assistance built in for creators.",
+      "hero": {
+        "ctaStart": "Start using GeKaixing",
+        "ctaSource": "View source on GitHub"
+      },
+      "features": {
+        "label": "What you can do",
+        "title": "Built for expression and connection.",
+        "feed": {
+          "title": "Feed & posts",
+          "description": "Share posts, replies, likes, shares, and bookmarks in a fast, focused feed."
+        },
+        "chat": {
+          "title": "Direct messaging",
+          "description": "Realtime one-to-one conversations with a clean, lightweight inbox."
+        },
+        "connect": {
+          "title": "Follow & connect",
+          "description": "Build your network by following people and discovering new voices."
+        },
+        "explore": {
+          "title": "Explore & search",
+          "description": "Find posts, topics, and people across the platform."
+        },
+        "live": {
+          "title": "Live streaming",
+          "description": "Go live and watch streams with the community in real time."
+        },
+        "ai": {
+          "title": "GKX AI assistant",
+          "description": "Ask questions and refine ideas in an AI workspace that remembers your conversations."
+        }
+      },
+      "values": {
+        "label": "Why GeKaixing",
+        "title": "The principles behind the product.",
         "who": {
           "title": "Who we are",
-          "description": "GeKaixing is a social platform focused on meaningful, fast, and global conversation experiences."
+          "description": "A social platform focused on meaningful, fast, and global conversation experiences."
         },
         "build": {
           "title": "What we build",
-          "description": "We build a feed-first product with replies, likes, sharing, messaging, and AI assistance for creators."
+          "description": "A feed-first product with replies, likes, sharing, messaging, live, and AI assistance for creators."
         },
         "work": {
           "title": "How we work",
           "description": "We prioritize accessibility, trust, and product clarity so every interaction feels intentional and human."
         }
+      },
+      "openSource": {
+        "label": "Open source",
+        "title": "Built in the open.",
+        "description": "GeKaixing is an open-source full-stack project built with Next.js, Prisma, and Supabase. Explore the code, report issues, or contribute.",
+        "cta": "Star on GitHub"
       }
     },
     "help": {

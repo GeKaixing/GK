@@ -9,6 +9,7 @@ import { ShieldCheck, UserCheck, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useTranslations } from "next-intl";
+import { isLoggedIn } from "@/store/user";
 
 function getID(pathname: string): string | null {
     const pathSegments = pathname.split("/").filter(Boolean);
@@ -45,6 +46,10 @@ export default function FollowCard() {
 
     // ⭐ follow/unfollow
     const handleFollow = async (targetUserId: string) => {
+        if (!isLoggedIn()) {
+            router.push("/account")
+            return
+        }
         try {
             const res = await fetch("/api/follow", {
                 method: "DELETE",

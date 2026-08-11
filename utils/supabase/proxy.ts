@@ -6,6 +6,48 @@ const hasEnvVars =
   process.env.NEXT_PUBLIC_SUPABASE_URL &&
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
+/**
+ * 公共路径 allowlist（游客免登录可访问）。
+ * 新增公开路由时，把对应路径前缀加到这里；不在列表里的路径游客会被重定向到 /account。
+ * 首页 `/gekaixing` 在 isPublicPath() 中单独精确匹配——其子路径（chat / settings /
+ * notifications / gkx / likes / bookmarks / history / ads 等）不在此列，游客仍被拦截。
+ */
+const PUBLIC_PATHS = [
+  // 原有豁免（登录页/静态页/认证回调）
+  "/tos",
+  "/cookies",
+  "/privacy",
+  "/account",
+  "/about",
+  "/help-center",
+  "/accessibility",
+  "/ads-info",
+  "/auth",
+  "/api",
+  // 游客可浏览的产品内容（首页 /gekaixing 精确匹配，见 isPublicPath）
+  "/gekaixing/user", // 个人主页
+  "/gekaixing/status", // 帖子详情
+  "/gekaixing/reply", // 回复串
+  "/gekaixing/explore",
+  "/gekaixing/search",
+  "/gekaixing/connect_people",
+  "/gekaixing/following",
+  "/gekaixing/jobs",
+  "/gekaixing/help",
+  // 公开内容站
+  "/blog",
+  "/notion",
+  "/motion",
+];
+
+function isPublicPath(pathname: string): boolean {
+  // 首页 feed：仅精确路径公开（?tab= 是查询参数，不影响匹配）；子路径须在列表中单独列出
+  if (pathname === "/gekaixing") return true;
+  return PUBLIC_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(path + "/")
+  );
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -48,23 +90,8 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  if (
-    request.nextUrl.pathname !== "/tos" &&
-    request.nextUrl.pathname !== "/cookies" &&
-    request.nextUrl.pathname !== "/privacy" &&
-    request.nextUrl.pathname !== "/account" &&
-    request.nextUrl.pathname !== "/about" &&
-    request.nextUrl.pathname !== "/account" &&
-    request.nextUrl.pathname !== "/about" &&
-    request.nextUrl.pathname !== "/help-center" &&
-    request.nextUrl.pathname !== "/accessibility" &&
-    request.nextUrl.pathname !== "/ads-info" &&
-    !request.nextUrl.pathname.startsWith("/api") &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/account") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
-    // 无用户，重定向到登录页面
+  if (!isPublicPath(request.nextUrl.pathname) && !user) {
+    // 无用户且路径不在公共 allowlist → 重定向到登录页
     const url = request.nextUrl.clone();
     url.pathname = "/account";
     return NextResponse.redirect(url);

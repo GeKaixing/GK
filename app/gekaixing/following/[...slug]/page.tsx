@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { isLoggedIn } from '@/store/user'
 
 interface UserProfile {
   id: string
@@ -55,6 +56,10 @@ export default function Page({ params }: { params: Promise<{ slug: string[] }> }
   }, [activeTab, fetchUsers])
 
   const handleFollow = async (targetId: string): Promise<void> => {
+    if (!isLoggedIn()) {
+      router.push('/account')
+      return
+    }
     const targetUser = users.find((u: UserProfile) => u.id === targetId)
     if (!targetUser) {
       return

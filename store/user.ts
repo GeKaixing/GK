@@ -25,3 +25,9 @@ export const userStore = create<Store>()((set) => ({
    followers: 0, // 被关注数
   following: 0. // 关注数
 }));
+
+/**
+ * 客户端登录信号：store 的 id 为空即游客（未登录）。
+ * 由 Sidebar 依据布局传入的 user 异步填充，游客态保持 ""。
+ */
+export const isLoggedIn = () => !!userStore.getState().id;

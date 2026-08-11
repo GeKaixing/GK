@@ -54,7 +54,7 @@ export default function GoLiveDialog() {
 
     setUploading(true);
     try {
-      const url = await uploadImageToSupabase(file);
+      const url = await uploadImageToSupabase(file, "images");
       if (!url) {
         toast.error(t("thumbnailFailed"));
         return;

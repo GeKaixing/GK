@@ -1,5 +1,6 @@
 import PostStore from "@/components/gekaixing/PostStore";
 import HomeFeedSeenTracker from "@/components/gekaixing/HomeFeedSeenTracker";
+import GuestBanner from "@/components/gekaixing/GuestBanner";
 import { getHomeFeed } from "@/lib/feed/service";
 import type { FeedPage, FeedPostItem as Post, FeedTab } from "@/lib/feed/types";
 import { prisma } from "@/lib/prisma";
@@ -173,9 +174,20 @@ export default async function Page({
   const feed = await getFeed(20, tab);
   const tf = await getTranslations("ImitationX.Feed");
 
+  // 是否游客（未登录）：用于渲染游客浏览横幅
+  let isGuest = false;
+  try {
+    const supabase = await createClient();
+    const authResult = await withTimeoutOrNull(supabase.auth.getUser(), 8000);
+    isGuest = !(authResult?.data.user?.id);
+  } catch {
+    isGuest = true;
+  }
+
   return (
     <div>
       <HomeFeedSeenTracker />
+      {isGuest ? <GuestBanner /> : null}
       <div className="sticky top-14 z-10 border-b border-border bg-background/95 backdrop-blur sm:top-0">
         <nav className="grid grid-cols-2" aria-label={tf("following")}>
           <Link

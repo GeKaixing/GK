@@ -18,9 +18,11 @@ import Link from "next/link"
 import { Post } from "@/app/gekaixing/page"
 import { postStore } from "@/store/post"
 import { replyStore } from "@/store/reply"
+import { isLoggedIn } from "@/store/user"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { getMentionHrefFromTarget, renderMentionHtml } from "@/utils/function/mention"
+import { highlightMatches } from "@/utils/function/search"
 
 function PostCard({
     id,
@@ -42,7 +44,8 @@ function PostCard({
     isSponsored,
     sponsoredBy,
     ctaUrl,
-    ctaLabel
+    ctaLabel,
+    highlightQuery
 }: Post) {
     const te = useTranslations("Dashboard.engagement")
     const tf = useTranslations("ImitationX.Feed")
@@ -65,7 +68,10 @@ function PostCard({
         setShareCount(share)
     }, [bookmarkedByMe, like, likedByMe, share, star])
 
-    const contentWithMentions = React.useMemo(() => renderMentionHtml(content), [content])
+    const contentWithMentions = React.useMemo(
+        () => (highlightQuery ? renderMentionHtml(highlightMatches(content, highlightQuery)) : renderMentionHtml(content)),
+        [content, highlightQuery]
+    )
     const hasEmbeddedMediaNode = React.useMemo(() => {
         return (
             content.includes("data-youtube-embed") ||
@@ -96,6 +102,10 @@ function PostCard({
     // =========================
     const handleLike = async () => {
         if (likeLoading) return
+        if (!isLoggedIn()) {
+            router.push("/account")
+            return
+        }
         setLikeLoading(true)
 
         const prevLiked = liked
@@ -141,6 +151,10 @@ function PostCard({
     // =========================
     const handleBookmark = async () => {
         if (bookmarkLoading) return
+        if (!isLoggedIn()) {
+            router.push("/account")
+            return
+        }
         setBookmarkLoading(true)
 
         const prevBookmarked = bookmarked
@@ -178,6 +192,15 @@ function PostCard({
     // =========================
     const handleShare = async () => {
         if (shareLoading) return
+
+        if (!isLoggedIn()) {
+            // 游客分享仅复制链接，不计数、不发请求
+            await navigator.clipboard.writeText(
+                `${window.location.origin}/gekaixing/status/${id}`
+            )
+            return
+        }
+
         setShareLoading(true)
 
         const prevShare = shareCount
@@ -401,6 +424,7 @@ function arePostCardPropsEqual(prev: Post, next: Post): boolean {
         prev.likedByMe === next.likedByMe &&
         prev.bookmarkedByMe === next.bookmarkedByMe &&
         prev.sharedByMe === next.sharedByMe &&
+        prev.highlightQuery === next.highlightQuery &&
         prev.isPremium === next.isPremium &&
         prev.isSponsored === next.isSponsored &&
         prev.sponsoredBy === next.sponsoredBy &&

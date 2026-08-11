@@ -2,7 +2,7 @@ import { createClient } from "../supabase/client"
 
 export async function uploadImageToSupabase(
     file: File,
-    bucketName: string = 'post-image',
+    bucketName: string = 'images',
     pathPrefix?: string
 ): Promise<string | null> {
     

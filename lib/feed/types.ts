@@ -19,6 +19,8 @@ export interface FeedPostItem {
   likedByMe: boolean;
   bookmarkedByMe: boolean;
   sharedByMe: boolean;
+  /** 搜索高亮词（可选，仅搜索页传入，用于给命中的文本加 <mark>）。 */
+  highlightQuery?: string;
   /** 以下为广告/赞助字段（可选，仅首页信息流中的广告帖会设置）。 */
   isSponsored?: boolean;
   /** 展示用广告主/品牌名。 */

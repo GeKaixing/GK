@@ -2,14 +2,7 @@ import fs from "fs"
 import path from "path"
 import type { MetadataRoute } from "next"
 import { prisma } from "@/lib/prisma"
-
-function getSiteUrl(): string {
-  const envUrl = process.env.NEXT_PUBLIC_URL
-  if (envUrl && envUrl.startsWith("http")) {
-    return envUrl.replace(/\/$/, "")
-  }
-  return "https://www.gekaixing.top"
-}
+import { getSiteUrl } from "@/lib/site"
 
 function getBlogSlugs(): string[] {
   try {

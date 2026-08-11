@@ -28,6 +28,7 @@ import { findUnusedUrls } from "@/utils/function/findUnusedUrls"
 import { deleteUnusedImages } from "@/utils/function/deleteUnusedImages"
 import { postStore } from "@/store/post"
 import { postModalStore } from "@/store/postModal"
+import { useRouter } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { useTranslations } from "next-intl"
 import { Loader2, Music2, Video } from "lucide-react"
@@ -63,13 +64,13 @@ interface EditPostProps {
 
 export default function EditPost({ onClose }: EditPostProps) {
   const t = useTranslations("EditPost")
+  const router = useRouter()
 
   // ⭐ 正确使用 store
   const { isOpen, closeModal, openModal } = postModalStore()
   const { poset_images } = post_imagesStore()
 
   const [isOpenAlertDialog, setIsOpenAlertDialog] = useState(false)
-  const [isLogin, setLogin] = useState(false)
   const [saved, setSaved] = useState(false)
   const [status, setStatus] = useState(false)
 
@@ -135,7 +136,7 @@ export default function EditPost({ onClose }: EditPostProps) {
 
   async function publish() {
     if (!id) {
-      setLogin(true)
+      router.push("/account")
       return
     }
     if (!hasPublishableContent(value)) {
@@ -307,9 +308,6 @@ export default function EditPost({ onClose }: EditPostProps) {
         setIsOpen={setIsOpenAlertDialog}
         closeEditPost={handleClose}
       />
-
-      {/* 登录弹窗 */}
-      <LoginDialog isOpen={isLogin} setIsOpen={setLogin} />
     </TooltipProvider>
   )
 }
@@ -350,39 +348,6 @@ function EditAlertDialog({
               closeEditPost() // ⭐ 一定会关闭 edit post
             }}
           >
-            {t("confirm")}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  )
-}
-
-function LoginDialog({
-  isOpen,
-  setIsOpen,
-}: {
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
-}) {
-  const t = useTranslations("EditPost")
-
-  return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t("loginTitle")}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {t("loginDesc")}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setIsOpen(false)}>
-            {t("cancel")}
-          </AlertDialogCancel>
-
-          <AlertDialogAction onClick={() => setIsOpen(false)}>
             {t("confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
