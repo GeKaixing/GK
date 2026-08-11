@@ -3,6 +3,7 @@
 import type React from "react";
 
 import {
+  IconAd,
   IconChartBar,
   IconDashboard,
   IconFolder,
@@ -47,6 +48,7 @@ const ICON_MAP: Record<DashboardNavKey, typeof IconDashboard> = {
   hireTalent: IconUsers,
   vipSupport: IconHelp,
   billing: IconCreditCard,
+  ads: IconAd,
   settings: IconSettings,
 };
 

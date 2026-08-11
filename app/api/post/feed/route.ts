@@ -101,7 +101,12 @@ export async function GET(req: NextRequest) {
               actionType: UserActionType.FEED_IMPRESSION,
               targetPostId: post.id,
               targetAuthorId: post.user_id,
-              metadata: JSON.stringify({ kind: "feed_impression", source: scope }),
+              metadata: JSON.stringify({
+                kind: "feed_impression",
+                source: scope,
+                ad: post.isSponsored ? true : undefined,
+                advertiserId: post.isSponsored ? post.user_id : undefined,
+              }),
             })
           )
         );

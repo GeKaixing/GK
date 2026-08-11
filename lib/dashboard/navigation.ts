@@ -6,6 +6,7 @@
   | "hireTalent"
   | "vipSupport"
   | "billing"
+  | "ads"
   | "settings";
 
 export interface DashboardNavItem {
@@ -21,6 +22,7 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
   { key: "hireTalent", href: "/dashboard/hire-talent" },
   { key: "vipSupport", href: "/dashboard/vip-support" },
   { key: "billing", href: "/dashboard/billing" },
+  { key: "ads", href: "/dashboard/ads" },
   { key: "settings", href: "/dashboard/settings" },
 ];
 
