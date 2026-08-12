@@ -118,7 +118,9 @@ async function main(): Promise<void> {
       create: { id: adminAuth.id, email: ADMIN_EMAIL, userid: `ads_admin_${RUN}`, name: "管理员测试", role: "ADMIN" },
     });
     check("创建测试用户(广告主/管理员)", !!advUser && !!adminUser);
-    cleanups.push(() => prisma.user.deleteMany({ where: { email: { in: [ADV_EMAIL, ADMIN_EMAIL] } } }));
+    cleanups.push(async () => {
+      await prisma.user.deleteMany({ where: { email: { in: [ADV_EMAIL, ADMIN_EMAIL] } } });
+    });
 
     // 2) 登录并构造 SSR cookie
     const advSession = await signIn(ADV_EMAIL, PASSWORD);
