@@ -1,4 +1,3 @@
-import { UserActionType } from "@/generated/prisma/enums";
 import {
   getActiveSponsoredAds,
   interleaveSponsoredPosts,
@@ -13,24 +12,9 @@ import {
   setFeedPageCache,
   tryAcquireFeedRecomputeLock,
 } from "@/lib/feed/cache";
+import { getFeedProvider } from "@/lib/feed/providers/registry";
 import { prisma } from "@/lib/prisma";
 import type { FeedPage, FeedPostItem, FeedTab } from "@/lib/feed/types";
-import {
-  RECOMMEND_FLAGS,
-  addExplorationSlots,
-  contentSimilarity,
-  getAuthorQualityScores,
-  getContentProfile,
-  getNetworkEngagementCandidates,
-  getSimilarUserCandidates,
-  rerankWithDiversity,
-  type RankedCandidate,
-} from "@/lib/feed/recommend";
-
-const FOLLOWING_CANDIDATE_LIMIT = 400;
-const HOT_CANDIDATE_LIMIT = 300;
-const RECENT_CANDIDATE_LIMIT = 300;
-const MAX_FEED_POST_IDS = 1000;
 
 interface FeedQueryOptions {
   userId: string | null;
@@ -39,28 +23,12 @@ interface FeedQueryOptions {
   tab?: FeedTab;
 }
 
-interface FeedCandidate {
-  id: string;
-  createdAt: Date;
-  likeCount: number;
-  replyCount: number;
-  shareCount: number;
-  authorId: string;
-  /** Author is followed by the viewer (in-network candidates). */
-  isInNetwork: boolean;
-}
-
 function normalizeLimit(rawLimit: number): number {
   if (!Number.isFinite(rawLimit)) {
     return 20;
   }
 
   return Math.min(Math.max(rawLimit, 1), 40);
-}
-
-function decayScore(createdAt: Date): number {
-  const hours = Math.max((Date.now() - createdAt.getTime()) / (1000 * 60 * 60), 0);
-  return Math.exp(-hours / 24);
 }
 
 function getStartIndex(postIds: string[], cursor: string | null): number {
@@ -78,262 +46,6 @@ function getStartIndex(postIds: string[], cursor: string | null): number {
 
 function getPageNumber(startIndex: number, limit: number): number {
   return Math.floor(startIndex / limit) + 1;
-}
-
-function sortByScore(a: RankedCandidate, b: RankedCandidate): number {
-  if (b.score !== a.score) return b.score - a.score;
-  if (b.createdAt.getTime() !== a.createdAt.getTime()) return b.createdAt.getTime() - a.createdAt.getTime();
-  return b.id.localeCompare(a.id);
-}
-
-function rankCandidates(
-  candidates: FeedCandidate[],
-  followingAuthorSet: Set<string>,
-  behaviorBoostMap: Map<string, number>,
-  authorQualityMap: Map<string, number>
-): RankedCandidate[] {
-  const scored: RankedCandidate[] = candidates.map((candidate) => {
-    const engagement =
-      Math.log1p(candidate.likeCount) * 1.5 +
-      Math.log1p(candidate.replyCount) * 1.3 +
-      Math.log1p(candidate.shareCount) * 2.0;
-    const socialBonus = followingAuthorSet.has(candidate.authorId) ? 10 : 0;
-    const behaviorBonus = behaviorBoostMap.get(candidate.authorId) ?? 0;
-    const qualityBonus = authorQualityMap.get(candidate.authorId) ?? 0;
-    const score =
-      engagement +
-      decayScore(candidate.createdAt) * 8 +
-      socialBonus +
-      behaviorBonus +
-      qualityBonus;
-
-    return { ...candidate, score };
-  });
-
-  scored.sort(sortByScore);
-  return scored;
-}
-
-function getActionWeight(actionType: UserActionType, dwellMs: number | null): number {
-  switch (actionType) {
-    case UserActionType.POST_LIKE:
-      return 3;
-    case UserActionType.POST_BOOKMARK:
-      return 4;
-    case UserActionType.POST_SHARE:
-      return 5;
-    case UserActionType.REPLY_CREATE:
-      return 4;
-    case UserActionType.POST_CLICK:
-      return 1.5;
-    case UserActionType.DWELL:
-      return Math.min((dwellMs ?? 0) / 4000, 3);
-    case UserActionType.POST_UNLIKE:
-    case UserActionType.POST_UNBOOKMARK:
-      return -2;
-    default:
-      return 0.2;
-  }
-}
-
-async function getBehaviorAuthorBoostMap(userId: string): Promise<Map<string, number>> {
-  const actions = await prisma.userAction.findMany({
-    where: {
-      userId,
-      targetAuthorId: { not: null },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 600,
-    select: {
-      targetAuthorId: true,
-      actionType: true,
-      dwellMs: true,
-    },
-  });
-
-  const boostMap = new Map<string, number>();
-  actions.forEach((action) => {
-    if (!action.targetAuthorId) {
-      return;
-    }
-
-    const current = boostMap.get(action.targetAuthorId) ?? 0;
-    boostMap.set(
-      action.targetAuthorId,
-      Math.min(current + getActionWeight(action.actionType, action.dwellMs), 15)
-    );
-  });
-
-  return boostMap;
-}
-
-async function getFollowingAuthorSet(userId: string): Promise<Set<string>> {
-  const follows = await prisma.follow.findMany({
-    where: {
-      followerId: userId,
-      status: "FOLLOWING",
-    },
-    select: {
-      followingId: true,
-    },
-  });
-
-  return new Set<string>(follows.map((item) => item.followingId));
-}
-
-async function buildCandidatePool(userId: string | null, tab: FeedTab = "foryou"): Promise<string[]> {
-  // Following tab: pure reverse-chronological posts from followed authors (X behavior).
-  if (tab === "following") {
-    if (!userId) {
-      return [];
-    }
-
-    const followingIds = Array.from(await getFollowingAuthorSet(userId));
-    if (!followingIds.length) {
-      return [];
-    }
-
-    const rows = await prisma.post.findMany({
-      where: {
-        parentId: null,
-        authorId: { in: followingIds },
-      },
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-      take: FOLLOWING_CANDIDATE_LIMIT,
-      select: { id: true },
-    });
-
-    return rows.map((row) => row.id);
-  }
-
-  const followingAuthorSet = userId ? await getFollowingAuthorSet(userId) : new Set<string>();
-  const followingIds = Array.from(followingAuthorSet);
-  const behaviorBoostMap = userId ? await getBehaviorAuthorBoostMap(userId) : new Map<string, number>();
-
-  const [followingPosts, hotPosts, recentPosts] = await Promise.all([
-    followingIds.length
-      ? prisma.post.findMany({
-          where: {
-            parentId: null,
-            authorId: { in: followingIds },
-          },
-          orderBy: [{ createdAt: "desc" }],
-          take: FOLLOWING_CANDIDATE_LIMIT,
-          select: {
-            id: true,
-            createdAt: true,
-            likeCount: true,
-            replyCount: true,
-            shareCount: true,
-            authorId: true,
-          },
-        })
-      : Promise.resolve([]),
-    prisma.post.findMany({
-      where: { parentId: null },
-      orderBy: [{ likeCount: "desc" }, { replyCount: "desc" }, { shareCount: "desc" }, { createdAt: "desc" }],
-      take: HOT_CANDIDATE_LIMIT,
-      select: {
-        id: true,
-        createdAt: true,
-        likeCount: true,
-        replyCount: true,
-        shareCount: true,
-        authorId: true,
-      },
-    }),
-    prisma.post.findMany({
-      where: { parentId: null },
-      orderBy: [{ createdAt: "desc" }],
-      take: RECENT_CANDIDATE_LIMIT,
-      select: {
-        id: true,
-        createdAt: true,
-        likeCount: true,
-        replyCount: true,
-        shareCount: true,
-        authorId: true,
-      },
-    }),
-  ]);
-
-  const deduped = new Map<string, FeedCandidate>();
-  const addCandidate = (
-    rows: Array<Pick<FeedCandidate, "id" | "createdAt" | "likeCount" | "replyCount" | "shareCount" | "authorId">>,
-    isInNetwork: boolean | ((row: Pick<FeedCandidate, "id" | "authorId">) => boolean)
-  ) => {
-    for (const row of rows) {
-      deduped.set(row.id, {
-        ...row,
-        isInNetwork: typeof isInNetwork === "function" ? isInNetwork(row) : isInNetwork,
-      });
-    }
-  };
-
-  addCandidate(followingPosts, true);
-  addCandidate(hotPosts, (row) => followingAuthorSet.has(row.authorId));
-  addCandidate(recentPosts, (row) => followingAuthorSet.has(row.authorId));
-
-  // Stage 1 — out-of-network candidates (only meaningful for an authed user)
-  if (userId && followingIds.length) {
-    if (RECOMMEND_FLAGS.networkEngagement) {
-      addCandidate(
-        await getNetworkEngagementCandidates(followingIds, followingAuthorSet),
-        false
-      );
-    }
-    if (RECOMMEND_FLAGS.similarUsers) {
-      addCandidate(
-        await getSimilarUserCandidates(userId, followingIds, followingAuthorSet),
-        false
-      );
-    }
-  }
-
-  const candidates = Array.from(deduped.values());
-
-  // Stage 3 — author quality (tweepcred analog)
-  const authorQualityMap = RECOMMEND_FLAGS.authorQuality
-    ? await getAuthorQualityScores(Array.from(new Set(candidates.map((c) => c.authorId))))
-    : new Map<string, number>();
-
-  let ranked = rankCandidates(candidates, followingAuthorSet, behaviorBoostMap, authorQualityMap);
-
-  // Stage 2 — content personalization (representation-scorer analog)
-  let contentProfile: Map<string, number> | null = null;
-  if (RECOMMEND_FLAGS.contentPersonalization && userId) {
-    contentProfile = await getContentProfile(userId);
-  }
-  if (contentProfile && contentProfile.size > 0 && ranked.length > 0) {
-    const top = ranked.slice(0, 400);
-    const rest = ranked.slice(400);
-    const contentRows = await prisma.post.findMany({
-      where: { id: { in: top.map((c) => c.id) } },
-      select: { id: true, content: true },
-    });
-    const contentById = new Map(contentRows.map((row) => [row.id, row.content]));
-    for (const candidate of top) {
-      candidate.score += contentSimilarity(contentProfile, contentById.get(candidate.id) ?? "");
-    }
-    top.sort(sortByScore);
-    ranked = [...top, ...rest];
-  }
-
-  // Stage 4 — diversity re-ranking (visibility-filters analog)
-  if (RECOMMEND_FLAGS.diversityRerank) {
-    ranked = rerankWithDiversity(ranked);
-  }
-
-  // Stage 5 — exploration slots
-  if (RECOMMEND_FLAGS.exploration && userId) {
-    const engagedAuthorIds = new Set<string>([
-      ...followingAuthorSet,
-      ...Array.from(behaviorBoostMap.keys()),
-    ]);
-    ranked = await addExplorationSlots(ranked, engagedAuthorIds);
-  }
-
-  return ranked.slice(0, MAX_FEED_POST_IDS).map((item) => item.id);
 }
 
 async function hydratePostsForPage(userId: string | null, pagePostIds: string[]): Promise<FeedPostItem[]> {
@@ -427,11 +139,12 @@ export async function recomputeAndCacheHomeFeed(userId: string | null, tab: Feed
     if (existing) {
       return existing.postIds;
     }
-    return buildCandidatePool(userId, tab);
+    // OSP RFC-014: ranking is delegated to the registered feed provider.
+    return getFeedProvider(tab).compute(userId);
   }
 
   try {
-    const rankedPostIds = await buildCandidatePool(userId, tab);
+    const rankedPostIds = await getFeedProvider(tab).compute(userId);
     await setFeedCache(
       userId,
       {

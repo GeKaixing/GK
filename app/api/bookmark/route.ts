@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { UserActionType } from "@/generated/prisma/enums";
+import { UserActionType, OspEventType } from "@/generated/prisma/enums";
 import { logUserAction } from "@/lib/feed/actions";
 import { invalidateUserHomeFeed } from "@/lib/feed/service";
+import { OBJECT_TYPES, recordUserOspEvent } from "@/lib/osp";
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
@@ -56,6 +57,11 @@ export async function POST(request: Request) {
       actionType: UserActionType.POST_BOOKMARK,
       targetPostId: postId,
       targetAuthorId: targetPost.authorId,
+    });
+    await recordUserOspEvent(user.id, {
+      eventType: OspEventType.POST_BOOKMARKED,
+      objectType: OBJECT_TYPES.POST,
+      objectId: postId,
     });
 
     return NextResponse.json({
@@ -120,6 +126,11 @@ export async function DELETE(request: Request) {
       actionType: UserActionType.POST_UNBOOKMARK,
       targetPostId: postId,
       targetAuthorId: targetPost?.authorId ?? null,
+    });
+    await recordUserOspEvent(user.id, {
+      eventType: OspEventType.POST_UNBOOKMARKED,
+      objectType: OBJECT_TYPES.POST,
+      objectId: postId,
     });
 
     return NextResponse.json({

@@ -7,6 +7,9 @@ import { googleGenerativeAIApi } from "@earendil-works/pi-ai/api/google-generati
 import { openAICompletionsApi } from "@earendil-works/pi-ai/api/openai-completions.lazy";
 import { openAIResponsesApi } from "@earendil-works/pi-ai/api/openai-responses.lazy";
 
+import { CapabilityType } from "@/generated/prisma/enums";
+import { checkCapability } from "@/lib/osp";
+
 import { fetchPageContent, searchWeb } from "./search";
 import type { AiProvider, AiUserConfig } from "./types";
 
@@ -97,7 +100,18 @@ const fetchUrlSchema = Type.Object({
 });
 
 /** webSearch / fetchUrl as Pi AgentTools, backed by lib/ai/search.ts. */
-export function createPiTools(): AgentTool[] {
+export function createPiTools(options: { actorId?: string } = {}): AgentTool[] {
+  const { actorId } = options;
+
+  // OSP RFC-015: gate the AI's tools by the acting actor's capabilities. The
+  // GKX AI is a service Actor (AI_SERVICE_ACTOR_ID) seeded with SEARCH by the
+  // OSP bootstrap; if the capability is missing the tool is denied gracefully.
+  const canSearch = async (): Promise<boolean> => {
+    if (!actorId) return true;
+    return checkCapability(actorId, CapabilityType.SEARCH);
+  };
+  const DENIED_TEXT = "Search capability not granted. Contact the Country to grant the SEARCH capability.";
+
   const webSearch: AgentTool<typeof webSearchSchema> = {
     name: "webSearch",
     label: "Web search",
@@ -106,6 +120,9 @@ export function createPiTools(): AgentTool[] {
       "Use when the user asks about recent events, live data, or anything that may postdate your training knowledge.",
     parameters: webSearchSchema,
     execute: async (_toolCallId, params) => {
+      if (!(await canSearch())) {
+        return { content: [{ type: "text", text: DENIED_TEXT }], details: {} };
+      }
       const results = await searchWeb(params.query);
       const text =
         results.length === 0
@@ -128,6 +145,9 @@ export function createPiTools(): AgentTool[] {
       "Use to read a full article or page when a search snippet is insufficient.",
     parameters: fetchUrlSchema,
     execute: async (_toolCallId, params) => {
+      if (!(await canSearch())) {
+        return { content: [{ type: "text", text: DENIED_TEXT }], details: {} };
+      }
       const text = await fetchPageContent(params.url);
       return { content: [{ type: "text", text }], details: {} };
     },
@@ -139,7 +159,7 @@ export function createPiTools(): AgentTool[] {
 /** A ready-to-prompt Agent bound to the user's provider/model and tools. */
 export function createPiAgent(
   config: AiUserConfig,
-  options: { initialMessages?: AgentMessage[] } = {}
+  options: { initialMessages?: AgentMessage[]; actorId?: string } = {}
 ) {
   const models = createModels();
   models.setProvider(buildPiProvider(config));
@@ -154,7 +174,7 @@ export function createPiAgent(
     initialState: {
       systemPrompt: PI_SYSTEM_PROMPT,
       model,
-      tools: createPiTools(),
+      tools: createPiTools({ actorId: options.actorId }),
       messages: options.initialMessages ?? [],
     },
     streamFn: models.streamSimple.bind(models),

@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { prisma } from "@/lib/prisma";
-import { UserActionType } from "@/generated/prisma/enums";
+import { UserActionType, OspEventType } from "@/generated/prisma/enums";
 import { logUserAction } from "@/lib/feed/actions";
 import { invalidateUserHomeFeed } from "@/lib/feed/service";
+import { recordUserOspEvent } from "@/lib/osp";
 
 
 // ===== 关注 =====
@@ -40,6 +41,10 @@ export async function POST(req: Request) {
       actionType: UserActionType.FOLLOW,
       targetAuthorId: targetId,
     });
+    await recordUserOspEvent(user.id, {
+      eventType: OspEventType.FOLLOWED,
+      payload: { targetActor: targetId },
+    });
 
     return NextResponse.json({ success: true });
   } catch (err) {
@@ -73,6 +78,10 @@ export async function DELETE(req: Request) {
       userId: user.id,
       actionType: UserActionType.UNFOLLOW,
       targetAuthorId: targetId,
+    });
+    await recordUserOspEvent(user.id, {
+      eventType: OspEventType.UNFOLLOWED,
+      payload: { targetActor: targetId },
     });
 
     return NextResponse.json({ success: true });

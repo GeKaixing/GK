@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { OspEventType } from "@/generated/prisma/enums";
+import { OBJECT_TYPES, recordUserOspEvent } from "@/lib/osp";
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
@@ -174,6 +176,20 @@ export async function POST(request: Request) {
       });
 
       return newMessage;
+    });
+
+    // OSP RFC-006/008: a signed existence record for the message. NEVER content —
+    // private data stays out of the ledger; only the sender, conversation and
+    // participant ids are recorded (for future federation delivery routing).
+    const participants = await prisma.conversationParticipant.findMany({
+      where: { conversationId },
+      select: { userId: true },
+    });
+    await recordUserOspEvent(user.id, {
+      eventType: OspEventType.MESSAGE_SENT,
+      objectType: OBJECT_TYPES.MESSAGE,
+      objectId: message.id,
+      payload: { conversationId, participants: participants.map((p) => p.userId) },
     });
 
     return NextResponse.json({

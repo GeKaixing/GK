@@ -118,3 +118,30 @@ export type LiveFeedback = Prisma.LiveFeedbackModel
  * 
  */
 export type SponsoredAd = Prisma.SponsoredAdModel
+/**
+ * Model Country
+ * OSP RFC-002: an independent server/network realm. Gekaixing is Country "gkx".
+ */
+export type Country = Prisma.CountryModel
+/**
+ * Model Actor
+ * OSP RFC-004: the universal participant primitive. Human or service actor.
+ * Actor survives User deletion (userId is SetNull) so the signed ledger stays.
+ */
+export type Actor = Prisma.ActorModel
+/**
+ * Model Passport
+ * OSP RFC-003: universal passport issued by the Country, signed with the Country key.
+ */
+export type Passport = Prisma.PassportModel
+/**
+ * Model OspEvent
+ * OSP RFC-006: append-only, signed event ledger. Immutable (no cascade from Actor).
+ * objectId is a protocol string, deliberately NOT an FK: the ledger survives object deletion.
+ */
+export type OspEvent = Prisma.OspEventModel
+/**
+ * Model Capability
+ * OSP RFC-015: what an Actor is allowed to do, separate from identity.
+ */
+export type Capability = Prisma.CapabilityModel

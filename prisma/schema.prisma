@@ -42,6 +42,7 @@ model User {
   liveStreams              LiveStream[]
   liveChatMessages         LiveChatMessage[]
   liveFeedback             LiveFeedback[]
+  actor                    Actor?                  @relation("UserActor")
 }
 
 /// ///////////////////////////////////////////////////
@@ -73,6 +74,7 @@ model Post {
   starCount  Int          @default(0)
   videoUrl   String?
   audioUrl   String?
+  visibility PostVisibility @default(PUBLIC) // RFC-005; schema-only in 3.0.0, enforcement deferred
   bookmarks  Bookmark[]
   likes      Like[]
   author     User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
@@ -323,6 +325,65 @@ enum AdStatus {
   CANCELLED       // 广告主取消（未付款时）
 }
 
+// ============ OSP (Open Social Protocol) — RFC-001..016 ============
+
+enum CountryStatus {
+  ACTIVE
+  SUSPENDED
+  DESTROYED
+}
+
+enum PassportStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+  SUSPENDED
+  MIGRATED
+}
+
+enum CapabilityType {
+  CREATE_POST
+  SEARCH
+  MODERATE
+  TRANSLATE
+  GENERATE_MEDIA
+  EXECUTE_TASK
+  ACCESS_MEMORY
+}
+
+enum CapabilityState {
+  GRANTED
+  REVOKED
+  EXPIRED
+}
+
+enum PostVisibility {
+  PUBLIC
+  FOLLOWERS
+  PRIVATE
+}
+
+enum OspEventType {
+  COUNTRY_BOOTSTRAPPED
+  ACTOR_CREATED
+  PASSPORT_ISSUED
+  PASSPORT_REVOKED
+  POST_CREATED
+  POST_DELETED
+  REPLY_CREATED
+  POST_LIKED
+  POST_UNLIKED
+  POST_BOOKMARKED
+  POST_UNBOOKMARKED
+  POST_SHARED
+  FOLLOWED
+  UNFOLLOWED
+  MESSAGE_SENT
+  CAPABILITY_GRANTED
+  CAPABILITY_REVOKED
+  ACCOUNT_DELETED
+}
+
 model LiveStream {
   id           String   @id @default(cuid())
   authorId     String
@@ -396,4 +457,98 @@ model SponsoredAd {
 
   @@index([status, endsAt])
   @@index([advertiserId])
+}
+
+// ============ OSP models — the protocol layer ============
+
+/// OSP RFC-002: an independent server/network realm. Gekaixing is Country "gkx".
+model Country {
+  id                 String        @id // stable slug: "gkx"
+  name               String
+  publicKey          String // base64 Ed25519 pubkey (derived from OSP_COUNTRY_SECRET)
+  federationEndpoint String?
+  policy             String?       @db.Text // JSON string (country policy set)
+  status             CountryStatus @default(ACTIVE)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  passports          Passport[]
+  events             OspEvent[]
+}
+
+/// OSP RFC-004: the universal participant primitive. Human or service actor.
+/// Actor survives User deletion (userId is SetNull) so the signed ledger stays.
+model Actor {
+  id           String        @id @default(uuid())
+  userId       String?       @unique // 1:1 human actor -> User; SetNull on user delete
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User?         @relation("UserActor", fields: [userId], references: [id], onDelete: SetNull)
+  passports    Passport[]
+  events       OspEvent[]
+  capabilities Capability[]
+}
+
+/// OSP RFC-003: universal passport issued by the Country, signed with the Country key.
+model Passport {
+  id               String         @id @default(uuid())
+  countryId        String
+  actorId          String
+  publicKey        String // base64 Ed25519 actor pubkey
+  issuedAt         DateTime       @default(now())
+  expiresAt        DateTime?
+  status           PassportStatus @default(ACTIVE)
+  signature        String // base64 country signature over the canonical passport payload
+  migrationHistory String?        @db.Text // JSON array string (RFC-003)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  country          Country        @relation(fields: [countryId], references: [id])
+  actor            Actor          @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@unique([countryId, actorId])
+  @@index([actorId])
+  @@index([status])
+}
+
+/// OSP RFC-006: append-only, signed event ledger. Immutable (no cascade from Actor).
+/// objectId is a protocol string, deliberately NOT an FK: the ledger survives object deletion.
+model OspEvent {
+  id         String       @id @default(cuid())
+  eventId    String       @unique @default(cuid())
+  countryId  String
+  actorId    String
+  eventType  OspEventType
+  objectType String?
+  objectId   String?
+  seq        Int
+  prevHash   String?
+  hash       String // sha256 of the canonical payload
+  signature  String // base64 country signature
+  payload    String?      @db.Text // canonical JSON (replay/verify)
+  globalSeq  BigInt       @unique @default(autoincrement())
+  createdAt  DateTime     @default(now())
+  country    Country      @relation(fields: [countryId], references: [id])
+  actor      Actor        @relation(fields: [actorId], references: [id]) // no cascade: ledger is immutable
+
+  @@unique([actorId, seq])
+  @@index([actorId, createdAt])
+  @@index([eventType])
+}
+
+/// OSP RFC-015: what an Actor is allowed to do, separate from identity.
+model Capability {
+  id             String          @id @default(uuid())
+  actorId        String
+  capabilityType CapabilityType
+  state          CapabilityState @default(GRANTED)
+  scope          String?         @db.Text // JSON string: resource/time/country-policy limits
+  grantedBy      String? // actorId or "country"
+  grantedAt      DateTime        @default(now())
+  expiresAt      DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  actor          Actor           @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@unique([actorId, capabilityType])
+  @@index([actorId])
 }

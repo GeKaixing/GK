@@ -54,6 +54,7 @@ export type PostMinAggregateOutputType = {
   starCount: number | null
   videoUrl: string | null
   audioUrl: string | null
+  visibility: $Enums.PostVisibility | null
 }
 
 export type PostMaxAggregateOutputType = {
@@ -70,6 +71,7 @@ export type PostMaxAggregateOutputType = {
   starCount: number | null
   videoUrl: string | null
   audioUrl: string | null
+  visibility: $Enums.PostVisibility | null
 }
 
 export type PostCountAggregateOutputType = {
@@ -86,6 +88,7 @@ export type PostCountAggregateOutputType = {
   starCount: number
   videoUrl: number
   audioUrl: number
+  visibility: number
   _all: number
 }
 
@@ -118,6 +121,7 @@ export type PostMinAggregateInputType = {
   starCount?: true
   videoUrl?: true
   audioUrl?: true
+  visibility?: true
 }
 
 export type PostMaxAggregateInputType = {
@@ -134,6 +138,7 @@ export type PostMaxAggregateInputType = {
   starCount?: true
   videoUrl?: true
   audioUrl?: true
+  visibility?: true
 }
 
 export type PostCountAggregateInputType = {
@@ -150,6 +155,7 @@ export type PostCountAggregateInputType = {
   starCount?: true
   videoUrl?: true
   audioUrl?: true
+  visibility?: true
   _all?: true
 }
 
@@ -253,6 +259,7 @@ export type PostGroupByOutputType = {
   starCount: number
   videoUrl: string | null
   audioUrl: string | null
+  visibility: $Enums.PostVisibility
   _count: PostCountAggregateOutputType | null
   _avg: PostAvgAggregateOutputType | null
   _sum: PostSumAggregateOutputType | null
@@ -292,6 +299,7 @@ export type PostWhereInput = {
   starCount?: Prisma.IntFilter<"Post"> | number
   videoUrl?: Prisma.StringNullableFilter<"Post"> | string | null
   audioUrl?: Prisma.StringNullableFilter<"Post"> | string | null
+  visibility?: Prisma.EnumPostVisibilityFilter<"Post"> | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkListRelationFilter
   likes?: Prisma.LikeListRelationFilter
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -316,6 +324,7 @@ export type PostOrderByWithRelationInput = {
   starCount?: Prisma.SortOrder
   videoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   audioUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  visibility?: Prisma.SortOrder
   bookmarks?: Prisma.BookmarkOrderByRelationAggregateInput
   likes?: Prisma.LikeOrderByRelationAggregateInput
   author?: Prisma.UserOrderByWithRelationInput
@@ -343,6 +352,7 @@ export type PostWhereUniqueInput = Prisma.AtLeast<{
   starCount?: Prisma.IntFilter<"Post"> | number
   videoUrl?: Prisma.StringNullableFilter<"Post"> | string | null
   audioUrl?: Prisma.StringNullableFilter<"Post"> | string | null
+  visibility?: Prisma.EnumPostVisibilityFilter<"Post"> | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkListRelationFilter
   likes?: Prisma.LikeListRelationFilter
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -367,6 +377,7 @@ export type PostOrderByWithAggregationInput = {
   starCount?: Prisma.SortOrder
   videoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   audioUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  visibility?: Prisma.SortOrder
   _count?: Prisma.PostCountOrderByAggregateInput
   _avg?: Prisma.PostAvgOrderByAggregateInput
   _max?: Prisma.PostMaxOrderByAggregateInput
@@ -391,6 +402,7 @@ export type PostScalarWhereWithAggregatesInput = {
   starCount?: Prisma.IntWithAggregatesFilter<"Post"> | number
   videoUrl?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
   audioUrl?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
+  visibility?: Prisma.EnumPostVisibilityWithAggregatesFilter<"Post"> | $Enums.PostVisibility
 }
 
 export type PostCreateInput = {
@@ -405,6 +417,7 @@ export type PostCreateInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeCreateNestedManyWithoutPostInput
   author: Prisma.UserCreateNestedOneWithoutPostsInput
@@ -429,6 +442,7 @@ export type PostUncheckedCreateInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
@@ -449,6 +463,7 @@ export type PostUpdateInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
@@ -473,6 +488,7 @@ export type PostUncheckedUpdateInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
@@ -495,6 +511,7 @@ export type PostCreateManyInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
 }
 
 export type PostUpdateManyMutationInput = {
@@ -509,6 +526,7 @@ export type PostUpdateManyMutationInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
 }
 
 export type PostUncheckedUpdateManyInput = {
@@ -525,6 +543,7 @@ export type PostUncheckedUpdateManyInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
 }
 
 export type PostListRelationFilter = {
@@ -556,6 +575,7 @@ export type PostCountOrderByAggregateInput = {
   starCount?: Prisma.SortOrder
   videoUrl?: Prisma.SortOrder
   audioUrl?: Prisma.SortOrder
+  visibility?: Prisma.SortOrder
 }
 
 export type PostAvgOrderByAggregateInput = {
@@ -579,6 +599,7 @@ export type PostMaxOrderByAggregateInput = {
   starCount?: Prisma.SortOrder
   videoUrl?: Prisma.SortOrder
   audioUrl?: Prisma.SortOrder
+  visibility?: Prisma.SortOrder
 }
 
 export type PostMinOrderByAggregateInput = {
@@ -595,6 +616,7 @@ export type PostMinOrderByAggregateInput = {
   starCount?: Prisma.SortOrder
   videoUrl?: Prisma.SortOrder
   audioUrl?: Prisma.SortOrder
+  visibility?: Prisma.SortOrder
 }
 
 export type PostSumOrderByAggregateInput = {
@@ -677,6 +699,10 @@ export type IntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type EnumPostVisibilityFieldUpdateOperationsInput = {
+  set?: $Enums.PostVisibility
 }
 
 export type PostUpdateOneWithoutRepliesNestedInput = {
@@ -801,6 +827,7 @@ export type PostCreateWithoutAuthorInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeCreateNestedManyWithoutPostInput
   parent?: Prisma.PostCreateNestedOneWithoutRepliesInput
@@ -823,6 +850,7 @@ export type PostUncheckedCreateWithoutAuthorInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
@@ -874,6 +902,7 @@ export type PostScalarWhereInput = {
   starCount?: Prisma.IntFilter<"Post"> | number
   videoUrl?: Prisma.StringNullableFilter<"Post"> | string | null
   audioUrl?: Prisma.StringNullableFilter<"Post"> | string | null
+  visibility?: Prisma.EnumPostVisibilityFilter<"Post"> | $Enums.PostVisibility
 }
 
 export type PostCreateWithoutRepliesInput = {
@@ -888,6 +917,7 @@ export type PostCreateWithoutRepliesInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeCreateNestedManyWithoutPostInput
   author: Prisma.UserCreateNestedOneWithoutPostsInput
@@ -911,6 +941,7 @@ export type PostUncheckedCreateWithoutRepliesInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutPostInput
@@ -935,6 +966,7 @@ export type PostCreateWithoutParentInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeCreateNestedManyWithoutPostInput
   author: Prisma.UserCreateNestedOneWithoutPostsInput
@@ -957,6 +989,7 @@ export type PostUncheckedCreateWithoutParentInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
@@ -998,6 +1031,7 @@ export type PostUpdateWithoutRepliesInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
@@ -1021,6 +1055,7 @@ export type PostUncheckedUpdateWithoutRepliesInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutPostNestedInput
@@ -1056,6 +1091,7 @@ export type PostCreateWithoutLikesInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
   author: Prisma.UserCreateNestedOneWithoutPostsInput
   parent?: Prisma.PostCreateNestedOneWithoutRepliesInput
@@ -1079,6 +1115,7 @@ export type PostUncheckedCreateWithoutLikesInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutPostInput
@@ -1114,6 +1151,7 @@ export type PostUpdateWithoutLikesInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
   parent?: Prisma.PostUpdateOneWithoutRepliesNestedInput
@@ -1137,6 +1175,7 @@ export type PostUncheckedUpdateWithoutLikesInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutPostNestedInput
@@ -1156,6 +1195,7 @@ export type PostCreateWithoutBookmarksInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   likes?: Prisma.LikeCreateNestedManyWithoutPostInput
   author: Prisma.UserCreateNestedOneWithoutPostsInput
   parent?: Prisma.PostCreateNestedOneWithoutRepliesInput
@@ -1179,6 +1219,7 @@ export type PostUncheckedCreateWithoutBookmarksInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutPostInput
@@ -1214,6 +1255,7 @@ export type PostUpdateWithoutBookmarksInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
   parent?: Prisma.PostUpdateOneWithoutRepliesNestedInput
@@ -1237,6 +1279,7 @@ export type PostUncheckedUpdateWithoutBookmarksInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutPostNestedInput
@@ -1256,6 +1299,7 @@ export type PostCreateWithoutSharesInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeCreateNestedManyWithoutPostInput
   author: Prisma.UserCreateNestedOneWithoutPostsInput
@@ -1279,6 +1323,7 @@ export type PostUncheckedCreateWithoutSharesInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
@@ -1314,6 +1359,7 @@ export type PostUpdateWithoutSharesInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
@@ -1337,6 +1383,7 @@ export type PostUncheckedUpdateWithoutSharesInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
@@ -1356,6 +1403,7 @@ export type PostCreateWithoutActionsInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeCreateNestedManyWithoutPostInput
   author: Prisma.UserCreateNestedOneWithoutPostsInput
@@ -1379,6 +1427,7 @@ export type PostUncheckedCreateWithoutActionsInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
@@ -1414,6 +1463,7 @@ export type PostUpdateWithoutActionsInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
@@ -1437,6 +1487,7 @@ export type PostUncheckedUpdateWithoutActionsInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
@@ -1456,6 +1507,7 @@ export type PostCreateWithoutSponsoredAdInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeCreateNestedManyWithoutPostInput
   author: Prisma.UserCreateNestedOneWithoutPostsInput
@@ -1479,6 +1531,7 @@ export type PostUncheckedCreateWithoutSponsoredAdInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutPostInput
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutPostInput
   replies?: Prisma.PostUncheckedCreateNestedManyWithoutParentInput
@@ -1514,6 +1567,7 @@ export type PostUpdateWithoutSponsoredAdInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
@@ -1537,6 +1591,7 @@ export type PostUncheckedUpdateWithoutSponsoredAdInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
@@ -1557,6 +1612,7 @@ export type PostCreateManyAuthorInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
 }
 
 export type PostUpdateWithoutAuthorInput = {
@@ -1571,6 +1627,7 @@ export type PostUpdateWithoutAuthorInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
   parent?: Prisma.PostUpdateOneWithoutRepliesNestedInput
@@ -1593,6 +1650,7 @@ export type PostUncheckedUpdateWithoutAuthorInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
@@ -1614,6 +1672,7 @@ export type PostUncheckedUpdateManyWithoutAuthorInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
 }
 
 export type PostCreateManyParentInput = {
@@ -1629,6 +1688,7 @@ export type PostCreateManyParentInput = {
   starCount?: number
   videoUrl?: string | null
   audioUrl?: string | null
+  visibility?: $Enums.PostVisibility
 }
 
 export type PostUpdateWithoutParentInput = {
@@ -1643,6 +1703,7 @@ export type PostUpdateWithoutParentInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUpdateManyWithoutPostNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
@@ -1665,6 +1726,7 @@ export type PostUncheckedUpdateWithoutParentInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutPostNestedInput
   likes?: Prisma.LikeUncheckedUpdateManyWithoutPostNestedInput
   replies?: Prisma.PostUncheckedUpdateManyWithoutParentNestedInput
@@ -1686,6 +1748,7 @@ export type PostUncheckedUpdateManyWithoutParentInput = {
   starCount?: Prisma.IntFieldUpdateOperationsInput | number
   videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   audioUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  visibility?: Prisma.EnumPostVisibilityFieldUpdateOperationsInput | $Enums.PostVisibility
 }
 
 
@@ -1769,6 +1832,7 @@ export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   starCount?: boolean
   videoUrl?: boolean
   audioUrl?: boolean
+  visibility?: boolean
   bookmarks?: boolean | Prisma.Post$bookmarksArgs<ExtArgs>
   likes?: boolean | Prisma.Post$likesArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1794,6 +1858,7 @@ export type PostSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   starCount?: boolean
   videoUrl?: boolean
   audioUrl?: boolean
+  visibility?: boolean
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   parent?: boolean | Prisma.Post$parentArgs<ExtArgs>
 }, ExtArgs["result"]["post"]>
@@ -1812,6 +1877,7 @@ export type PostSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   starCount?: boolean
   videoUrl?: boolean
   audioUrl?: boolean
+  visibility?: boolean
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   parent?: boolean | Prisma.Post$parentArgs<ExtArgs>
 }, ExtArgs["result"]["post"]>
@@ -1830,9 +1896,10 @@ export type PostSelectScalar = {
   starCount?: boolean
   videoUrl?: boolean
   audioUrl?: boolean
+  visibility?: boolean
 }
 
-export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "content" | "createdAt" | "updatedAt" | "authorId" | "parentId" | "rootId" | "likeCount" | "replyCount" | "shareCount" | "starCount" | "videoUrl" | "audioUrl", ExtArgs["result"]["post"]>
+export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "content" | "createdAt" | "updatedAt" | "authorId" | "parentId" | "rootId" | "likeCount" | "replyCount" | "shareCount" | "starCount" | "videoUrl" | "audioUrl" | "visibility", ExtArgs["result"]["post"]>
 export type PostInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bookmarks?: boolean | Prisma.Post$bookmarksArgs<ExtArgs>
   likes?: boolean | Prisma.Post$likesArgs<ExtArgs>
@@ -1879,6 +1946,7 @@ export type $PostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     starCount: number
     videoUrl: string | null
     audioUrl: string | null
+    visibility: $Enums.PostVisibility
   }, ExtArgs["result"]["post"]>
   composites: {}
 }
@@ -2323,6 +2391,7 @@ export interface PostFieldRefs {
   readonly starCount: Prisma.FieldRef<"Post", 'Int'>
   readonly videoUrl: Prisma.FieldRef<"Post", 'String'>
   readonly audioUrl: Prisma.FieldRef<"Post", 'String'>
+  readonly visibility: Prisma.FieldRef<"Post", 'PostVisibility'>
 }
     
 

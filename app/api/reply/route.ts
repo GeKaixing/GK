@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { UserActionType } from "@/generated/prisma/enums";
+import { UserActionType, OspEventType } from "@/generated/prisma/enums";
 import { logUserAction } from "@/lib/feed/actions";
 import { invalidateUserHomeFeed } from "@/lib/feed/service";
+import { OBJECT_TYPES, DEFAULT_CUSTOMS_PIPELINES, recordUserOspEvent, runCustoms } from "@/lib/osp";
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { extractYouTubeEmbedUrl } from "@/utils/function/extractYouTubeEmbedUrl";
@@ -60,6 +61,18 @@ export async function POST(request: Request) {
       rootId = post_id;
     }
 
+    // OSP RFC-010 Customs admission (RFC-005 Object: Comment). v1 admits everything.
+    const customs = await runCustoms(
+      { actorId: user.id, objectType: "comment", content },
+      DEFAULT_CUSTOMS_PIPELINES
+    );
+    if (customs.decision === "DENY" || customs.decision === "QUARANTINE") {
+      return NextResponse.json(
+        { error: customs.reason ?? "Content not admitted by customs" },
+        { status: 403 }
+      );
+    }
+
     const reply = await prisma.post.create({
       data: {
         content,
@@ -93,6 +106,12 @@ export async function POST(request: Request) {
       targetPostId: post_id ?? parentId,
       targetAuthorId: parentPost?.authorId ?? null,
       metadata: JSON.stringify({ kind: "reply_create", source: "reply_box" }),
+    });
+    await recordUserOspEvent(user.id, {
+      eventType: OspEventType.REPLY_CREATED,
+      objectType: OBJECT_TYPES.COMMENT,
+      objectId: reply.id,
+      payload: { parentId, rootId },
     });
 
     return NextResponse.json({ data: reply, success: true });
@@ -148,6 +167,11 @@ export async function DELETE(request: Request) {
       invalidateUserHomeFeed(user.id),
       invalidateUserHomeFeed(parentPost?.authorId ?? null),
     ]);
+    await recordUserOspEvent(user.id, {
+      eventType: OspEventType.POST_DELETED,
+      objectType: OBJECT_TYPES.COMMENT,
+      objectId: id,
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

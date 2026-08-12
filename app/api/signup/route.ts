@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { prisma } from "@/lib/prisma";
+import { ensureCitizen } from "@/lib/osp";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -86,6 +87,10 @@ export async function POST(request: Request) {
         avatar: avatar ?? null,
       },
     });
+
+    // OSP identity bootstrap: Actor + Passport + capability seeds + lifecycle
+    // events. A failure here fails the signup — identity is part of account creation.
+    await ensureCitizen(authUserId);
 
     return NextResponse.json({ success: true });
 

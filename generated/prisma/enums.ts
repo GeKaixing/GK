@@ -66,3 +66,78 @@ export const AdStatus = {
 } as const
 
 export type AdStatus = (typeof AdStatus)[keyof typeof AdStatus]
+
+
+export const CountryStatus = {
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+  DESTROYED: 'DESTROYED'
+} as const
+
+export type CountryStatus = (typeof CountryStatus)[keyof typeof CountryStatus]
+
+
+export const PassportStatus = {
+  ACTIVE: 'ACTIVE',
+  REVOKED: 'REVOKED',
+  EXPIRED: 'EXPIRED',
+  SUSPENDED: 'SUSPENDED',
+  MIGRATED: 'MIGRATED'
+} as const
+
+export type PassportStatus = (typeof PassportStatus)[keyof typeof PassportStatus]
+
+
+export const CapabilityType = {
+  CREATE_POST: 'CREATE_POST',
+  SEARCH: 'SEARCH',
+  MODERATE: 'MODERATE',
+  TRANSLATE: 'TRANSLATE',
+  GENERATE_MEDIA: 'GENERATE_MEDIA',
+  EXECUTE_TASK: 'EXECUTE_TASK',
+  ACCESS_MEMORY: 'ACCESS_MEMORY'
+} as const
+
+export type CapabilityType = (typeof CapabilityType)[keyof typeof CapabilityType]
+
+
+export const CapabilityState = {
+  GRANTED: 'GRANTED',
+  REVOKED: 'REVOKED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type CapabilityState = (typeof CapabilityState)[keyof typeof CapabilityState]
+
+
+export const PostVisibility = {
+  PUBLIC: 'PUBLIC',
+  FOLLOWERS: 'FOLLOWERS',
+  PRIVATE: 'PRIVATE'
+} as const
+
+export type PostVisibility = (typeof PostVisibility)[keyof typeof PostVisibility]
+
+
+export const OspEventType = {
+  COUNTRY_BOOTSTRAPPED: 'COUNTRY_BOOTSTRAPPED',
+  ACTOR_CREATED: 'ACTOR_CREATED',
+  PASSPORT_ISSUED: 'PASSPORT_ISSUED',
+  PASSPORT_REVOKED: 'PASSPORT_REVOKED',
+  POST_CREATED: 'POST_CREATED',
+  POST_DELETED: 'POST_DELETED',
+  REPLY_CREATED: 'REPLY_CREATED',
+  POST_LIKED: 'POST_LIKED',
+  POST_UNLIKED: 'POST_UNLIKED',
+  POST_BOOKMARKED: 'POST_BOOKMARKED',
+  POST_UNBOOKMARKED: 'POST_UNBOOKMARKED',
+  POST_SHARED: 'POST_SHARED',
+  FOLLOWED: 'FOLLOWED',
+  UNFOLLOWED: 'UNFOLLOWED',
+  MESSAGE_SENT: 'MESSAGE_SENT',
+  CAPABILITY_GRANTED: 'CAPABILITY_GRANTED',
+  CAPABILITY_REVOKED: 'CAPABILITY_REVOKED',
+  ACCOUNT_DELETED: 'ACCOUNT_DELETED'
+} as const
+
+export type OspEventType = (typeof OspEventType)[keyof typeof OspEventType]

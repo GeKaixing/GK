@@ -70,7 +70,12 @@ export const ModelName = {
   LiveStream: 'LiveStream',
   LiveChatMessage: 'LiveChatMessage',
   LiveFeedback: 'LiveFeedback',
-  SponsoredAd: 'SponsoredAd'
+  SponsoredAd: 'SponsoredAd',
+  Country: 'Country',
+  Actor: 'Actor',
+  Passport: 'Passport',
+  OspEvent: 'OspEvent',
+  Capability: 'Capability'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -137,7 +142,8 @@ export const PostScalarFieldEnum = {
   shareCount: 'shareCount',
   starCount: 'starCount',
   videoUrl: 'videoUrl',
-  audioUrl: 'audioUrl'
+  audioUrl: 'audioUrl',
+  visibility: 'visibility'
 } as const
 
 export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
@@ -368,6 +374,84 @@ export const SponsoredAdScalarFieldEnum = {
 } as const
 
 export type SponsoredAdScalarFieldEnum = (typeof SponsoredAdScalarFieldEnum)[keyof typeof SponsoredAdScalarFieldEnum]
+
+
+export const CountryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  publicKey: 'publicKey',
+  federationEndpoint: 'federationEndpoint',
+  policy: 'policy',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CountryScalarFieldEnum = (typeof CountryScalarFieldEnum)[keyof typeof CountryScalarFieldEnum]
+
+
+export const ActorScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ActorScalarFieldEnum = (typeof ActorScalarFieldEnum)[keyof typeof ActorScalarFieldEnum]
+
+
+export const PassportScalarFieldEnum = {
+  id: 'id',
+  countryId: 'countryId',
+  actorId: 'actorId',
+  publicKey: 'publicKey',
+  issuedAt: 'issuedAt',
+  expiresAt: 'expiresAt',
+  status: 'status',
+  signature: 'signature',
+  migrationHistory: 'migrationHistory',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PassportScalarFieldEnum = (typeof PassportScalarFieldEnum)[keyof typeof PassportScalarFieldEnum]
+
+
+export const OspEventScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  countryId: 'countryId',
+  actorId: 'actorId',
+  eventType: 'eventType',
+  objectType: 'objectType',
+  objectId: 'objectId',
+  seq: 'seq',
+  prevHash: 'prevHash',
+  hash: 'hash',
+  signature: 'signature',
+  payload: 'payload',
+  globalSeq: 'globalSeq',
+  createdAt: 'createdAt'
+} as const
+
+export type OspEventScalarFieldEnum = (typeof OspEventScalarFieldEnum)[keyof typeof OspEventScalarFieldEnum]
+
+
+export const CapabilityScalarFieldEnum = {
+  id: 'id',
+  actorId: 'actorId',
+  capabilityType: 'capabilityType',
+  state: 'state',
+  scope: 'scope',
+  grantedBy: 'grantedBy',
+  grantedAt: 'grantedAt',
+  expiresAt: 'expiresAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CapabilityScalarFieldEnum = (typeof CapabilityScalarFieldEnum)[keyof typeof CapabilityScalarFieldEnum]
 
 
 export const SortOrder = {

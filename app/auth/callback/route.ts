@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { withTimeoutOrNull } from "@/lib/with-timeout";
+import { ensureCitizen } from "@/lib/osp";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -37,6 +38,9 @@ export async function GET(request: Request): Promise<NextResponse> {
         },
         create: {
           id: user.id,
+          // Fix the Google-first rough edge: give OAuth users a friendly
+          // handle instead of the auto-generated random UUID.
+          userid: `user_${user.id.slice(0, 8)}`,
           email: user.email ?? "",
           name: user.user_metadata?.full_name ?? null,
           avatar: user.user_metadata?.avatar_url ?? null,
@@ -47,6 +51,25 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     if (!upsertResult) {
       console.warn("User sync timed out in auth callback.");
+    } else {
+      // Backfill a placeholder handle (auto-generated UUID) left from before this
+      // fix. Never rewrite a user-set handle — that would break @userid mentions.
+      if (/^[0-9a-f]{8}-[0-9a-f]{4}-/.test(upsertResult.userid)) {
+        try {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { userid: `user_${user.id.slice(0, 8)}` },
+          });
+        } catch (backfillError) {
+          console.error("Failed to backfill OAuth userid:", backfillError);
+        }
+      }
+
+      // OSP identity bootstrap: Actor + Passport + capability seeds. Non-fatal —
+      // the bootstrap script (scripts/bootstrap-osp.ts) is the backstop.
+      await ensureCitizen(user.id).catch((ospError) =>
+        console.error("OSP ensureCitizen failed in auth callback:", ospError)
+      );
     }
   } catch (upsertError) {
     console.error("Failed to sync user into Prisma:", upsertError);

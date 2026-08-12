@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { UserActionType } from "@/generated/prisma/enums";
+import { UserActionType, OspEventType } from "@/generated/prisma/enums";
 import { logUserAction } from "@/lib/feed/actions";
 import { invalidateUserHomeFeed } from "@/lib/feed/service";
+import { OBJECT_TYPES, recordUserOspEvent } from "@/lib/osp";
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
@@ -62,6 +63,11 @@ export async function POST(request: Request) {
       actionType: UserActionType.POST_LIKE,
       targetPostId: postId,
       targetAuthorId: targetPost.authorId,
+    });
+    await recordUserOspEvent(user.id, {
+      eventType: OspEventType.POST_LIKED,
+      objectType: OBJECT_TYPES.POST,
+      objectId: postId,
     });
 
     const post = await prisma.post.findUnique({
@@ -140,6 +146,11 @@ export async function DELETE(request: Request) {
       actionType: UserActionType.POST_UNLIKE,
       targetPostId: postId,
       targetAuthorId: targetPost?.authorId ?? null,
+    });
+    await recordUserOspEvent(user.id, {
+      eventType: OspEventType.POST_UNLIKED,
+      objectType: OBJECT_TYPES.POST,
+      objectId: postId,
     });
 
     const post = await prisma.post.findUnique({

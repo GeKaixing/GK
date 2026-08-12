@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 
+import { AI_SERVICE_ACTOR_ID } from "@/lib/osp";
 import { getUserAiConfig } from "@/lib/ai/config";
 import { createPiAgent } from "@/lib/ai/pi";
 import { appendChatMessage, openOrResetChatSession } from "@/lib/ai/pi-chat";
@@ -65,7 +66,12 @@ export async function POST(req: NextRequest) {
   const history = await loadPiSessionMessages(session);
   const seededCount = history.length;
 
-  const { agent } = createPiAgent(config, { initialMessages: history });
+  const { agent } = createPiAgent(config, {
+    initialMessages: history,
+    // OSP RFC-015: the assistant acts as the GKX AI service Actor; its tools are
+    // gated by that actor's capabilities (seeded by the OSP bootstrap).
+    actorId: AI_SERVICE_ACTOR_ID,
+  });
 
   const lastUserMessage = [...messages].reverse().find((m) => m.role === "user");
   const lastUserText = lastUserMessage?.content ?? messages[messages.length - 1].content;

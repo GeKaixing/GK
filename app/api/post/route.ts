@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { UserActionType } from "@/generated/prisma/enums";
+import { UserActionType, UserRole, OspEventType } from "@/generated/prisma/enums";
 import { logUserAction } from "@/lib/feed/actions";
 import { invalidateAuthorAudienceFeed, invalidateUserHomeFeed } from "@/lib/feed/service";
+import { OBJECT_TYPES, DEFAULT_CUSTOMS_PIPELINES, recordUserOspEvent, runCustoms } from "@/lib/osp";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { extractYouTubeEmbedUrl } from "@/utils/function/extractYouTubeEmbedUrl";
@@ -195,6 +196,21 @@ export async function POST(request: Request) {
     const videoUrl = containsEmbeddedYouTube ? null : inputVideoUrl ?? extractYouTubeEmbedUrl(content);
     const audioUrl = inputAudioUrl ?? null;
 
+    // OSP RFC-010 Customs: run the object through the Country's admission
+    // pipeline before it enters the repository. v1 registers only the
+    // pass-through `allowingCustoms` pipeline, so this never denies — it lands
+    // the admission contract for real moderation policies later.
+    const customs = await runCustoms(
+      { actorId: user.id, objectType: "post", content },
+      DEFAULT_CUSTOMS_PIPELINES
+    );
+    if (customs.decision === "DENY" || customs.decision === "QUARANTINE") {
+      return NextResponse.json(
+        { error: customs.reason ?? "Content not admitted by customs" },
+        { status: 403 }
+      );
+    }
+
     const post = await prisma.post.create({
       data: {
         content,
@@ -218,6 +234,11 @@ export async function POST(request: Request) {
         targetPostId: post.id,
         targetAuthorId: user.id,
       });
+      await recordUserOspEvent(user.id, {
+        eventType: OspEventType.POST_CREATED,
+        objectType: OBJECT_TYPES.POST,
+        objectId: post.id,
+      });
     } else {
       await invalidateUserHomeFeed(user.id);
       await logUserAction({
@@ -225,6 +246,12 @@ export async function POST(request: Request) {
         actionType: UserActionType.REPLY_CREATE,
         targetPostId: post.id,
         targetAuthorId: user.id,
+      });
+      await recordUserOspEvent(user.id, {
+        eventType: OspEventType.REPLY_CREATED,
+        objectType: OBJECT_TYPES.COMMENT,
+        objectId: post.id,
+        payload: { parentId: parentId ?? null, rootId: rootId ?? null },
       });
     }
 
@@ -240,7 +267,35 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await request.json();
+
+    const existing = await prisma.post.findUnique({
+      where: { id },
+      select: { id: true, authorId: true, parentId: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    // Ownership check (previously MISSING — anyone could delete any post by id).
+    const profile = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    });
+    const isOwner = existing.authorId === user.id;
+    const isAdmin = profile?.role === UserRole.ADMIN;
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const deleted = await prisma.post.delete({
       where: { id },
@@ -249,11 +304,19 @@ export async function DELETE(request: Request) {
     revalidatePath("/gekaixing");
     await invalidateUserHomeFeed(deleted.authorId);
 
+    await recordUserOspEvent(existing.authorId, {
+      eventType: OspEventType.POST_DELETED,
+      objectType: existing.parentId ? OBJECT_TYPES.COMMENT : OBJECT_TYPES.POST,
+      objectId: id,
+      payload: { deletedBy: user.id },
+    });
+
     return NextResponse.json({ data: deleted, success: true });
   } catch (error: any) {
+    console.error("DELETE /api/post failed:", error);
     return NextResponse.json(
       { error: error.message },
-      { status: 401 }
+      { status: 500 }
     );
   }
 }
