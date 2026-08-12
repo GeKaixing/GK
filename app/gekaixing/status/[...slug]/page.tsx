@@ -1,6 +1,5 @@
 'use server'
 
-import PostRetreat from '@/components/gekaixing/PostRetreat'
 import PublishReply from '@/components/gekaixing/PublishReply'
 import Reply from '@/components/gekaixing/Reply'
 import StatusStore from '@/components/gekaixing/StatusStore'
