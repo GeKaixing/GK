@@ -56,6 +56,12 @@ export default async function layout({ children }: { children: React.ReactNode }
             >
               {t("forgotPassword")}
             </Link>
+            <Link
+              href="/gekaixing"
+              className="flex h-10 w-full items-center justify-center rounded-2xl border border-dashed border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              {t("continueAsGuest")}
+            </Link>
           </div>
         </div>
       </main>

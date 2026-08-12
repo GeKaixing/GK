@@ -255,7 +255,8 @@
     "GuestBanner": {
       "title": "游客模式",
       "description": "你正在以游客身份浏览。登录后即可发帖、点赞、关注和私信。",
-      "login": "登录"
+      "login": "登录",
+      "notNow": "暂不登录"
     },
     "FollowCard": {
       "loading": "加载中...",
@@ -904,7 +905,8 @@
     "Layout": {
       "alreadyHaveAccount": "已经有账户了吗？",
       "login": "登录",
-      "forgotPassword": "忘记密码"
+      "forgotPassword": "忘记密码",
+      "continueAsGuest": "暂不登录，先以游客身份浏览"
     },
     "RegistrationProtocol": {
       "createAccount": "建立你的账户",

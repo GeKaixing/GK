@@ -255,7 +255,8 @@
     "GuestBanner": {
       "title": "Guest mode",
       "description": "You're browsing as a guest. Log in to post, like, follow, and message.",
-      "login": "Log in"
+      "login": "Log in",
+      "notNow": "Not now"
     },
     "FollowCard": {
       "loading": "Loading...",
@@ -904,7 +905,8 @@
     "Layout": {
       "alreadyHaveAccount": "Already have an account?",
       "login": "Log in",
-      "forgotPassword": "Forgot password"
+      "forgotPassword": "Forgot password",
+      "continueAsGuest": "Not now — browse as guest"
     },
     "RegistrationProtocol": {
       "createAccount": "Create your account",
