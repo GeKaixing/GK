@@ -166,7 +166,7 @@ export default function SearchMain({ initialQuery }: SearchMainProps) {
                 <h2 className="mb-1 text-sm font-bold text-muted-foreground">
                   {t("postsSection", { count: posts.length })}
                 </h2>
-                <div className="flex flex-col">
+                <div className="flex flex-col gap-4">
                   {posts.map((post) => (
                     <PostCard key={post.id} {...post} highlightQuery={committedQuery} />
                   ))}
