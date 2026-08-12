@@ -23,7 +23,7 @@
 //     newsRes = await fetch(`https://newsapi.org/v2/top-headlines?${news_url}&apiKey=${newsApiKey}`,
 //       {
 //         headers: {
-//           'User-Agent': 'MyNewsFetcher/1.0 (https://gekaixing.top)',
+//           'User-Agent': 'MyNewsFetcher/1.0 (https://gekaixing.vercel.app)',
 //         },
 //       });
 

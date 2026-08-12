@@ -13,6 +13,7 @@ import type { Post } from '../../page'
 import PostRetreatServer from '@/components/gekaixing/PostRetreatServer'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { getPostReplies } from "@/lib/feed/replies"
+import { getSiteUrl } from "@/lib/site"
 
 /* =======================
    类型定义
@@ -33,14 +34,6 @@ function toRate(numerator: number, denominator: number): number {
 function buildExcerpt(text: string): string {
     const plainText = text.replace(/\s+/g, ' ').trim()
     return plainText.slice(0, 120)
-}
-
-function getSiteUrl(): string {
-    const envUrl = process.env.NEXT_PUBLIC_URL
-    if (envUrl && envUrl.startsWith('http')) {
-        return envUrl
-    }
-    return 'https://www.gekaixing.top'
 }
 
 export async function generateMetadata({

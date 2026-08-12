@@ -12,6 +12,7 @@ import { createClient } from "@/utils/supabase/server"
 import { Prisma } from '@/generated/prisma/client'
 import { notFound } from 'next/navigation'
 import { withTimeoutOrNull } from '@/lib/with-timeout'
+import { getSiteUrl } from "@/lib/site"
 
 const PROFILE_LIST_LIMIT = 20
 type FeedScope = "user-posts" | "user-replies" | "user-liked" | "user-bookmarks"
@@ -31,14 +32,6 @@ async function safeDbQuery<T>(label: string, query: () => Promise<T>, timeoutMs:
         console.error(`${label} failed:`, error)
         return null
     }
-}
-
-function getSiteUrl(): string {
-    const envUrl = process.env.NEXT_PUBLIC_URL
-    if (envUrl && envUrl.startsWith('http')) {
-        return envUrl
-    }
-    return 'https://www.gekaixing.top'
 }
 
 function buildBioDescription(text: string | null): string {

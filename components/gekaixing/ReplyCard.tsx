@@ -207,7 +207,7 @@ export default function ReplyCard({
             updatePost(id, { share: result.shareCount })
         }
 
-        copyToClipboard(`https://www.gekaixing.top/gekaixing/status/${id}`)
+        copyToClipboard(`https://gekaixing.vercel.app/gekaixing/status/${id}`)
         setIsShareLoading(false)
     }
 

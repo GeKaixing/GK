@@ -6,5 +6,5 @@ export function getSiteUrl(): string {
   if (envUrl && envUrl.startsWith("http")) {
     return envUrl.replace(/\/$/, "");
   }
-  return "https://www.gekaixing.top";
+  return "https://gekaixing.vercel.app";
 }
