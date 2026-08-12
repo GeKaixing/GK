@@ -56,7 +56,7 @@ export default function FollowCard() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ targetUserId }),
+                body: JSON.stringify({ targetId: targetUserId }),
             });
 
             if (!res.ok) throw new Error("follow failed");

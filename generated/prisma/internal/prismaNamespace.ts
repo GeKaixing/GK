@@ -427,7 +427,12 @@ export const ModelName = {
   FedDelivery: 'FedDelivery',
   FedInbox: 'FedInbox',
   FedObject: 'FedObject',
-  RemoteActor: 'RemoteActor'
+  RemoteActor: 'RemoteActor',
+  RemoteFollow: 'RemoteFollow',
+  RemoteFollower: 'RemoteFollower',
+  RemoteLike: 'RemoteLike',
+  RemoteLikeInbound: 'RemoteLikeInbound',
+  RemoteReply: 'RemoteReply'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -443,7 +448,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "follow" | "post" | "like" | "bookmark" | "share" | "conversation" | "conversationParticipant" | "message" | "conversationRead" | "workTask" | "chatAISession" | "chatAIMessage" | "piSessionFile" | "jobPosting" | "userAction" | "liveStream" | "liveChatMessage" | "liveFeedback" | "sponsoredAd" | "country" | "actor" | "passport" | "ospEvent" | "capability" | "remoteCountry" | "recognition" | "fedDelivery" | "fedInbox" | "fedObject" | "remoteActor"
+    modelProps: "user" | "follow" | "post" | "like" | "bookmark" | "share" | "conversation" | "conversationParticipant" | "message" | "conversationRead" | "workTask" | "chatAISession" | "chatAIMessage" | "piSessionFile" | "jobPosting" | "userAction" | "liveStream" | "liveChatMessage" | "liveFeedback" | "sponsoredAd" | "country" | "actor" | "passport" | "ospEvent" | "capability" | "remoteCountry" | "recognition" | "fedDelivery" | "fedInbox" | "fedObject" | "remoteActor" | "remoteFollow" | "remoteFollower" | "remoteLike" | "remoteLikeInbound" | "remoteReply"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2741,6 +2746,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RemoteFollow: {
+      payload: Prisma.$RemoteFollowPayload<ExtArgs>
+      fields: Prisma.RemoteFollowFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RemoteFollowFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RemoteFollowFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowPayload>
+        }
+        findFirst: {
+          args: Prisma.RemoteFollowFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RemoteFollowFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowPayload>
+        }
+        findMany: {
+          args: Prisma.RemoteFollowFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowPayload>[]
+        }
+        create: {
+          args: Prisma.RemoteFollowCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowPayload>
+        }
+        createMany: {
+          args: Prisma.RemoteFollowCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RemoteFollowCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowPayload>[]
+        }
+        delete: {
+          args: Prisma.RemoteFollowDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowPayload>
+        }
+        update: {
+          args: Prisma.RemoteFollowUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowPayload>
+        }
+        deleteMany: {
+          args: Prisma.RemoteFollowDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RemoteFollowUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RemoteFollowUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowPayload>[]
+        }
+        upsert: {
+          args: Prisma.RemoteFollowUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowPayload>
+        }
+        aggregate: {
+          args: Prisma.RemoteFollowAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRemoteFollow>
+        }
+        groupBy: {
+          args: Prisma.RemoteFollowGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RemoteFollowGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RemoteFollowCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RemoteFollowCountAggregateOutputType> | number
+        }
+      }
+    }
+    RemoteFollower: {
+      payload: Prisma.$RemoteFollowerPayload<ExtArgs>
+      fields: Prisma.RemoteFollowerFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RemoteFollowerFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowerPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RemoteFollowerFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowerPayload>
+        }
+        findFirst: {
+          args: Prisma.RemoteFollowerFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowerPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RemoteFollowerFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowerPayload>
+        }
+        findMany: {
+          args: Prisma.RemoteFollowerFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowerPayload>[]
+        }
+        create: {
+          args: Prisma.RemoteFollowerCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowerPayload>
+        }
+        createMany: {
+          args: Prisma.RemoteFollowerCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RemoteFollowerCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowerPayload>[]
+        }
+        delete: {
+          args: Prisma.RemoteFollowerDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowerPayload>
+        }
+        update: {
+          args: Prisma.RemoteFollowerUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowerPayload>
+        }
+        deleteMany: {
+          args: Prisma.RemoteFollowerDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RemoteFollowerUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RemoteFollowerUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowerPayload>[]
+        }
+        upsert: {
+          args: Prisma.RemoteFollowerUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteFollowerPayload>
+        }
+        aggregate: {
+          args: Prisma.RemoteFollowerAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRemoteFollower>
+        }
+        groupBy: {
+          args: Prisma.RemoteFollowerGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RemoteFollowerGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RemoteFollowerCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RemoteFollowerCountAggregateOutputType> | number
+        }
+      }
+    }
+    RemoteLike: {
+      payload: Prisma.$RemoteLikePayload<ExtArgs>
+      fields: Prisma.RemoteLikeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RemoteLikeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RemoteLikeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikePayload>
+        }
+        findFirst: {
+          args: Prisma.RemoteLikeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RemoteLikeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikePayload>
+        }
+        findMany: {
+          args: Prisma.RemoteLikeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikePayload>[]
+        }
+        create: {
+          args: Prisma.RemoteLikeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikePayload>
+        }
+        createMany: {
+          args: Prisma.RemoteLikeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RemoteLikeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikePayload>[]
+        }
+        delete: {
+          args: Prisma.RemoteLikeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikePayload>
+        }
+        update: {
+          args: Prisma.RemoteLikeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikePayload>
+        }
+        deleteMany: {
+          args: Prisma.RemoteLikeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RemoteLikeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RemoteLikeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikePayload>[]
+        }
+        upsert: {
+          args: Prisma.RemoteLikeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikePayload>
+        }
+        aggregate: {
+          args: Prisma.RemoteLikeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRemoteLike>
+        }
+        groupBy: {
+          args: Prisma.RemoteLikeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RemoteLikeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RemoteLikeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RemoteLikeCountAggregateOutputType> | number
+        }
+      }
+    }
+    RemoteLikeInbound: {
+      payload: Prisma.$RemoteLikeInboundPayload<ExtArgs>
+      fields: Prisma.RemoteLikeInboundFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RemoteLikeInboundFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikeInboundPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RemoteLikeInboundFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikeInboundPayload>
+        }
+        findFirst: {
+          args: Prisma.RemoteLikeInboundFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikeInboundPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RemoteLikeInboundFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikeInboundPayload>
+        }
+        findMany: {
+          args: Prisma.RemoteLikeInboundFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikeInboundPayload>[]
+        }
+        create: {
+          args: Prisma.RemoteLikeInboundCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikeInboundPayload>
+        }
+        createMany: {
+          args: Prisma.RemoteLikeInboundCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RemoteLikeInboundCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikeInboundPayload>[]
+        }
+        delete: {
+          args: Prisma.RemoteLikeInboundDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikeInboundPayload>
+        }
+        update: {
+          args: Prisma.RemoteLikeInboundUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikeInboundPayload>
+        }
+        deleteMany: {
+          args: Prisma.RemoteLikeInboundDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RemoteLikeInboundUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RemoteLikeInboundUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikeInboundPayload>[]
+        }
+        upsert: {
+          args: Prisma.RemoteLikeInboundUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteLikeInboundPayload>
+        }
+        aggregate: {
+          args: Prisma.RemoteLikeInboundAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRemoteLikeInbound>
+        }
+        groupBy: {
+          args: Prisma.RemoteLikeInboundGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RemoteLikeInboundGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RemoteLikeInboundCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RemoteLikeInboundCountAggregateOutputType> | number
+        }
+      }
+    }
+    RemoteReply: {
+      payload: Prisma.$RemoteReplyPayload<ExtArgs>
+      fields: Prisma.RemoteReplyFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RemoteReplyFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteReplyPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RemoteReplyFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteReplyPayload>
+        }
+        findFirst: {
+          args: Prisma.RemoteReplyFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteReplyPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RemoteReplyFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteReplyPayload>
+        }
+        findMany: {
+          args: Prisma.RemoteReplyFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteReplyPayload>[]
+        }
+        create: {
+          args: Prisma.RemoteReplyCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteReplyPayload>
+        }
+        createMany: {
+          args: Prisma.RemoteReplyCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RemoteReplyCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteReplyPayload>[]
+        }
+        delete: {
+          args: Prisma.RemoteReplyDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteReplyPayload>
+        }
+        update: {
+          args: Prisma.RemoteReplyUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteReplyPayload>
+        }
+        deleteMany: {
+          args: Prisma.RemoteReplyDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RemoteReplyUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RemoteReplyUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteReplyPayload>[]
+        }
+        upsert: {
+          args: Prisma.RemoteReplyUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RemoteReplyPayload>
+        }
+        aggregate: {
+          args: Prisma.RemoteReplyAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRemoteReply>
+        }
+        groupBy: {
+          args: Prisma.RemoteReplyGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RemoteReplyGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RemoteReplyCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RemoteReplyCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3238,6 +3613,64 @@ export const RemoteActorScalarFieldEnum = {
 export type RemoteActorScalarFieldEnum = (typeof RemoteActorScalarFieldEnum)[keyof typeof RemoteActorScalarFieldEnum]
 
 
+export const RemoteFollowScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  countryId: 'countryId',
+  actorId: 'actorId',
+  createdAt: 'createdAt'
+} as const
+
+export type RemoteFollowScalarFieldEnum = (typeof RemoteFollowScalarFieldEnum)[keyof typeof RemoteFollowScalarFieldEnum]
+
+
+export const RemoteFollowerScalarFieldEnum = {
+  id: 'id',
+  countryId: 'countryId',
+  actorId: 'actorId',
+  targetUserId: 'targetUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type RemoteFollowerScalarFieldEnum = (typeof RemoteFollowerScalarFieldEnum)[keyof typeof RemoteFollowerScalarFieldEnum]
+
+
+export const RemoteLikeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  countryId: 'countryId',
+  actorId: 'actorId',
+  objectId: 'objectId',
+  createdAt: 'createdAt'
+} as const
+
+export type RemoteLikeScalarFieldEnum = (typeof RemoteLikeScalarFieldEnum)[keyof typeof RemoteLikeScalarFieldEnum]
+
+
+export const RemoteLikeInboundScalarFieldEnum = {
+  id: 'id',
+  sourceCountryId: 'sourceCountryId',
+  sourceActorId: 'sourceActorId',
+  postId: 'postId',
+  createdAt: 'createdAt'
+} as const
+
+export type RemoteLikeInboundScalarFieldEnum = (typeof RemoteLikeInboundScalarFieldEnum)[keyof typeof RemoteLikeInboundScalarFieldEnum]
+
+
+export const RemoteReplyScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  localPostId: 'localPostId',
+  countryId: 'countryId',
+  actorId: 'actorId',
+  remotePostId: 'remotePostId',
+  createdAt: 'createdAt'
+} as const
+
+export type RemoteReplyScalarFieldEnum = (typeof RemoteReplyScalarFieldEnum)[keyof typeof RemoteReplyScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3722,6 +4155,11 @@ export type GlobalOmitConfig = {
   fedInbox?: Prisma.FedInboxOmit
   fedObject?: Prisma.FedObjectOmit
   remoteActor?: Prisma.RemoteActorOmit
+  remoteFollow?: Prisma.RemoteFollowOmit
+  remoteFollower?: Prisma.RemoteFollowerOmit
+  remoteLike?: Prisma.RemoteLikeOmit
+  remoteLikeInbound?: Prisma.RemoteLikeInboundOmit
+  remoteReply?: Prisma.RemoteReplyOmit
 }
 
 /* Types for Logging */

@@ -179,3 +179,29 @@ export type FedObject = Prisma.FedObjectModel
  * OSP RFC-001/009: cached remote actor identity (for DID resolution).
  */
 export type RemoteActor = Prisma.RemoteActorModel
+/**
+ * Model RemoteFollow
+ * A LOCAL user following a REMOTE actor. Distinct from the local Follow table.
+ */
+export type RemoteFollow = Prisma.RemoteFollowModel
+/**
+ * Model RemoteFollower
+ * A REMOTE actor following one of OUR users.
+ */
+export type RemoteFollower = Prisma.RemoteFollowerModel
+/**
+ * Model RemoteLike
+ * A LOCAL user liking a REMOTE post.
+ */
+export type RemoteLike = Prisma.RemoteLikeModel
+/**
+ * Model RemoteLikeInbound
+ * A REMOTE actor liking one of OUR posts.
+ */
+export type RemoteLikeInbound = Prisma.RemoteLikeInboundModel
+/**
+ * Model RemoteReply
+ * A LOCAL reply Post that responds to a REMOTE post (the local Post has no
+ * local parentId; this row links it to the remote parent).
+ */
+export type RemoteReply = Prisma.RemoteReplyModel

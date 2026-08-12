@@ -3,8 +3,10 @@
 import PublishReply from '@/components/gekaixing/PublishReply'
 import Reply from '@/components/gekaixing/Reply'
 import StatusStore from '@/components/gekaixing/StatusStore'
+import FedPostCard from '@/components/gekaixing/FedPostCard'
 import { prisma } from '@/lib/prisma'
-import { UserActionType } from "@/generated/prisma/enums";
+import { FedInboundStatus, RecognitionState, UserActionType } from "@/generated/prisma/enums";
+import { buildFedInteractionMaps, COUNTRY_ID, getRemoteLikeCount } from "@/lib/osp";
 import { logUserAction } from "@/lib/feed/actions";
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
@@ -272,6 +274,33 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
         notFound()
     }
 
+    // OSP RFC-012: remote (federated) replies to THIS post + remote like count.
+    const [remoteReplies, remoteLikes] = await Promise.all([
+        prisma.fedObject.findMany({
+            where: {
+                status: FedInboundStatus.ADMITTED,
+                parentId: data.id,
+                remoteCountry: {
+                    status: "ACTIVE",
+                    recognitions: {
+                        some: {
+                            fromCountryId: COUNTRY_ID,
+                            state: { in: [RecognitionState.RECOGNIZED, RecognitionState.TRUSTED] },
+                        },
+                    },
+                },
+            },
+            orderBy: [{ receivedAt: "desc" }, { id: "desc" }],
+            take: 20,
+            include: { remoteCountry: { select: { id: true, name: true } } },
+        }),
+        getRemoteLikeCount(data.id),
+    ]);
+    const remoteReplyMaps = await buildFedInteractionMaps(
+        userId ?? null,
+        remoteReplies.map((o) => ({ sourceCountryId: o.sourceCountryId, actorId: o.actorId, objectId: o.objectId }))
+    );
+
     return (
         <div className="space-y-4 pt-4">
             {/* 返回按钮 */}
@@ -279,6 +308,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
             <div className="px-4">
                 {/* 主帖子 */}
                 <StatusStore data={[data]} />
+
+                {remoteLikes > 0 ? (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                        🌍 {remoteLikes} like{remoteLikes === 1 ? "" : "s"} from federated countries
+                    </p>
+                ) : null}
 
                 <div className="h-4" />
 
@@ -299,6 +334,36 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
                     hasMore={replyPage.page.hasMore}
                     feedQuery={{ scope: "status-replies", targetId: id }}
                 />
+
+                {remoteReplies.length > 0 ? (
+                    <>
+                        <div className="h-4" />
+                        <h2 className="mb-2 text-sm font-semibold text-muted-foreground">
+                            🌍 {remoteReplies.length} reply{remoteReplies.length === 1 ? "" : "ies"} from federated countries
+                        </h2>
+                        <div className="space-y-3">
+                            {remoteReplies.map((o) => (
+                                <FedPostCard
+                                    key={o.id}
+                                    sourceCountryId={o.sourceCountryId}
+                                    sourceCountryName={o.remoteCountry?.name ?? o.sourceCountryId}
+                                    actorId={o.actorId}
+                                    did={`did:osp:${o.sourceCountryId}:${o.actorId}`}
+                                    objectId={o.objectId}
+                                    content={o.content}
+                                    authorName={o.authorName}
+                                    authorHandle={o.authorHandle}
+                                    authorAvatar={o.authorAvatar}
+                                    createdAt={o.createdAt.toISOString()}
+                                    viewerId={userId ?? null}
+                                    isFollowing={remoteReplyMaps.following.has(`${o.sourceCountryId}:${o.actorId}`)}
+                                    likedByMe={remoteReplyMaps.liked.has(o.objectId)}
+                                    remoteLikeCount={remoteReplyMaps.likeCount.get(o.objectId) ?? 0}
+                                />
+                            ))}
+                        </div>
+                    </>
+                ) : null}
             </div>
         </div>
     )

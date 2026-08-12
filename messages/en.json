@@ -886,7 +886,13 @@
       "title": "Federated",
       "empty": "No posts from federated countries yet. When a recognized country publishes, their public posts appear here.",
       "fromCountry": "via",
-      "readOnly": "Read-only"
+      "readOnly": "Read-only",
+      "replyTitle": "Reply to federated post",
+      "replyPlaceholder": "Write a reply…",
+      "replySuccess": "Reply published and sent to the source country.",
+      "replyFailed": "Failed to publish reply.",
+      "follow": "Follow",
+      "following": "Following"
     }
   },
   "AuthCodeError": {

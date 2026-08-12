@@ -16,6 +16,7 @@ type UserBackgroundBioProps = {
   viewedUserid?: string | null
   followers?: number
   following?: number
+  remoteFollowers?: number
   isOwner?: boolean
   isPremium: boolean
   isHiring?: boolean
@@ -30,6 +31,7 @@ export default function User_background_bio({
   viewedUserid,
   followers = 0,
   following = 0,
+  remoteFollowers = 0,
   isOwner = false,
   isHiring = false,
 }: UserBackgroundBioProps) {
@@ -79,6 +81,12 @@ export default function User_background_bio({
           <div className="font-bold">{followers}</div>
           <span className="text-muted-foreground">{t("labels.followers")}</span>
         </Link>
+        {remoteFollowers > 0 ? (
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <span aria-hidden>🌍</span>
+            {remoteFollowers} from federated countries
+          </span>
+        ) : null}
       </div>
 
       <div className="h-3 w-full sm:h-5" />

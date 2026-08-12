@@ -6,12 +6,19 @@ import {
   buildWellKnown,
   deliverPending,
   enqueueFederationDelivery,
+  enqueueTargetedDelivery,
   fetchCountryWellKnown,
+  followRemote,
   getRecognition,
+  getRemoteFollowerCount,
+  getRemoteLikeCount,
   handleInboundFederation,
+  isFollowingRemote,
   isAdmitting,
+  isRemoteLiked,
   sanitizeFederatedContent,
   setRecognition,
+  unfollowRemote,
   type FedEnvelope,
 } from "./federation";
 
@@ -26,13 +33,22 @@ const { fakePrisma, mockDb } = vi.hoisted(() => {
     Object.fromEntries(names.map((n) => [n, vi.fn()])) as Record<string, ReturnType<typeof vi.fn>>;
   const mockDb: Record<string, Record<string, any>> = {
     country: mk(["findUnique", "create"]),
+    actor: mk(["findUnique", "upsert", "create"]),
     remoteCountry: mk(["findUnique", "findMany", "create", "upsert"]),
     recognition: mk(["findUnique", "upsert", "create"]),
     fedDelivery: mk(["findMany", "upsert", "create", "update"]),
     fedInbox: mk(["create", "update"]),
     fedObject: mk(["create"]),
     remoteActor: mk(["findUnique", "upsert", "create"]),
+    remoteFollow: mk(["findUnique", "upsert", "deleteMany"]),
+    remoteFollower: mk(["upsert", "deleteMany", "count"]),
+    remoteLike: mk(["findFirst", "upsert", "deleteMany"]),
+    remoteLikeInbound: mk(["upsert", "deleteMany", "count"]),
+    ospEvent: mk(["findFirst", "create", "findMany", "count"]),
+    post: mk(["findUnique"]),
   };
+  (mockDb as any).$transaction = async (fn: any) =>
+    fn({ ospEvent: mockDb.ospEvent, actor: mockDb.actor, country: mockDb.country });
   return { fakePrisma: mockDb, mockDb };
 });
 
@@ -47,6 +63,12 @@ function setupStores() {
     inbox: [] as any[],
     objects: [] as any[],
     remoteActors: [] as any[],
+    remoteFollows: [] as any[],
+    remoteFollowers: [] as any[],
+    remoteLikes: [] as any[],
+    remoteLikeInbounds: [] as any[],
+    events: [] as any[],
+    posts: [] as any[],
   };
 
   mockDb.country.findUnique.mockResolvedValue({
@@ -176,6 +198,119 @@ function setupStores() {
     stores.remoteActors.push(row);
     return row;
   });
+
+  // Social-graph models (RFC-012)
+  mockDb.actor.upsert.mockImplementation(({ create }: any) => ({
+    id: create?.id ?? "actor-uuid",
+    userId: create?.userId ?? "user-uuid",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }));
+  mockDb.actor.findUnique.mockImplementation(({ where }: any) =>
+    where.id ? { id: where.id, userId: "user-uuid" } : null
+  );
+  mockDb.post.findUnique.mockImplementation(({ where }: any) =>
+    stores.posts.some((p) => p.id === where.id) ? { id: where.id } : null
+  );
+
+  mockDb.ospEvent.findFirst.mockImplementation(({ where }: any) => {
+    const rows = stores.events.filter((e) => e.actorId === where.actorId);
+    return rows[rows.length - 1] ?? null;
+  });
+  mockDb.ospEvent.create.mockImplementation(({ data }: any) => {
+    const row = { ...data, id: `ev_${stores.events.length + 1}`, createdAt: new Date(), globalSeq: BigInt(stores.events.length + 1) };
+    stores.events.push(row);
+    return row;
+  });
+
+  mockDb.remoteFollow.findUnique.mockImplementation(({ where }: any) => {
+    const key = where.userId_countryId_actorId;
+    return stores.remoteFollows.find(
+      (f) => f.userId === key.userId && f.countryId === key.countryId && f.actorId === key.actorId
+    ) ?? null;
+  });
+  mockDb.remoteFollow.upsert.mockImplementation(({ where, create }: any) => {
+    const key = where.userId_countryId_actorId;
+    const existing = stores.remoteFollows.find(
+      (f) => f.userId === key.userId && f.countryId === key.countryId && f.actorId === key.actorId
+    );
+    if (existing) return existing;
+    const row = { ...create, id: `rf_${stores.remoteFollows.length + 1}` };
+    stores.remoteFollows.push(row);
+    return row;
+  });
+  mockDb.remoteFollow.deleteMany.mockImplementation(({ where }: any) => {
+    const before = stores.remoteFollows.length;
+    stores.remoteFollows = stores.remoteFollows.filter(
+      (f) => !(f.userId === where.userId && f.countryId === where.countryId && f.actorId === where.actorId)
+    );
+    return { count: before - stores.remoteFollows.length };
+  });
+
+  mockDb.remoteFollower.upsert.mockImplementation(({ where, create }: any) => {
+    const key = where.countryId_actorId_targetUserId;
+    const existing = stores.remoteFollowers.find(
+      (f) => f.countryId === key.countryId && f.actorId === key.actorId && f.targetUserId === key.targetUserId
+    );
+    if (existing) return existing;
+    const row = { ...create, id: `rfol_${stores.remoteFollowers.length + 1}` };
+    stores.remoteFollowers.push(row);
+    return row;
+  });
+  mockDb.remoteFollower.deleteMany.mockImplementation(({ where }: any) => {
+    const before = stores.remoteFollowers.length;
+    stores.remoteFollowers = stores.remoteFollowers.filter(
+      (f) => !(f.countryId === where.countryId && f.actorId === where.actorId && f.targetUserId === where.targetUserId)
+    );
+    return { count: before - stores.remoteFollowers.length };
+  });
+  mockDb.remoteFollower.count.mockImplementation(({ where }: any) =>
+    stores.remoteFollowers.filter((f) => f.targetUserId === where.targetUserId).length
+  );
+
+  mockDb.remoteLike.findFirst.mockImplementation(({ where }: any) =>
+    stores.remoteLikes.find(
+      (l) => l.userId === where.userId && l.objectId === where.objectId
+    ) ?? null
+  );
+  mockDb.remoteLike.upsert.mockImplementation(({ where, create }: any) => {
+    const key = where.userId_countryId_actorId_objectId;
+    const existing = stores.remoteLikes.find(
+      (l) => l.userId === key.userId && l.countryId === key.countryId && l.actorId === key.actorId && l.objectId === key.objectId
+    );
+    if (existing) return existing;
+    const row = { ...create, id: `rl_${stores.remoteLikes.length + 1}` };
+    stores.remoteLikes.push(row);
+    return row;
+  });
+  mockDb.remoteLike.deleteMany.mockImplementation(({ where }: any) => {
+    const before = stores.remoteLikes.length;
+    stores.remoteLikes = stores.remoteLikes.filter(
+      (l) => !(l.userId === where.userId && l.objectId === where.objectId)
+    );
+    return { count: before - stores.remoteLikes.length };
+  });
+
+  mockDb.remoteLikeInbound.upsert.mockImplementation(({ where, create }: any) => {
+    const key = where.sourceCountryId_sourceActorId_postId;
+    const existing = stores.remoteLikeInbounds.find(
+      (l) => l.sourceCountryId === key.sourceCountryId && l.sourceActorId === key.sourceActorId && l.postId === key.postId
+    );
+    if (existing) return existing;
+    const row = { ...create, id: `rli_${stores.remoteLikeInbounds.length + 1}` };
+    stores.remoteLikeInbounds.push(row);
+    return row;
+  });
+  mockDb.remoteLikeInbound.deleteMany.mockImplementation(({ where }: any) => {
+    const before = stores.remoteLikeInbounds.length;
+    stores.remoteLikeInbounds = stores.remoteLikeInbounds.filter(
+      (l) => !(l.sourceCountryId === where.sourceCountryId && l.sourceActorId === where.sourceActorId && l.postId === where.postId)
+    );
+    return { count: before - stores.remoteLikeInbounds.length };
+  });
+  mockDb.remoteLikeInbound.count.mockImplementation(({ where }: any) =>
+    stores.remoteLikeInbounds.filter((l) => l.postId === where.postId).length
+  );
 
   return stores;
 }
@@ -435,5 +570,115 @@ describe("handleInboundFederation", () => {
     );
     expect(result.status).toBe("ADMITTED");
     expect(stores.objects[0].content).toBe("<p>ok</p>");
+  });
+});
+
+describe("cross-country social graph (RFC-012)", () => {
+  it("enqueueTargetedDelivery delivers only to the specified country", async () => {
+    seedPeer(stores, RecognitionState.RECOGNIZED);
+    seedPeer(stores, RecognitionState.RECOGNIZED, "other-2");
+
+    const event = { eventId: "evt-1", eventType: OspEventType.POST_CREATED, actorId: "a", countryId: "gkx", seq: 1, prevHash: null, createdAt: new Date() } as any;
+    const deliveries = await enqueueTargetedDelivery("other-2", event, {});
+    expect(deliveries.length).toBe(1);
+    expect(deliveries[0].targetCountryId).toBe("other-2");
+  });
+
+  it("followRemote records the relationship, logs FOLLOWED and targets delivery", async () => {
+    seedPeer(stores, RecognitionState.RECOGNIZED);
+    const follow = await followRemote("user-1", REMOTE_COUNTRY, "remote-actor", { name: "Alice", handle: "alice" });
+
+    expect(follow.userId).toBe("user-1");
+    expect(stores.remoteFollows.length).toBe(1);
+    expect(stores.events.some((e) => e.eventType === OspEventType.FOLLOWED)).toBe(true);
+    expect(stores.deliveries.some((d) => d.targetCountryId === REMOTE_COUNTRY)).toBe(true);
+    expect(await isFollowingRemote("user-1", REMOTE_COUNTRY, "remote-actor")).toBe(true);
+  });
+
+  it("unfollowRemote removes the relationship and delivers UNFOLLOWED", async () => {
+    seedPeer(stores, RecognitionState.RECOGNIZED);
+    await followRemote("user-1", REMOTE_COUNTRY, "remote-actor");
+    expect(await unfollowRemote("user-1", REMOTE_COUNTRY, "remote-actor")).toBe(true);
+    expect(await isFollowingRemote("user-1", REMOTE_COUNTRY, "remote-actor")).toBe(false);
+    expect(stores.events.some((e) => e.eventType === OspEventType.UNFOLLOWED)).toBe(true);
+  });
+
+  it("inbound FOLLOWED records a RemoteFollower for our user", async () => {
+    seedPeer(stores, RecognitionState.RECOGNIZED);
+    const result = await handleInboundFederation(
+      envelope({
+        event_id: "evt-follow-1",
+        event_type: OspEventType.FOLLOWED,
+        actor: "remote-actor",
+        country: REMOTE_COUNTRY,
+        targetActor: "our-actor",
+        follower: { name: "Remote Bob", handle: "rbob" },
+      })
+    );
+    expect(result.status).toBe("ADMITTED");
+    expect(stores.remoteFollowers.length).toBe(1);
+    expect(stores.remoteFollowers[0].targetUserId).toBe("user-uuid");
+    expect(stores.remoteFollowers[0].countryId).toBe(REMOTE_COUNTRY);
+  });
+
+  it("inbound UNFOLLOWED removes the RemoteFollower", async () => {
+    seedPeer(stores, RecognitionState.RECOGNIZED);
+    await handleInboundFederation(
+      envelope({ event_id: "evt-follow-1", event_type: OspEventType.FOLLOWED, actor: "remote-actor", country: REMOTE_COUNTRY, targetActor: "our-actor" })
+    );
+    expect(stores.remoteFollowers.length).toBe(1);
+    await handleInboundFederation(
+      envelope({ event_id: "evt-unfollow-1", event_type: OspEventType.UNFOLLOWED, actor: "remote-actor", country: REMOTE_COUNTRY, targetActor: "our-actor" })
+    );
+    expect(stores.remoteFollowers.length).toBe(0);
+  });
+
+  it("inbound POST_LIKED records a RemoteLikeInbound on our post", async () => {
+    seedPeer(stores, RecognitionState.RECOGNIZED);
+    stores.posts.push({ id: "local-post-1" });
+    const result = await handleInboundFederation(
+      envelope({
+        event_id: "evt-like-1",
+        event_type: OspEventType.POST_LIKED,
+        actor: "remote-actor",
+        object: { type: "post", id: "local-post-1" },
+        country: REMOTE_COUNTRY,
+      })
+    );
+    expect(result.status).toBe("ADMITTED");
+    expect(stores.remoteLikeInbounds.length).toBe(1);
+    expect(stores.remoteLikeInbounds[0].postId).toBe("local-post-1");
+    expect(await getRemoteLikeCount("local-post-1")).toBe(1);
+  });
+
+  it("inbound POST_UNLIKED removes the RemoteLikeInbound", async () => {
+    seedPeer(stores, RecognitionState.RECOGNIZED);
+    stores.posts.push({ id: "local-post-1" });
+    await handleInboundFederation(
+      envelope({ event_id: "evt-like-1", event_type: OspEventType.POST_LIKED, actor: "remote-actor", object: { type: "post", id: "local-post-1" }, country: REMOTE_COUNTRY })
+    );
+    await handleInboundFederation(
+      envelope({ event_id: "evt-unlike-1", event_type: OspEventType.POST_UNLIKED, actor: "remote-actor", object: { type: "post", id: "local-post-1" }, country: REMOTE_COUNTRY })
+    );
+    expect(stores.remoteLikeInbounds.length).toBe(0);
+  });
+
+  it("isRemoteLiked reflects a like on a remote object", async () => {
+    seedPeer(stores, RecognitionState.RECOGNIZED);
+    await followRemote("user-1", REMOTE_COUNTRY, "remote-actor");
+    mockDb.remoteLike.upsert.mockImplementationOnce(({ create }: any) => {
+      const row = { ...create, id: "rl_1" };
+      stores.remoteLikes.push(row);
+      return row;
+    });
+    expect(await isRemoteLiked("user-1", "remote-post-1")).toBe(false);
+  });
+
+  it("getRemoteFollowerCount counts followers of a user", async () => {
+    seedPeer(stores, RecognitionState.RECOGNIZED);
+    await handleInboundFederation(
+      envelope({ event_id: "evt-follow-1", event_type: OspEventType.FOLLOWED, actor: "remote-actor", country: REMOTE_COUNTRY, targetActor: "our-actor" })
+    );
+    expect(await getRemoteFollowerCount("user-uuid")).toBe(1);
   });
 });

@@ -690,3 +690,70 @@ model RemoteActor {
 
   @@unique([countryId, actorId])
 }
+
+// ============ OSP cross-country social graph — RFC-012 ============
+
+/// A LOCAL user following a REMOTE actor. Distinct from the local Follow table.
+model RemoteFollow {
+  id        String   @id @default(uuid())
+  userId    String
+  countryId String
+  actorId   String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, countryId, actorId])
+  @@index([userId])
+  @@index([countryId, actorId])
+}
+
+/// A REMOTE actor following one of OUR users.
+model RemoteFollower {
+  id            String   @id @default(uuid())
+  countryId     String
+  actorId       String
+  targetUserId  String
+  createdAt     DateTime @default(now())
+
+  @@unique([countryId, actorId, targetUserId])
+  @@index([targetUserId])
+}
+
+/// A LOCAL user liking a REMOTE post.
+model RemoteLike {
+  id        String   @id @default(uuid())
+  userId    String
+  countryId String
+  actorId   String
+  objectId  String // the remote post's id in its source country
+  createdAt DateTime @default(now())
+
+  @@unique([userId, countryId, actorId, objectId])
+  @@index([objectId])
+  @@index([userId])
+}
+
+/// A REMOTE actor liking one of OUR posts.
+model RemoteLikeInbound {
+  id              String   @id @default(uuid())
+  sourceCountryId String
+  sourceActorId   String
+  postId          String // our local Post id
+  createdAt       DateTime @default(now())
+
+  @@unique([sourceCountryId, sourceActorId, postId])
+  @@index([postId])
+}
+
+/// A LOCAL reply Post that responds to a REMOTE post (the local Post has no
+/// local parentId; this row links it to the remote parent).
+model RemoteReply {
+  id           String   @id @default(uuid())
+  userId       String
+  localPostId  String   @unique // our local Post id
+  countryId    String
+  actorId      String
+  remotePostId String // the remote post being replied to
+  createdAt    DateTime @default(now())
+
+  @@index([remotePostId])
+}

@@ -12,12 +12,15 @@ import type {
   OspEventModel,
   RecognitionModel,
   RemoteActorModel,
+  RemoteFollowModel,
 } from "@/generated/prisma/models";
 import { prisma } from "@/lib/prisma";
 import { COUNTRY_ID, countrySign, getCountry } from "./country";
 import { DEFAULT_CUSTOMS_PIPELINES, runCustoms } from "./customs";
 import { actorDid } from "./did";
+import { recordUserOspEvent } from "./event";
 import { canonicalize, verifyPayload } from "./keys";
+import { OBJECT_TYPES } from "./object";
 
 /**
  * OSP RFC-009 (Federation) + RFC-011 (Recognition).
@@ -129,6 +132,30 @@ export async function enqueueFederationDelivery(
       },
     },
   });
+  return enqueueToPeers(peers, ospEvent, contentInfo);
+}
+
+/**
+ * Deliver a signed event to ONE specific peer country (e.g. a follow or like
+ * targeted at an actor/post that country owns). Broadcast would be wrong here.
+ */
+export async function enqueueTargetedDelivery(
+  targetCountryId: string,
+  ospEvent: OspEventModel,
+  contentInfo: FedContentInfo = {}
+): Promise<FedDeliveryModel[]> {
+  const peer = await prisma.remoteCountry.findUnique({ where: { id: targetCountryId } });
+  if (!peer || peer.status !== CountryStatus.ACTIVE) {
+    return [];
+  }
+  return enqueueToPeers([peer], ospEvent, contentInfo);
+}
+
+async function enqueueToPeers(
+  peers: { id: string }[],
+  ospEvent: OspEventModel,
+  contentInfo: FedContentInfo
+): Promise<FedDeliveryModel[]> {
   if (peers.length === 0) {
     return [];
   }
@@ -399,6 +426,51 @@ export async function handleInboundFederation(body: FedEnvelope): Promise<Inboun
         avatar: author?.avatar ? String(author.avatar) : null,
       },
     });
+  } else if (eventType === OspEventType.FOLLOWED || eventType === OspEventType.UNFOLLOWED) {
+    // RFC-012: a remote actor follows / unfollows one of OUR users.
+    const targetActorId = payload.targetActor ? String(payload.targetActor) : null;
+    if (targetActorId) {
+      const targetActor = await prisma.actor.findUnique({
+        where: { id: targetActorId },
+        select: { userId: true },
+      });
+      if (targetActor?.userId) {
+        if (eventType === OspEventType.FOLLOWED) {
+          await prisma.remoteFollower.upsert({
+            where: {
+              countryId_actorId_targetUserId: { countryId, actorId, targetUserId: targetActor.userId },
+            },
+            update: {},
+            create: { countryId, actorId, targetUserId: targetActor.userId },
+          });
+        } else {
+          await prisma.remoteFollower.deleteMany({
+            where: { countryId, actorId, targetUserId: targetActor.userId },
+          });
+        }
+      }
+    }
+  } else if (eventType === OspEventType.POST_LIKED || eventType === OspEventType.POST_UNLIKED) {
+    // RFC-012: a remote actor likes / unlikes one of OUR posts.
+    const postId = object?.id;
+    if (postId) {
+      const post = await prisma.post.findUnique({ where: { id: postId }, select: { id: true } });
+      if (post) {
+        if (eventType === OspEventType.POST_LIKED) {
+          await prisma.remoteLikeInbound.upsert({
+            where: {
+              sourceCountryId_sourceActorId_postId: { sourceCountryId: countryId, sourceActorId: actorId, postId },
+            },
+            update: {},
+            create: { sourceCountryId: countryId, sourceActorId: actorId, postId },
+          });
+        } else {
+          await prisma.remoteLikeInbound.deleteMany({
+            where: { sourceCountryId: countryId, sourceActorId: actorId, postId },
+          });
+        }
+      }
+    }
   }
 
   await prisma.fedInbox.update({
@@ -510,4 +582,200 @@ export async function buildRemoteActorProfile(
     publicKey: remote.publicKey,
     passportStatus: null,
   };
+}
+
+// ============ Cross-country social graph (RFC-012) ============
+
+export interface RemoteFollowerInfo {
+  name?: string | null;
+  handle?: string | null;
+  avatar?: string | null;
+}
+
+/** Is a LOCAL user following a REMOTE actor? */
+export async function isFollowingRemote(
+  userId: string,
+  countryId: string,
+  actorId: string
+): Promise<boolean> {
+  const row = await prisma.remoteFollow.findUnique({
+    where: { userId_countryId_actorId: { userId, countryId, actorId } },
+    select: { id: true },
+  });
+  return !!row;
+}
+
+/**
+ * A LOCAL user follows a REMOTE actor: record the relationship, log a FOLLOWED
+ * event, and deliver it (targeted) to the actor's country.
+ */
+export async function followRemote(
+  userId: string,
+  countryId: string,
+  actorId: string,
+  followerInfo: RemoteFollowerInfo = {}
+): Promise<RemoteFollowModel> {
+  const follow = await prisma.remoteFollow.upsert({
+    where: { userId_countryId_actorId: { userId, countryId, actorId } },
+    update: {},
+    create: { userId, countryId, actorId },
+  });
+
+  const ospEvent = await recordUserOspEvent(userId, {
+    eventType: OspEventType.FOLLOWED,
+    payload: {
+      targetActor: actorId,
+      follower: {
+        name: followerInfo.name ?? null,
+        handle: followerInfo.handle ?? null,
+        avatar: followerInfo.avatar ?? null,
+      },
+    },
+  });
+  await enqueueTargetedDelivery(countryId, ospEvent, {});
+  return follow;
+}
+
+/** A LOCAL user unfollows a REMOTE actor (deletes + delivers UNFOLLOWED). */
+export async function unfollowRemote(
+  userId: string,
+  countryId: string,
+  actorId: string
+): Promise<boolean> {
+  const removed = await prisma.remoteFollow.deleteMany({ where: { userId, countryId, actorId } });
+  if (removed.count === 0) {
+    return false;
+  }
+  const ospEvent = await recordUserOspEvent(userId, {
+    eventType: OspEventType.UNFOLLOWED,
+    payload: { targetActor: actorId },
+  });
+  await enqueueTargetedDelivery(countryId, ospEvent, {});
+  return true;
+}
+
+/** A LOCAL user likes a REMOTE post (records + delivers POST_LIKED, targeted). */
+export async function likeRemote(
+  userId: string,
+  countryId: string,
+  actorId: string,
+  objectId: string
+): Promise<boolean> {
+  const existing = await prisma.remoteLike.findUnique({
+    where: { userId_countryId_actorId_objectId: { userId, countryId, actorId, objectId } },
+    select: { id: true },
+  });
+  if (existing) {
+    return false;
+  }
+  await prisma.remoteLike.create({ data: { userId, countryId, actorId, objectId } });
+  const ospEvent = await recordUserOspEvent(userId, {
+    eventType: OspEventType.POST_LIKED,
+    objectType: OBJECT_TYPES.POST,
+    objectId,
+  });
+  await enqueueTargetedDelivery(countryId, ospEvent, {});
+  return true;
+}
+
+/** A LOCAL user unlikes a REMOTE post (removes + delivers POST_UNLIKED). */
+export async function unlikeRemote(
+  userId: string,
+  countryId: string,
+  actorId: string,
+  objectId: string
+): Promise<boolean> {
+  const removed = await prisma.remoteLike.deleteMany({
+    where: { userId, countryId, actorId, objectId },
+  });
+  if (removed.count === 0) {
+    return false;
+  }
+  const ospEvent = await recordUserOspEvent(userId, {
+    eventType: OspEventType.POST_UNLIKED,
+    objectType: OBJECT_TYPES.POST,
+    objectId,
+  });
+  await enqueueTargetedDelivery(countryId, ospEvent, {});
+  return true;
+}
+
+/** How many remote actors follow one of OUR users. */
+export async function getRemoteFollowerCount(targetUserId: string): Promise<number> {
+  return prisma.remoteFollower.count({ where: { targetUserId } });
+}
+
+/** How many remote actors like one of OUR posts. */
+export async function getRemoteLikeCount(postId: string): Promise<number> {
+  return prisma.remoteLikeInbound.count({ where: { postId } });
+}
+
+/** How many LOCAL users like a specific REMOTE post (by its source objectId). */
+export async function getRemotePostLikeCount(objectId: string): Promise<number> {
+  return prisma.remoteLike.count({ where: { objectId } });
+}
+
+export interface FedInteractionMaps {
+  /** "countryId:actorId" pairs the viewer follows. */
+  following: Set<string>;
+  /** remote objectIds the viewer liked. */
+  liked: Set<string>;
+  /** remote objectId -> number of LOCAL users who liked it. */
+  likeCount: Map<string, number>;
+}
+
+/**
+ * Batch interaction state for a page of federated items (used by /api/fed/feed
+ * and the /gekaixing/federated page). Guests get counts but no per-viewer state.
+ */
+export async function buildFedInteractionMaps(
+  viewerId: string | null,
+  items: Array<{ sourceCountryId: string; actorId: string; objectId: string }>
+): Promise<FedInteractionMaps> {
+  const objectIds = items.map((i) => i.objectId);
+  const maps: FedInteractionMaps = { following: new Set(), liked: new Set(), likeCount: new Map() };
+
+  if (objectIds.length > 0) {
+    const counts = await prisma.remoteLike.groupBy({
+      by: ["objectId"],
+      where: { objectId: { in: objectIds } },
+      _count: true,
+    });
+    for (const row of counts) {
+      maps.likeCount.set(row.objectId, row._count);
+    }
+  }
+
+  if (viewerId && items.length > 0) {
+    const [follows, likes] = await Promise.all([
+      prisma.remoteFollow.findMany({
+        where: {
+          userId: viewerId,
+          OR: items.map((i) => ({ countryId: i.sourceCountryId, actorId: i.actorId })),
+        },
+        select: { countryId: true, actorId: true },
+      }),
+      prisma.remoteLike.findMany({
+        where: { userId: viewerId, objectId: { in: objectIds } },
+        select: { objectId: true },
+      }),
+    ]);
+    for (const f of follows) {
+      maps.following.add(`${f.countryId}:${f.actorId}`);
+    }
+    for (const l of likes) {
+      maps.liked.add(l.objectId);
+    }
+  }
+
+  return maps;
+}
+
+/** Has a LOCAL user liked a specific REMOTE post (by its source objectId)? */
+export async function isRemoteLiked(userId: string, objectId: string): Promise<boolean> {
+  const row = await prisma.remoteLike.findFirst({
+    where: { userId, objectId },
+    select: { id: true },
+  });
+  return !!row;
 }

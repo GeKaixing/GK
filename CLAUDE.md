@@ -79,6 +79,16 @@ Peer "Countries" discover, recognize and exchange signed content. **Inbound auth
 - **CLI:** `scripts/fed-add-country.ts <host>` (discover + add peer), `scripts/fed-recognize.ts <countryId> --state=RECOGNIZED`, `scripts/fed-deliver.ts` (flush queue). Use `npx tsx --env-file=.env.development.local`.
 - **Security:** inbound content sanitized with `sanitize-html` (scripts/XSS stripped, `data-*` kept for embeds); inbox caps body at 1MB; unknown/unrecognized peers are rejected/denied; remote content is read-only in v1.
 
+### Cross-country social graph (RFC-012)
+
+Federated content is interactive: a local user can follow remote actors, and like/reply to remote posts. Remote relationships live in **separate models** — never merged into the local `Follow`/`Like`/`Post` tables.
+
+- **Models:** `RemoteFollow` (we → remote actor), `RemoteFollower` (remote actor → our user), `RemoteLike` (we → remote post), `RemoteLikeInbound` (remote actor → our post), `RemoteReply` (our local Post → remote parent). All unique-constrained to prevent dupes.
+- **Delivery:** replies reuse the existing **broadcast** (`enqueueFederationDelivery`, `parent_id` = remote post); follows/likes use **targeted** delivery (`enqueueTargetedDelivery`) to the post/actor's country. Inbound FOLLOWED/POST_LIKED are handled by `handleInboundFederation` → `RemoteFollower`/`RemoteLikeInbound` (deduped, signature/recognition-gated).
+- **Helpers:** `followRemote`/`unfollowRemote`/`likeRemote`/`unlikeRemote` (each records the relationship + ledger event + targeted delivery), `isFollowingRemote`, `isRemoteLiked`, `getRemoteFollowerCount`, `getRemoteLikeCount`, `getRemotePostLikeCount`, `buildFedInteractionMaps` (batch interaction state for feed/page).
+- **Routes:** `POST/DELETE /api/fed/follow`, `POST/DELETE /api/fed/like`, `POST /api/fed/reply` (local Post + RemoteReply + broadcast). `GET /api/fed/feed` returns per-item `isFollowing`/`likedByMe`/`remoteLikeCount`.
+- **UI:** `FedPostCard` is interactive (follow button, like, reply dialog via `MinimalTiptapEditor`); the status page shows remote replies + a remote-like count; profiles show a remote-follower count. Guests are redirected to `/account` on interaction.
+
 ### AI subsystem
 
 - **Users bring their own API key; the app is provider-agnostic (Pi agent + AI SDK).** Provider/key/model live in Supabase `user_metadata` (`ai_provider`, `ai_api_key`, `ai_model`, optional `ai_base_url`), configured in `components/gekaixing/SettingAI.tsx` at `/gekaixing/settings/account`. Legacy `gemini_api_key` / `gemini_model` still work (treated as provider `google`). If no key is set, AI endpoints return 503 and point the user to settings.

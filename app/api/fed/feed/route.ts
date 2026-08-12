@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { FedInboundStatus, RecognitionState } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
-import { COUNTRY_ID } from "@/lib/osp";
+import { buildFedInteractionMaps, COUNTRY_ID } from "@/lib/osp";
+import { createClient } from "@/utils/supabase/server";
 
 /**
- * OSP RFC-009: federated content — admitted remote posts from RECOGNIZED/TRUSTED
- * peers, newest first. Public. Read-only in v1 (cross-country actions are RFC-012).
+ * OSP RFC-009/012: federated content — admitted remote posts from
+ * RECOGNIZED/TRUSTED peers, newest first. Public. Includes per-viewer
+ * interaction state (isFollowing / likedByMe / remoteLikeCount) when authed.
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -35,6 +37,24 @@ export async function GET(request: Request) {
   const page = hasMore ? objects.slice(0, limit) : objects;
   const nextCursor = hasMore ? page[page.length - 1]?.id ?? null : null;
 
+  // Optional viewer for interaction state.
+  let viewerId: string | null = null;
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    viewerId = user?.id ?? null;
+  } catch {
+    viewerId = null;
+  }
+
+  // Batch interaction state (RFC-012).
+  const maps = await buildFedInteractionMaps(
+    viewerId,
+    page.map((o) => ({ sourceCountryId: o.sourceCountryId, actorId: o.actorId, objectId: o.objectId }))
+  );
+
   return NextResponse.json({
     data: page.map((o) => ({
       id: o.id,
@@ -50,6 +70,9 @@ export async function GET(request: Request) {
       parentId: o.parentId,
       createdAt: o.createdAt,
       receivedAt: o.receivedAt,
+      isFollowing: maps.following.has(`${o.sourceCountryId}:${o.actorId}`),
+      likedByMe: maps.liked.has(o.objectId),
+      remoteLikeCount: maps.likeCount.get(o.objectId) ?? 0,
     })),
     page: { nextCursor, hasMore },
     success: true,

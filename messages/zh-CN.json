@@ -886,7 +886,13 @@
       "title": "联邦",
       "empty": "还没有来自联邦国家的内容。当已互认的国家发布内容时，公开帖子会出现在这里。",
       "fromCountry": "来自",
-      "readOnly": "只读"
+      "readOnly": "只读",
+      "replyTitle": "回复联邦帖子",
+      "replyPlaceholder": "写回复…",
+      "replySuccess": "回复已发布并发送到源国家。",
+      "replyFailed": "回复发布失败。",
+      "follow": "关注",
+      "following": "已关注"
     }
   },
   "AuthCodeError": {

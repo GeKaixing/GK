@@ -81,7 +81,12 @@ export const ModelName = {
   FedDelivery: 'FedDelivery',
   FedInbox: 'FedInbox',
   FedObject: 'FedObject',
-  RemoteActor: 'RemoteActor'
+  RemoteActor: 'RemoteActor',
+  RemoteFollow: 'RemoteFollow',
+  RemoteFollower: 'RemoteFollower',
+  RemoteLike: 'RemoteLike',
+  RemoteLikeInbound: 'RemoteLikeInbound',
+  RemoteReply: 'RemoteReply'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -556,6 +561,64 @@ export const RemoteActorScalarFieldEnum = {
 } as const
 
 export type RemoteActorScalarFieldEnum = (typeof RemoteActorScalarFieldEnum)[keyof typeof RemoteActorScalarFieldEnum]
+
+
+export const RemoteFollowScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  countryId: 'countryId',
+  actorId: 'actorId',
+  createdAt: 'createdAt'
+} as const
+
+export type RemoteFollowScalarFieldEnum = (typeof RemoteFollowScalarFieldEnum)[keyof typeof RemoteFollowScalarFieldEnum]
+
+
+export const RemoteFollowerScalarFieldEnum = {
+  id: 'id',
+  countryId: 'countryId',
+  actorId: 'actorId',
+  targetUserId: 'targetUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type RemoteFollowerScalarFieldEnum = (typeof RemoteFollowerScalarFieldEnum)[keyof typeof RemoteFollowerScalarFieldEnum]
+
+
+export const RemoteLikeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  countryId: 'countryId',
+  actorId: 'actorId',
+  objectId: 'objectId',
+  createdAt: 'createdAt'
+} as const
+
+export type RemoteLikeScalarFieldEnum = (typeof RemoteLikeScalarFieldEnum)[keyof typeof RemoteLikeScalarFieldEnum]
+
+
+export const RemoteLikeInboundScalarFieldEnum = {
+  id: 'id',
+  sourceCountryId: 'sourceCountryId',
+  sourceActorId: 'sourceActorId',
+  postId: 'postId',
+  createdAt: 'createdAt'
+} as const
+
+export type RemoteLikeInboundScalarFieldEnum = (typeof RemoteLikeInboundScalarFieldEnum)[keyof typeof RemoteLikeInboundScalarFieldEnum]
+
+
+export const RemoteReplyScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  localPostId: 'localPostId',
+  countryId: 'countryId',
+  actorId: 'actorId',
+  remotePostId: 'remotePostId',
+  createdAt: 'createdAt'
+} as const
+
+export type RemoteReplyScalarFieldEnum = (typeof RemoteReplyScalarFieldEnum)[keyof typeof RemoteReplyScalarFieldEnum]
 
 
 export const SortOrder = {

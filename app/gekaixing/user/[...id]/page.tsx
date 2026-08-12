@@ -2,6 +2,7 @@
 import ArrowLeftBack from '@/components/gekaixing/ArrowLeftBack'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { prisma } from '@/lib/prisma'
+import { getRemoteFollowerCount } from "@/lib/osp";
 import { Post } from '../../page'
 import PostStore from '@/components/gekaixing/PostStore'
 import User_background_image from '@/components/gekaixing/User_background_image'
@@ -360,6 +361,9 @@ export default async function Page({ params }: { params: Promise<{ id: string[] 
     const isHiring = hiringResult.status === "fulfilled" ? hiringResult.value : false
     const isOwner = currentUser?.id === user?.id
 
+    // OSP RFC-012: followers from federated (remote) countries.
+    const remoteFollowers = user ? await getRemoteFollowerCount(user.id).catch(() => 0) : 0
+
 
     return (
         <div className="pb-20 sm:pb-0">
@@ -377,6 +381,7 @@ export default async function Page({ params }: { params: Promise<{ id: string[] 
                     viewedUserid={user?.userid}
                     followers={user?._count.followers}
                     following={user?._count.following}
+                    remoteFollowers={remoteFollowers}
                     isOwner={isOwner}
                     isPremium={user?.isPremium || false}
                     isHiring={isHiring}

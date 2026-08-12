@@ -25,4 +25,4 @@ An Actor in Country A MAY maintain a relationship with an Actor in Country B, su
 
 ## Implementation Status
 
-**Draft — deferred (no code landed in v3.0.0).**
+**Draft — reference implementation landed in Gekaixing v3.2.0 (cross-country social graph: follow, like, reply between countries).**

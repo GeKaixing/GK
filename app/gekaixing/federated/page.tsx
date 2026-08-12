@@ -2,14 +2,16 @@ import ArrowLeftBack from "@/components/gekaixing/ArrowLeftBack";
 import FedPostCard from "@/components/gekaixing/FedPostCard";
 import { FedInboundStatus, RecognitionState } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
-import { COUNTRY_ID } from "@/lib/osp";
+import { buildFedInteractionMaps, COUNTRY_ID } from "@/lib/osp";
+import { createClient } from "@/utils/supabase/server";
 import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 /**
- * OSP RFC-009 federated surface: admitted public posts from RECOGNIZED/TRUSTED
- * peer countries, newest first. Read-only in v1.
+ * OSP RFC-009/012 federated surface: admitted public posts from
+ * RECOGNIZED/TRUSTED peer countries, newest first. Interactive — follow, like
+ * and reply to remote posts (RFC-012).
  */
 export default async function FederatedPage() {
   const t = await getTranslations("ImitationX.Federated");
@@ -32,6 +34,23 @@ export default async function FederatedPage() {
     include: { remoteCountry: { select: { id: true, name: true } } },
   });
 
+  // Optional viewer for interaction state.
+  let viewerId: string | null = null;
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    viewerId = user?.id ?? null;
+  } catch {
+    viewerId = null;
+  }
+
+  const maps = await buildFedInteractionMaps(
+    viewerId,
+    objects.map((o) => ({ sourceCountryId: o.sourceCountryId, actorId: o.actorId, objectId: o.objectId }))
+  );
+
   return (
     <div>
       <ArrowLeftBack name={t("title")} />
@@ -46,11 +65,16 @@ export default async function FederatedPage() {
               sourceCountryName={o.remoteCountry?.name ?? o.sourceCountryId}
               actorId={o.actorId}
               did={`did:osp:${o.sourceCountryId}:${o.actorId}`}
+              objectId={o.objectId}
               content={o.content}
               authorName={o.authorName}
               authorHandle={o.authorHandle}
               authorAvatar={o.authorAvatar}
               createdAt={o.createdAt.toISOString()}
+              viewerId={viewerId}
+              isFollowing={maps.following.has(`${o.sourceCountryId}:${o.actorId}`)}
+              likedByMe={maps.liked.has(o.objectId)}
+              remoteLikeCount={maps.likeCount.get(o.objectId) ?? 0}
             />
           ))
         )}
