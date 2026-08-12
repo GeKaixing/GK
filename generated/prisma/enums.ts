@@ -141,3 +141,36 @@ export const OspEventType = {
 } as const
 
 export type OspEventType = (typeof OspEventType)[keyof typeof OspEventType]
+
+
+export const RecognitionState = {
+  UNKNOWN: 'UNKNOWN',
+  RECOGNIZED: 'RECOGNIZED',
+  TRUSTED: 'TRUSTED',
+  RESTRICTED: 'RESTRICTED',
+  BLOCKED: 'BLOCKED',
+  SUSPENDED: 'SUSPENDED'
+} as const
+
+export type RecognitionState = (typeof RecognitionState)[keyof typeof RecognitionState]
+
+
+export const FedDeliveryStatus = {
+  PENDING: 'PENDING',
+  SENDING: 'SENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+} as const
+
+export type FedDeliveryStatus = (typeof FedDeliveryStatus)[keyof typeof FedDeliveryStatus]
+
+
+export const FedInboundStatus = {
+  RECEIVED: 'RECEIVED',
+  ADMITTED: 'ADMITTED',
+  DENIED: 'DENIED',
+  DUPLICATE: 'DUPLICATE',
+  ERROR: 'ERROR'
+} as const
+
+export type FedInboundStatus = (typeof FedInboundStatus)[keyof typeof FedInboundStatus]

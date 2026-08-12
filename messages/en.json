@@ -112,7 +112,8 @@
       "clearHistory": "Clear history",
       "clearHistoryTitle": "Clear browsing history?",
       "clearHistoryConfirm": "This removes every post you've clicked and can't be undone.",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "federated": "Federated"
     },
     "Mobile": {
       "home": "Home",
@@ -142,14 +143,14 @@
       "inputPlaceholder": "Type a message...",
       "send": "Send",
       "emptyState": "Start chatting with GKX 🚀",
-  "tagline": "Your AI assistant, ready when you are",
-  "searchPlaceholder": "Search conversations",
-  "disclaimer": "GKX can make mistakes. Verify important information.",
-  "dateToday": "Today",
-  "dateYesterday": "Yesterday",
-  "datePrev7": "Previous 7 days",
-  "datePrev30": "Previous 30 days",
-  "dateOlder": "Older",
+      "tagline": "Your AI assistant, ready when you are",
+      "searchPlaceholder": "Search conversations",
+      "disclaimer": "GKX can make mistakes. Verify important information.",
+      "dateToday": "Today",
+      "dateYesterday": "Yesterday",
+      "datePrev7": "Previous 7 days",
+      "datePrev30": "Previous 30 days",
+      "dateOlder": "Older",
       "copySuccess": "Copied",
       "copyFailed": "Copy failed",
       "copyMessage": "Copy message",
@@ -880,6 +881,12 @@
       "feedbackSubmitted": "Thanks for the feedback",
       "feedbackFailed": "Failed to submit feedback",
       "feedbackMessageRequired": "Please describe the problem"
+    },
+    "Federated": {
+      "title": "Federated",
+      "empty": "No posts from federated countries yet. When a recognized country publishes, their public posts appear here.",
+      "fromCountry": "via",
+      "readOnly": "Read-only"
     }
   },
   "AuthCodeError": {

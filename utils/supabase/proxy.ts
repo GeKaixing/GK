@@ -34,10 +34,13 @@ const PUBLIC_PATHS = [
   "/gekaixing/following",
   "/gekaixing/jobs",
   "/gekaixing/help",
+  "/gekaixing/federated", // OSP 联邦内容（公开）
   // 公开内容站
   "/blog",
   "/notion",
   "/motion",
+  // OSP 联邦：对端国家的无会话发现请求（/.well-known/osp）
+  "/.well-known",
 ];
 
 function isPublicPath(pathname: string): boolean {

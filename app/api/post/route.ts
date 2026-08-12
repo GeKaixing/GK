@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { UserActionType, UserRole, OspEventType } from "@/generated/prisma/enums";
 import { logUserAction } from "@/lib/feed/actions";
 import { invalidateAuthorAudienceFeed, invalidateUserHomeFeed } from "@/lib/feed/service";
-import { OBJECT_TYPES, DEFAULT_CUSTOMS_PIPELINES, recordUserOspEvent, runCustoms } from "@/lib/osp";
+import { OBJECT_TYPES, DEFAULT_CUSTOMS_PIPELINES, enqueueFederationDelivery, recordUserOspEvent, runCustoms } from "@/lib/osp";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { extractYouTubeEmbedUrl } from "@/utils/function/extractYouTubeEmbedUrl";
@@ -238,6 +238,15 @@ export async function POST(request: Request) {
         eventType: OspEventType.POST_CREATED,
         objectType: OBJECT_TYPES.POST,
         objectId: post.id,
+      }).then(async (ospEvent) => {
+        // OSP RFC-009: broadcast the signed content event to recognized peers.
+        await enqueueFederationDelivery(ospEvent, {
+          content: post.content,
+          authorName: post.author?.name ?? null,
+          authorHandle: post.author?.userid ?? null,
+          authorAvatar: post.author?.avatar ?? null,
+          parentId: null,
+        });
       });
     } else {
       await invalidateUserHomeFeed(user.id);
@@ -252,6 +261,14 @@ export async function POST(request: Request) {
         objectType: OBJECT_TYPES.COMMENT,
         objectId: post.id,
         payload: { parentId: parentId ?? null, rootId: rootId ?? null },
+      }).then(async (ospEvent) => {
+        await enqueueFederationDelivery(ospEvent, {
+          content: post.content,
+          authorName: post.author?.name ?? null,
+          authorHandle: post.author?.userid ?? null,
+          authorAvatar: post.author?.avatar ?? null,
+          parentId: parentId ?? null,
+        });
       });
     }
 

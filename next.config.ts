@@ -18,6 +18,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // OSP RFC-009 discovery: App Router ignores dot-prefixed folders (.well-known),
+  // so route the well-known document through a rewrite.
+  async rewrites() {
+    return [
+      {
+        source: "/.well-known/osp",
+        destination: "/well-known/osp",
+      },
+    ];
+  },
 };
 
 const withNextIntl = createNextIntlPlugin();

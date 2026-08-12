@@ -68,6 +68,17 @@ Gekaixing is the **reference implementation of OSP (Open Social Protocol)** — 
 - **Capabilities (RFC-015):** `CREATE_POST`/`SEARCH` (+`MODERATE` for admins) are seeded per actor; the AI chat's `webSearch`/`fetchUrl` are gated by the AI service actor's `SEARCH` capability (`lib/ai/pi.ts`).
 - **Data ownership (RFC-008):** `GET /api/user/export` returns a full signed export (manifest digest + Country signature); account deletion (`DELETE /api/user`) revokes passport/capabilities, records `ACCOUNT_DELETED`, and cleans tables Prisma can't cascade (`PiSessionFile`, `ChatAISession`, `Follow` both directions, orphaned conversations).
 
+### OSP federation (RFC-009 Federation + RFC-011 Recognition)
+
+Peer "Countries" discover, recognize and exchange signed content. **Inbound auth = signature verification** — no shared secret; the peer's public key is the credential.
+
+- **Models:** `RemoteCountry` (peer id/name/publicKey/federationEndpoint), `Recognition` (directional, `fromCountryId`=gkx; default UNKNOWN; RECOGNIZED/TRUSTED admit), `FedDelivery` (outbound queue, payload persisted so retries are self-contained), `FedInbox` (inbound receipt log, `eventId` unique = idempotency), `FedObject` (admitted remote content — **never mixed into `Post`**, sanitized on receipt), `RemoteActor` (remote identity cache).
+- **`lib/osp/federation.ts`:** `buildWellKnown`/`fetchCountryWellKnown` (discovery), `getRecognition`/`setRecognition`/`isAdmitting`, `enqueueFederationDelivery` (broadcast signed content events to recognized peers; fire-and-forget), `deliverPending` (worker, `attempts^2` min backoff), `handleInboundFederation` (verify → recognition gate → Customs → sanitize → store), `resolveRemoteActor`/`buildRemoteActorProfile` (DID resolution).
+- **Discovery:** served at `/.well-known/osp` via a **rewrite** (`next.config.ts` — App Router ignores dot-prefixed folders); added `/.well-known` and `/gekaixing/federated` to the proxy allowlist.
+- **Routes:** `POST /api/fed/inbox` (202/401/200-duplicate), `POST /api/fed/deliver` (admin or `FED_DELIVERY_SECRET` Bearer), `GET /api/fed/feed`, `GET /api/fed/resolve?did=`, `GET /api/fed/actors/[countryId]/[actorId]`, `POST /api/admin/federation` (admin: add/recognize). Only `post`/`reply` POST enqueue outbound content (likes/follows/messages do NOT federate — RFC-012 deferred; messages are private).
+- **CLI:** `scripts/fed-add-country.ts <host>` (discover + add peer), `scripts/fed-recognize.ts <countryId> --state=RECOGNIZED`, `scripts/fed-deliver.ts` (flush queue). Use `npx tsx --env-file=.env.development.local`.
+- **Security:** inbound content sanitized with `sanitize-html` (scripts/XSS stripped, `data-*` kept for embeds); inbox caps body at 1MB; unknown/unrecognized peers are rejected/denied; remote content is read-only in v1.
+
 ### AI subsystem
 
 - **Users bring their own API key; the app is provider-agnostic (Pi agent + AI SDK).** Provider/key/model live in Supabase `user_metadata` (`ai_provider`, `ai_api_key`, `ai_model`, optional `ai_base_url`), configured in `components/gekaixing/SettingAI.tsx` at `/gekaixing/settings/account`. Legacy `gemini_api_key` / `gemini_model` still work (treated as provider `google`). If no key is set, AI endpoints return 503 and point the user to settings.

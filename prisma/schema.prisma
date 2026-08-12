@@ -552,3 +552,141 @@ model Capability {
   @@unique([actorId, capabilityType])
   @@index([actorId])
 }
+
+// ============ OSP federation — RFC-009/011 ============
+
+enum RecognitionState {
+  UNKNOWN
+  RECOGNIZED
+  TRUSTED
+  RESTRICTED
+  BLOCKED
+  SUSPENDED
+}
+
+enum FedDeliveryStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+}
+
+enum FedInboundStatus {
+  RECEIVED
+  ADMITTED
+  DENIED
+  DUPLICATE
+  ERROR
+}
+
+/// OSP RFC-009/011: a peer Country this instance federates with. The public key
+/// is the ONLY thing needed to verify an inbound envelope (signature = auth).
+model RemoteCountry {
+  id                 String        @id // remote country id
+  name               String
+  publicKey          String // base64 SPKI
+  federationEndpoint String // base URL; delivery posts to ${base}/api/fed/inbox
+  status             CountryStatus @default(ACTIVE)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  deliveries         FedDelivery[]
+  recognitions       Recognition[]
+  objects            FedObject[]
+  inbound            FedInbox[]
+  actors             RemoteActor[]
+}
+
+/// OSP RFC-011: directional recognition. v1 records only OUR stance (from=gkx)
+/// toward each peer; A recognizing B does not imply B recognizes A.
+model Recognition {
+  id            String          @id @default(uuid())
+  fromCountryId String // always our COUNTRY_ID in v1
+  toCountryId   String
+  state         RecognitionState @default(UNKNOWN)
+  policy        String?         @db.Text // JSON string
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  remoteCountry RemoteCountry   @relation(fields: [toCountryId], references: [id], onDelete: Cascade)
+
+  @@unique([fromCountryId, toCountryId])
+  @@index([toCountryId])
+}
+
+/// OSP RFC-009: outbound delivery queue. `payload` persists the signed envelope
+/// so retries never need to re-read the source content.
+model FedDelivery {
+  id              String           @id @default(uuid())
+  eventId         String
+  actorId         String
+  targetCountryId String
+  payload         String           @db.Text // envelope payload JSON (canonical)
+  status          FedDeliveryStatus @default(PENDING)
+  attempts        Int              @default(0)
+  nextRetryAt     DateTime?
+  lastError       String?
+  deliveredAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  remoteCountry   RemoteCountry    @relation(fields: [targetCountryId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, targetCountryId])
+  @@index([status, nextRetryAt])
+}
+
+/// OSP RFC-009: inbound receipt / audit log. eventId is the idempotency key.
+model FedInbox {
+  id              String           @id @default(uuid())
+  eventId         String           @unique
+  sourceCountryId String
+  actorId         String
+  eventType       OspEventType
+  objectType      String?
+  objectId        String?
+  payload         String           @db.Text // received canonical envelope payload
+  signature       String
+  status          FedInboundStatus @default(RECEIVED)
+  error           String?
+  receivedAt      DateTime         @default(now())
+  remoteCountry   RemoteCountry    @relation(fields: [sourceCountryId], references: [id], onDelete: Cascade)
+
+  @@index([sourceCountryId, status])
+}
+
+/// OSP RFC-009: admitted remote content (the federated surface). Never mixed
+/// into the local Post table — content is server-side sanitized on receipt.
+model FedObject {
+  id              String           @id @default(uuid())
+  eventId         String           @unique
+  sourceCountryId String
+  actorId         String
+  objectType      String
+  objectId        String
+  content         String?          @db.Text // sanitized HTML
+  authorName      String?
+  authorHandle    String?
+  authorAvatar    String?
+  parentId        String? // thread parent object id (replies)
+  createdAt       DateTime // original timestamp from the sender
+  receivedAt      DateTime         @default(now())
+  status          FedInboundStatus @default(ADMITTED)
+  remoteCountry   RemoteCountry    @relation(fields: [sourceCountryId], references: [id], onDelete: Cascade)
+
+  @@index([sourceCountryId, receivedAt])
+}
+
+/// OSP RFC-001/009: cached remote actor identity (for DID resolution).
+model RemoteActor {
+  id            String        @id @default(uuid())
+  countryId     String
+  actorId       String
+  name          String?
+  handle        String?
+  avatar        String?
+  publicKey     String?
+  profile       String?       @db.Text // JSON string
+  firstSeenAt   DateTime      @default(now())
+  lastSeenAt    DateTime      @updatedAt
+  remoteCountry RemoteCountry @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  @@unique([countryId, actorId])
+}

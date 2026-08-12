@@ -10,6 +10,7 @@ export * from "./country";
 export * from "./customs";
 export * from "./did";
 export * from "./event";
+export * from "./federation";
 export * from "./keys";
 export * from "./object";
 export * from "./passport";

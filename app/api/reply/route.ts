@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { UserActionType, OspEventType } from "@/generated/prisma/enums";
 import { logUserAction } from "@/lib/feed/actions";
 import { invalidateUserHomeFeed } from "@/lib/feed/service";
-import { OBJECT_TYPES, DEFAULT_CUSTOMS_PIPELINES, recordUserOspEvent, runCustoms } from "@/lib/osp";
+import { OBJECT_TYPES, DEFAULT_CUSTOMS_PIPELINES, enqueueFederationDelivery, recordUserOspEvent, runCustoms } from "@/lib/osp";
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { extractYouTubeEmbedUrl } from "@/utils/function/extractYouTubeEmbedUrl";
@@ -112,6 +112,15 @@ export async function POST(request: Request) {
       objectType: OBJECT_TYPES.COMMENT,
       objectId: reply.id,
       payload: { parentId, rootId },
+    }).then(async (ospEvent) => {
+      // OSP RFC-009: broadcast the signed reply to recognized peers.
+      await enqueueFederationDelivery(ospEvent, {
+        content: reply.content,
+        authorName: reply.author?.name ?? null,
+        authorHandle: reply.author?.userid ?? null,
+        authorAvatar: reply.author?.avatar ?? null,
+        parentId,
+      });
     });
 
     return NextResponse.json({ data: reply, success: true });

@@ -75,7 +75,13 @@ export const ModelName = {
   Actor: 'Actor',
   Passport: 'Passport',
   OspEvent: 'OspEvent',
-  Capability: 'Capability'
+  Capability: 'Capability',
+  RemoteCountry: 'RemoteCountry',
+  Recognition: 'Recognition',
+  FedDelivery: 'FedDelivery',
+  FedInbox: 'FedInbox',
+  FedObject: 'FedObject',
+  RemoteActor: 'RemoteActor'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -452,6 +458,104 @@ export const CapabilityScalarFieldEnum = {
 } as const
 
 export type CapabilityScalarFieldEnum = (typeof CapabilityScalarFieldEnum)[keyof typeof CapabilityScalarFieldEnum]
+
+
+export const RemoteCountryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  publicKey: 'publicKey',
+  federationEndpoint: 'federationEndpoint',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RemoteCountryScalarFieldEnum = (typeof RemoteCountryScalarFieldEnum)[keyof typeof RemoteCountryScalarFieldEnum]
+
+
+export const RecognitionScalarFieldEnum = {
+  id: 'id',
+  fromCountryId: 'fromCountryId',
+  toCountryId: 'toCountryId',
+  state: 'state',
+  policy: 'policy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RecognitionScalarFieldEnum = (typeof RecognitionScalarFieldEnum)[keyof typeof RecognitionScalarFieldEnum]
+
+
+export const FedDeliveryScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  actorId: 'actorId',
+  targetCountryId: 'targetCountryId',
+  payload: 'payload',
+  status: 'status',
+  attempts: 'attempts',
+  nextRetryAt: 'nextRetryAt',
+  lastError: 'lastError',
+  deliveredAt: 'deliveredAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FedDeliveryScalarFieldEnum = (typeof FedDeliveryScalarFieldEnum)[keyof typeof FedDeliveryScalarFieldEnum]
+
+
+export const FedInboxScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  sourceCountryId: 'sourceCountryId',
+  actorId: 'actorId',
+  eventType: 'eventType',
+  objectType: 'objectType',
+  objectId: 'objectId',
+  payload: 'payload',
+  signature: 'signature',
+  status: 'status',
+  error: 'error',
+  receivedAt: 'receivedAt'
+} as const
+
+export type FedInboxScalarFieldEnum = (typeof FedInboxScalarFieldEnum)[keyof typeof FedInboxScalarFieldEnum]
+
+
+export const FedObjectScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  sourceCountryId: 'sourceCountryId',
+  actorId: 'actorId',
+  objectType: 'objectType',
+  objectId: 'objectId',
+  content: 'content',
+  authorName: 'authorName',
+  authorHandle: 'authorHandle',
+  authorAvatar: 'authorAvatar',
+  parentId: 'parentId',
+  createdAt: 'createdAt',
+  receivedAt: 'receivedAt',
+  status: 'status'
+} as const
+
+export type FedObjectScalarFieldEnum = (typeof FedObjectScalarFieldEnum)[keyof typeof FedObjectScalarFieldEnum]
+
+
+export const RemoteActorScalarFieldEnum = {
+  id: 'id',
+  countryId: 'countryId',
+  actorId: 'actorId',
+  name: 'name',
+  handle: 'handle',
+  avatar: 'avatar',
+  publicKey: 'publicKey',
+  profile: 'profile',
+  firstSeenAt: 'firstSeenAt',
+  lastSeenAt: 'lastSeenAt'
+} as const
+
+export type RemoteActorScalarFieldEnum = (typeof RemoteActorScalarFieldEnum)[keyof typeof RemoteActorScalarFieldEnum]
 
 
 export const SortOrder = {

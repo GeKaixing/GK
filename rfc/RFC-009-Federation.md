@@ -21,4 +21,4 @@ Bridges to ActivityPub, AT Protocol, or other protocols MAY be implemented as ex
 
 ## Implementation Status
 
-**Draft — deferred (no code landed in v3.0.0).**
+**Draft — reference implementation landed in Gekaixing v3.1.0 (federation core: discovery, recognition, signed envelope exchange, delivery worker). Cross-country social graph (RFC-012) and ActivityPub interop remain deferred.**

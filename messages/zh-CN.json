@@ -112,7 +112,8 @@
       "clearHistory": "清空历史",
       "clearHistoryTitle": "清空浏览历史？",
       "clearHistoryConfirm": "将删除所有浏览记录，此操作无法撤销。",
-      "cancel": "取消"
+      "cancel": "取消",
+      "federated": "联邦"
     },
     "Mobile": {
       "home": "主页",
@@ -142,14 +143,14 @@
       "inputPlaceholder": "输入消息...",
       "send": "发送",
       "emptyState": "开始和 GKX 对话吧 🚀",
-  "tagline": "你的 AI 助手，随时为你服务",
-  "searchPlaceholder": "搜索会话",
-  "disclaimer": "GKX 可能会犯错，请核对重要信息。",
-  "dateToday": "今天",
-  "dateYesterday": "昨天",
-  "datePrev7": "近 7 天",
-  "datePrev30": "近 30 天",
-  "dateOlder": "更早",
+      "tagline": "你的 AI 助手，随时为你服务",
+      "searchPlaceholder": "搜索会话",
+      "disclaimer": "GKX 可能会犯错，请核对重要信息。",
+      "dateToday": "今天",
+      "dateYesterday": "昨天",
+      "datePrev7": "近 7 天",
+      "datePrev30": "近 30 天",
+      "dateOlder": "更早",
       "copySuccess": "复制成功",
       "copyFailed": "复制失败",
       "copyMessage": "复制消息",
@@ -880,6 +881,12 @@
       "feedbackSubmitted": "感谢你的反馈",
       "feedbackFailed": "反馈提交失败",
       "feedbackMessageRequired": "请描述遇到的问题"
+    },
+    "Federated": {
+      "title": "联邦",
+      "empty": "还没有来自联邦国家的内容。当已互认的国家发布内容时，公开帖子会出现在这里。",
+      "fromCountry": "来自",
+      "readOnly": "只读"
     }
   },
   "AuthCodeError": {

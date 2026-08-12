@@ -4,7 +4,7 @@ import { postModalStore } from "@/store/postModal";
 import { feedDotStore } from "@/store/feedDot";
 import { chatDotStore } from "@/store/chatDot";
 import { liveDotStore } from "@/store/liveDot";
-import { MessageSquare, House, LogIn, Settings, Users, Search, Sparkles, CircleEllipsis, Heart, Bookmark, Feather, User as UserIcon, ShieldCheck, Bell, BriefcaseBusiness, Radio, History } from "lucide-react";
+import { MessageSquare, House, LogIn, Settings, Users, Search, Sparkles, CircleEllipsis, Heart, Bookmark, Feather, User as UserIcon, ShieldCheck, Bell, BriefcaseBusiness, Radio, History, Globe } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -52,6 +52,7 @@ export default function Sidebar({ user, mentionCount = 0, hasNewTweets = false, 
       { href: "/gekaixing/chat", icon: MessageSquare, label: t("chat"), active: isActivePath("/gekaixing/chat") },
       { href: "/gekaixing/connect_people", icon: Users, label: t("connect"), active: isActivePath("/gekaixing/connect_people") },
       { href: "/gekaixing/explore", icon: Search, label: t("explore"), active: isActivePath("/gekaixing/explore") },
+      { href: "/gekaixing/federated", icon: Globe, label: t("federated"), active: isActivePath("/gekaixing/federated") },
       { href: "/gekaixing/live", icon: Radio, label: t("live"), active: isActivePath("/gekaixing/live") },
       { href: "/gekaixing/gkx", icon: Sparkles, label: "GKX", active: isActivePath("/gekaixing/gkx") },
       { href: "/premium", icon: ShieldCheck, label: t("premium"), active: isActivePath("/premium") },
