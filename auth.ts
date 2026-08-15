@@ -137,7 +137,10 @@ export const authOptions: NextAuthOptions = {
       return await decodeAuthToken(params);
     },
   },
-  secret: getAuthSecret(),
+  // Resolve lazily (non-throwing) so importing @/auth never fails at build time
+  // when the env var is missing; Auth.js also reads AUTH_SECRET/NEXTAUTH_SECRET
+  // itself. Runtime fails only if the deployment truly lacks the secret.
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   providers: [
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ? [
