@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 function buildMetadata(avatar: string | null, name: string | null): Record<string, string> {
   const base: Record<string, string> = {};
   if (avatar) {

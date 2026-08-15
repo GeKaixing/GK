@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 interface UpdateProfileBody {
   email?: string;
   password?: string;

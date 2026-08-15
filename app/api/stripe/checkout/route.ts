@@ -4,6 +4,8 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 const checkoutBodySchema = z.object({
   priceId: z.string().min(1),
 });
