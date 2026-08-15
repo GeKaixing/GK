@@ -42,3 +42,4 @@ next-env.d.ts
 
 /lib/generated/prisma
 
+supabase/.temp/
