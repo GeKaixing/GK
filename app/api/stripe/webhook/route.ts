@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import type Stripe from "stripe";
 
@@ -127,6 +127,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<void> {
 }
 
 export async function POST(req: Request) {
+  const stripe = getStripe();
   const body = await req.text();
   const h = await headers();
   const sig = h.get("stripe-signature");

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -25,6 +25,7 @@ function getAllowedPriceIds(): Set<string> {
 
 export async function POST(request: Request) {
   try {
+    const stripe = getStripe();
     const authSession = await auth();
     if (!authSession?.user?.id) {
       return NextResponse.json(
