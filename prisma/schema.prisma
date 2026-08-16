@@ -26,6 +26,7 @@ model User {
   premiumExpiresAt         DateTime?
   premiumGraceEndsAt       DateTime?
   stripePriceId            String?
+  role                     UserRole                  @default(STANDARD)
   bookmarks                Bookmark[]
   conversationParticipants ConversationParticipant[]
   conversationReads        ConversationRead[]
@@ -38,6 +39,7 @@ model User {
   actions                  UserAction[]
   jobPosts                 JobPosting[]
   settings                 UserSettings?
+  actor                    Actor?                    @relation("UserActor")
 }
 
 model EmailVerificationToken {
@@ -100,6 +102,7 @@ model Post {
   starCount  Int          @default(0)
   videoUrl   String?
   audioUrl   String?
+  visibility PostVisibility @default(PUBLIC) // OSP RFC-005; schema-only, enforcement deferred
   bookmarks  Bookmark[]
   likes      Like[]
   author     User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
@@ -295,3 +298,367 @@ enum SubscriptionStatus {
   EXPIRED
   CANCELED
 }
+
+// ============ OSP (Open Social Protocol) — ported from main ============
+
+enum UserRole {
+  ADMIN
+  STANDARD
+}
+
+enum PostVisibility {
+  PUBLIC
+  FOLLOWERS
+  PRIVATE
+}
+
+enum CountryStatus {
+  ACTIVE
+  SUSPENDED
+  DESTROYED
+}
+
+enum PassportStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+  SUSPENDED
+  MIGRATED
+}
+
+enum CapabilityType {
+  CREATE_POST
+  SEARCH
+  MODERATE
+  TRANSLATE
+  GENERATE_MEDIA
+  EXECUTE_TASK
+  ACCESS_MEMORY
+}
+
+enum CapabilityState {
+  GRANTED
+  REVOKED
+  EXPIRED
+}
+
+enum OspEventType {
+  COUNTRY_BOOTSTRAPPED
+  ACTOR_CREATED
+  PASSPORT_ISSUED
+  PASSPORT_REVOKED
+  POST_CREATED
+  POST_DELETED
+  REPLY_CREATED
+  POST_LIKED
+  POST_UNLIKED
+  POST_BOOKMARKED
+  POST_UNBOOKMARKED
+  POST_SHARED
+  FOLLOWED
+  UNFOLLOWED
+  MESSAGE_SENT
+  CAPABILITY_GRANTED
+  CAPABILITY_REVOKED
+  ACCOUNT_DELETED
+}
+
+// ============ OSP models — the protocol layer ============
+
+/// OSP RFC-002: an independent server/network realm. Gekaixing is Country "gkx".
+model Country {
+  id                 String        @id // stable slug: "gkx"
+  name               String
+  publicKey          String // base64 Ed25519 pubkey (derived from OSP_COUNTRY_SECRET)
+  federationEndpoint String?
+  policy             String?       @db.Text // JSON string (country policy set)
+  status             CountryStatus @default(ACTIVE)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  passports          Passport[]
+  events             OspEvent[]
+}
+
+/// OSP RFC-004: the universal participant primitive. Human or service actor.
+/// Actor survives User deletion (userId is SetNull) so the signed ledger stays.
+model Actor {
+  id           String        @id @default(uuid())
+  userId       String?       @unique // 1:1 human actor -> User; SetNull on user delete
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User?         @relation("UserActor", fields: [userId], references: [id], onDelete: SetNull)
+  passports    Passport[]
+  events       OspEvent[]
+  capabilities Capability[]
+}
+
+/// OSP RFC-003: universal passport issued by the Country, signed with the Country key.
+model Passport {
+  id               String         @id @default(uuid())
+  countryId        String
+  actorId          String
+  publicKey        String // base64 Ed25519 actor pubkey
+  issuedAt         DateTime       @default(now())
+  expiresAt        DateTime?
+  status           PassportStatus @default(ACTIVE)
+  signature        String // base64 country signature over the canonical passport payload
+  migrationHistory String?        @db.Text // JSON array string (RFC-003)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  country          Country        @relation(fields: [countryId], references: [id])
+  actor            Actor          @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@unique([countryId, actorId])
+  @@index([actorId])
+  @@index([status])
+}
+
+/// OSP RFC-006: append-only, signed event ledger. Immutable (no cascade from Actor).
+/// objectId is a protocol string, deliberately NOT an FK: the ledger survives object deletion.
+model OspEvent {
+  id         String       @id @default(cuid())
+  eventId    String       @unique @default(cuid())
+  countryId  String
+  actorId    String
+  eventType  OspEventType
+  objectType String?
+  objectId   String?
+  seq        Int
+  prevHash   String?
+  hash       String // sha256 of the canonical payload
+  signature  String // base64 country signature
+  payload    String?      @db.Text // canonical JSON (replay/verify)
+  globalSeq  BigInt       @unique @default(autoincrement())
+  createdAt  DateTime     @default(now())
+  country    Country      @relation(fields: [countryId], references: [id])
+  actor      Actor        @relation(fields: [actorId], references: [id]) // no cascade: ledger is immutable
+
+  @@unique([actorId, seq])
+  @@index([actorId, createdAt])
+  @@index([eventType])
+}
+
+/// OSP RFC-015: what an Actor is allowed to do, separate from identity.
+model Capability {
+  id             String          @id @default(uuid())
+  actorId        String
+  capabilityType CapabilityType
+  state          CapabilityState @default(GRANTED)
+  scope          String?         @db.Text // JSON string: resource/time/country-policy limits
+  grantedBy      String? // actorId or "country"
+  grantedAt      DateTime        @default(now())
+  expiresAt      DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  actor          Actor           @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@unique([actorId, capabilityType])
+  @@index([actorId])
+}
+
+// ============ OSP federation — RFC-009/011 ============
+
+enum RecognitionState {
+  UNKNOWN
+  RECOGNIZED
+  TRUSTED
+  RESTRICTED
+  BLOCKED
+  SUSPENDED
+}
+
+enum FedDeliveryStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+}
+
+enum FedInboundStatus {
+  RECEIVED
+  ADMITTED
+  DENIED
+  DUPLICATE
+  ERROR
+}
+
+/// OSP RFC-009/011: a peer Country this instance federates with. The public key
+/// is the ONLY thing needed to verify an inbound envelope (signature = auth).
+model RemoteCountry {
+  id                 String        @id // remote country id
+  name               String
+  publicKey          String // base64 SPKI
+  federationEndpoint String // base URL; delivery posts to ${base}/api/fed/inbox
+  status             CountryStatus @default(ACTIVE)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  deliveries         FedDelivery[]
+  recognitions       Recognition[]
+  objects            FedObject[]
+  inbound            FedInbox[]
+  actors             RemoteActor[]
+}
+
+/// OSP RFC-011: directional recognition. v1 records only OUR stance (from=gkx)
+/// toward each peer; A recognizing B does not imply B recognizes A.
+model Recognition {
+  id            String          @id @default(uuid())
+  fromCountryId String // always our COUNTRY_ID in v1
+  toCountryId   String
+  state         RecognitionState @default(UNKNOWN)
+  policy        String?         @db.Text // JSON string
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  remoteCountry RemoteCountry   @relation(fields: [toCountryId], references: [id], onDelete: Cascade)
+
+  @@unique([fromCountryId, toCountryId])
+  @@index([toCountryId])
+}
+
+/// OSP RFC-009: outbound delivery queue. `payload` persists the signed envelope
+/// so retries never need to re-read the source content.
+model FedDelivery {
+  id              String           @id @default(uuid())
+  eventId         String
+  actorId         String
+  targetCountryId String
+  payload         String           @db.Text // envelope payload JSON (canonical)
+  status          FedDeliveryStatus @default(PENDING)
+  attempts        Int              @default(0)
+  nextRetryAt     DateTime?
+  lastError       String?
+  deliveredAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  remoteCountry   RemoteCountry    @relation(fields: [targetCountryId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, targetCountryId])
+  @@index([status, nextRetryAt])
+}
+
+/// OSP RFC-009: inbound receipt / audit log. eventId is the idempotency key.
+model FedInbox {
+  id              String           @id @default(uuid())
+  eventId         String           @unique
+  sourceCountryId String
+  actorId         String
+  eventType       OspEventType
+  objectType      String?
+  objectId        String?
+  payload         String           @db.Text // received canonical envelope payload
+  signature       String
+  status          FedInboundStatus @default(RECEIVED)
+  error           String?
+  receivedAt      DateTime         @default(now())
+  remoteCountry   RemoteCountry    @relation(fields: [sourceCountryId], references: [id], onDelete: Cascade)
+
+  @@index([sourceCountryId, status])
+}
+
+/// OSP RFC-009: admitted remote content (the federated surface). Never mixed
+/// into the local Post table — content is server-side sanitized on receipt.
+model FedObject {
+  id              String           @id @default(uuid())
+  eventId         String           @unique
+  sourceCountryId String
+  actorId         String
+  objectType      String
+  objectId        String
+  content         String?          @db.Text // sanitized HTML
+  authorName      String?
+  authorHandle    String?
+  authorAvatar    String?
+  parentId        String? // thread parent object id (replies)
+  createdAt       DateTime // original timestamp from the sender
+  receivedAt      DateTime         @default(now())
+  status          FedInboundStatus @default(ADMITTED)
+  remoteCountry   RemoteCountry    @relation(fields: [sourceCountryId], references: [id], onDelete: Cascade)
+
+  @@index([sourceCountryId, receivedAt])
+}
+
+/// OSP RFC-001/009: cached remote actor identity (for DID resolution).
+model RemoteActor {
+  id            String        @id @default(uuid())
+  countryId     String
+  actorId       String
+  name          String?
+  handle        String?
+  avatar        String?
+  publicKey     String?
+  profile       String?       @db.Text // JSON string
+  firstSeenAt   DateTime      @default(now())
+  lastSeenAt    DateTime      @updatedAt
+  remoteCountry RemoteCountry @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  @@unique([countryId, actorId])
+}
+
+// ============ OSP cross-country social graph — RFC-012 ============
+
+/// A LOCAL user following a REMOTE actor. Distinct from the local Follow table.
+model RemoteFollow {
+  id        String   @id @default(uuid())
+  userId    String
+  countryId String
+  actorId   String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, countryId, actorId])
+  @@index([userId])
+  @@index([countryId, actorId])
+}
+
+/// A REMOTE actor following one of OUR users.
+model RemoteFollower {
+  id            String   @id @default(uuid())
+  countryId     String
+  actorId       String
+  targetUserId  String
+  createdAt     DateTime @default(now())
+
+  @@unique([countryId, actorId, targetUserId])
+  @@index([targetUserId])
+}
+
+/// A LOCAL user liking a REMOTE post.
+model RemoteLike {
+  id        String   @id @default(uuid())
+  userId    String
+  countryId String
+  actorId   String
+  objectId  String // the remote post's id in its source country
+  createdAt DateTime @default(now())
+
+  @@unique([userId, countryId, actorId, objectId])
+  @@index([objectId])
+  @@index([userId])
+}
+
+/// A REMOTE actor liking one of OUR posts.
+model RemoteLikeInbound {
+  id              String   @id @default(uuid())
+  sourceCountryId String
+  sourceActorId   String
+  postId          String // our local Post id
+  createdAt       DateTime @default(now())
+
+  @@unique([sourceCountryId, sourceActorId, postId])
+  @@index([postId])
+}
+
+/// A LOCAL reply Post that responds to a REMOTE post (the local Post has no
+/// local parentId; this row links it to the remote parent).
+model RemoteReply {
+  id           String   @id @default(uuid())
+  userId       String
+  localPostId  String   @unique // our local Post id
+  countryId    String
+  actorId      String
+  remotePostId String // the remote post being replied to
+  createdAt    DateTime @default(now())
+
+  @@index([remotePostId])
+}
+

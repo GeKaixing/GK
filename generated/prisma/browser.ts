@@ -103,3 +103,90 @@ export type JobPosting = Prisma.JobPostingModel
  * 
  */
 export type UserAction = Prisma.UserActionModel
+/**
+ * Model Country
+ * OSP RFC-002: an independent server/network realm. Gekaixing is Country "gkx".
+ */
+export type Country = Prisma.CountryModel
+/**
+ * Model Actor
+ * OSP RFC-004: the universal participant primitive. Human or service actor.
+ * Actor survives User deletion (userId is SetNull) so the signed ledger stays.
+ */
+export type Actor = Prisma.ActorModel
+/**
+ * Model Passport
+ * OSP RFC-003: universal passport issued by the Country, signed with the Country key.
+ */
+export type Passport = Prisma.PassportModel
+/**
+ * Model OspEvent
+ * OSP RFC-006: append-only, signed event ledger. Immutable (no cascade from Actor).
+ * objectId is a protocol string, deliberately NOT an FK: the ledger survives object deletion.
+ */
+export type OspEvent = Prisma.OspEventModel
+/**
+ * Model Capability
+ * OSP RFC-015: what an Actor is allowed to do, separate from identity.
+ */
+export type Capability = Prisma.CapabilityModel
+/**
+ * Model RemoteCountry
+ * OSP RFC-009/011: a peer Country this instance federates with. The public key
+ * is the ONLY thing needed to verify an inbound envelope (signature = auth).
+ */
+export type RemoteCountry = Prisma.RemoteCountryModel
+/**
+ * Model Recognition
+ * OSP RFC-011: directional recognition. v1 records only OUR stance (from=gkx)
+ * toward each peer; A recognizing B does not imply B recognizes A.
+ */
+export type Recognition = Prisma.RecognitionModel
+/**
+ * Model FedDelivery
+ * OSP RFC-009: outbound delivery queue. `payload` persists the signed envelope
+ * so retries never need to re-read the source content.
+ */
+export type FedDelivery = Prisma.FedDeliveryModel
+/**
+ * Model FedInbox
+ * OSP RFC-009: inbound receipt / audit log. eventId is the idempotency key.
+ */
+export type FedInbox = Prisma.FedInboxModel
+/**
+ * Model FedObject
+ * OSP RFC-009: admitted remote content (the federated surface). Never mixed
+ * into the local Post table — content is server-side sanitized on receipt.
+ */
+export type FedObject = Prisma.FedObjectModel
+/**
+ * Model RemoteActor
+ * OSP RFC-001/009: cached remote actor identity (for DID resolution).
+ */
+export type RemoteActor = Prisma.RemoteActorModel
+/**
+ * Model RemoteFollow
+ * A LOCAL user following a REMOTE actor. Distinct from the local Follow table.
+ */
+export type RemoteFollow = Prisma.RemoteFollowModel
+/**
+ * Model RemoteFollower
+ * A REMOTE actor following one of OUR users.
+ */
+export type RemoteFollower = Prisma.RemoteFollowerModel
+/**
+ * Model RemoteLike
+ * A LOCAL user liking a REMOTE post.
+ */
+export type RemoteLike = Prisma.RemoteLikeModel
+/**
+ * Model RemoteLikeInbound
+ * A REMOTE actor liking one of OUR posts.
+ */
+export type RemoteLikeInbound = Prisma.RemoteLikeInboundModel
+/**
+ * Model RemoteReply
+ * A LOCAL reply Post that responds to a REMOTE post (the local Post has no
+ * local parentId; this row links it to the remote parent).
+ */
+export type RemoteReply = Prisma.RemoteReplyModel

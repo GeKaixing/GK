@@ -43,6 +43,7 @@ export type UserMinAggregateOutputType = {
   premiumExpiresAt: Date | null
   premiumGraceEndsAt: Date | null
   stripePriceId: string | null
+  role: $Enums.UserRole | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -64,6 +65,7 @@ export type UserMaxAggregateOutputType = {
   premiumExpiresAt: Date | null
   premiumGraceEndsAt: Date | null
   stripePriceId: string | null
+  role: $Enums.UserRole | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -85,6 +87,7 @@ export type UserCountAggregateOutputType = {
   premiumExpiresAt: number
   premiumGraceEndsAt: number
   stripePriceId: number
+  role: number
   _all: number
 }
 
@@ -108,6 +111,7 @@ export type UserMinAggregateInputType = {
   premiumExpiresAt?: true
   premiumGraceEndsAt?: true
   stripePriceId?: true
+  role?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -129,6 +133,7 @@ export type UserMaxAggregateInputType = {
   premiumExpiresAt?: true
   premiumGraceEndsAt?: true
   stripePriceId?: true
+  role?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -150,6 +155,7 @@ export type UserCountAggregateInputType = {
   premiumExpiresAt?: true
   premiumGraceEndsAt?: true
   stripePriceId?: true
+  role?: true
   _all?: true
 }
 
@@ -244,6 +250,7 @@ export type UserGroupByOutputType = {
   premiumExpiresAt: Date | null
   premiumGraceEndsAt: Date | null
   stripePriceId: string | null
+  role: $Enums.UserRole
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -286,6 +293,7 @@ export type UserWhereInput = {
   premiumExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   premiumGraceEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   stripePriceId?: Prisma.StringNullableFilter<"User"> | string | null
+  role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   bookmarks?: Prisma.BookmarkListRelationFilter
   conversationParticipants?: Prisma.ConversationParticipantListRelationFilter
   conversationReads?: Prisma.ConversationReadListRelationFilter
@@ -298,6 +306,7 @@ export type UserWhereInput = {
   actions?: Prisma.UserActionListRelationFilter
   jobPosts?: Prisma.JobPostingListRelationFilter
   settings?: Prisma.XOR<Prisma.UserSettingsNullableScalarRelationFilter, Prisma.UserSettingsWhereInput> | null
+  actor?: Prisma.XOR<Prisma.ActorNullableScalarRelationFilter, Prisma.ActorWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -319,6 +328,7 @@ export type UserOrderByWithRelationInput = {
   premiumExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   premiumGraceEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   stripePriceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  role?: Prisma.SortOrder
   bookmarks?: Prisma.BookmarkOrderByRelationAggregateInput
   conversationParticipants?: Prisma.ConversationParticipantOrderByRelationAggregateInput
   conversationReads?: Prisma.ConversationReadOrderByRelationAggregateInput
@@ -331,6 +341,7 @@ export type UserOrderByWithRelationInput = {
   actions?: Prisma.UserActionOrderByRelationAggregateInput
   jobPosts?: Prisma.JobPostingOrderByRelationAggregateInput
   settings?: Prisma.UserSettingsOrderByWithRelationInput
+  actor?: Prisma.ActorOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -355,6 +366,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   premiumExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   premiumGraceEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   stripePriceId?: Prisma.StringNullableFilter<"User"> | string | null
+  role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   bookmarks?: Prisma.BookmarkListRelationFilter
   conversationParticipants?: Prisma.ConversationParticipantListRelationFilter
   conversationReads?: Prisma.ConversationReadListRelationFilter
@@ -367,6 +379,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   actions?: Prisma.UserActionListRelationFilter
   jobPosts?: Prisma.JobPostingListRelationFilter
   settings?: Prisma.XOR<Prisma.UserSettingsNullableScalarRelationFilter, Prisma.UserSettingsWhereInput> | null
+  actor?: Prisma.XOR<Prisma.ActorNullableScalarRelationFilter, Prisma.ActorWhereInput> | null
 }, "id" | "email" | "userid" | "stripeCustomerId" | "stripeSubId">
 
 export type UserOrderByWithAggregationInput = {
@@ -388,6 +401,7 @@ export type UserOrderByWithAggregationInput = {
   premiumExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   premiumGraceEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   stripePriceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  role?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -415,6 +429,7 @@ export type UserScalarWhereWithAggregatesInput = {
   premiumExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   premiumGraceEndsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   stripePriceId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
 }
 
 export type UserCreateInput = {
@@ -436,6 +451,7 @@ export type UserCreateInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -448,6 +464,7 @@ export type UserCreateInput = {
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -469,6 +486,7 @@ export type UserUncheckedCreateInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -481,6 +499,7 @@ export type UserUncheckedCreateInput = {
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -502,6 +521,7 @@ export type UserUpdateInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -514,6 +534,7 @@ export type UserUpdateInput = {
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -535,6 +556,7 @@ export type UserUncheckedUpdateInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -547,6 +569,7 @@ export type UserUncheckedUpdateInput = {
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -568,6 +591,7 @@ export type UserCreateManyInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
 }
 
 export type UserUpdateManyMutationInput = {
@@ -589,6 +613,7 @@ export type UserUpdateManyMutationInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -610,6 +635,7 @@ export type UserUncheckedUpdateManyInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -631,6 +657,7 @@ export type UserCountOrderByAggregateInput = {
   premiumExpiresAt?: Prisma.SortOrder
   premiumGraceEndsAt?: Prisma.SortOrder
   stripePriceId?: Prisma.SortOrder
+  role?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -652,6 +679,7 @@ export type UserMaxOrderByAggregateInput = {
   premiumExpiresAt?: Prisma.SortOrder
   premiumGraceEndsAt?: Prisma.SortOrder
   stripePriceId?: Prisma.SortOrder
+  role?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -673,11 +701,17 @@ export type UserMinOrderByAggregateInput = {
   premiumExpiresAt?: Prisma.SortOrder
   premiumGraceEndsAt?: Prisma.SortOrder
   stripePriceId?: Prisma.SortOrder
+  role?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -702,6 +736,10 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type EnumSubscriptionStatusFieldUpdateOperationsInput = {
   set?: $Enums.SubscriptionStatus
+}
+
+export type EnumUserRoleFieldUpdateOperationsInput = {
+  set?: $Enums.UserRole
 }
 
 export type UserCreateNestedOneWithoutSettingsInput = {
@@ -872,6 +910,22 @@ export type UserUpdateOneRequiredWithoutActionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutActionsInput, Prisma.UserUpdateWithoutActionsInput>, Prisma.UserUncheckedUpdateWithoutActionsInput>
 }
 
+export type UserCreateNestedOneWithoutActorInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutActorInput, Prisma.UserUncheckedCreateWithoutActorInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutActorInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutActorNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutActorInput, Prisma.UserUncheckedCreateWithoutActorInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutActorInput
+  upsert?: Prisma.UserUpsertWithoutActorInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutActorInput, Prisma.UserUpdateWithoutActorInput>, Prisma.UserUncheckedUpdateWithoutActorInput>
+}
+
 export type UserCreateWithoutSettingsInput = {
   id?: string
   email: string
@@ -891,6 +945,7 @@ export type UserCreateWithoutSettingsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -902,6 +957,7 @@ export type UserCreateWithoutSettingsInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSettingsInput = {
@@ -923,6 +979,7 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -934,6 +991,7 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSettingsInput = {
@@ -971,6 +1029,7 @@ export type UserUpdateWithoutSettingsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -982,6 +1041,7 @@ export type UserUpdateWithoutSettingsInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSettingsInput = {
@@ -1003,6 +1063,7 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -1014,6 +1075,7 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutFollowingInput = {
@@ -1035,6 +1097,7 @@ export type UserCreateWithoutFollowingInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -1046,6 +1109,7 @@ export type UserCreateWithoutFollowingInput = {
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFollowingInput = {
@@ -1067,6 +1131,7 @@ export type UserUncheckedCreateWithoutFollowingInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -1078,6 +1143,7 @@ export type UserUncheckedCreateWithoutFollowingInput = {
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFollowingInput = {
@@ -1104,6 +1170,7 @@ export type UserCreateWithoutFollowersInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -1115,6 +1182,7 @@ export type UserCreateWithoutFollowersInput = {
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFollowersInput = {
@@ -1136,6 +1204,7 @@ export type UserUncheckedCreateWithoutFollowersInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -1147,6 +1216,7 @@ export type UserUncheckedCreateWithoutFollowersInput = {
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFollowersInput = {
@@ -1184,6 +1254,7 @@ export type UserUpdateWithoutFollowingInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -1195,6 +1266,7 @@ export type UserUpdateWithoutFollowingInput = {
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFollowingInput = {
@@ -1216,6 +1288,7 @@ export type UserUncheckedUpdateWithoutFollowingInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -1227,6 +1300,7 @@ export type UserUncheckedUpdateWithoutFollowingInput = {
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutFollowersInput = {
@@ -1259,6 +1333,7 @@ export type UserUpdateWithoutFollowersInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -1270,6 +1345,7 @@ export type UserUpdateWithoutFollowersInput = {
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFollowersInput = {
@@ -1291,6 +1367,7 @@ export type UserUncheckedUpdateWithoutFollowersInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -1302,6 +1379,7 @@ export type UserUncheckedUpdateWithoutFollowersInput = {
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPostsInput = {
@@ -1323,6 +1401,7 @@ export type UserCreateWithoutPostsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -1334,6 +1413,7 @@ export type UserCreateWithoutPostsInput = {
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPostsInput = {
@@ -1355,6 +1435,7 @@ export type UserUncheckedCreateWithoutPostsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -1366,6 +1447,7 @@ export type UserUncheckedCreateWithoutPostsInput = {
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPostsInput = {
@@ -1403,6 +1485,7 @@ export type UserUpdateWithoutPostsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -1414,6 +1497,7 @@ export type UserUpdateWithoutPostsInput = {
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPostsInput = {
@@ -1435,6 +1519,7 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -1446,6 +1531,7 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLikesInput = {
@@ -1467,6 +1553,7 @@ export type UserCreateWithoutLikesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -1478,6 +1565,7 @@ export type UserCreateWithoutLikesInput = {
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLikesInput = {
@@ -1499,6 +1587,7 @@ export type UserUncheckedCreateWithoutLikesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -1510,6 +1599,7 @@ export type UserUncheckedCreateWithoutLikesInput = {
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLikesInput = {
@@ -1547,6 +1637,7 @@ export type UserUpdateWithoutLikesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -1558,6 +1649,7 @@ export type UserUpdateWithoutLikesInput = {
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLikesInput = {
@@ -1579,6 +1671,7 @@ export type UserUncheckedUpdateWithoutLikesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -1590,6 +1683,7 @@ export type UserUncheckedUpdateWithoutLikesInput = {
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBookmarksInput = {
@@ -1611,6 +1705,7 @@ export type UserCreateWithoutBookmarksInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
   following?: Prisma.FollowCreateNestedManyWithoutFollowerInput
@@ -1622,6 +1717,7 @@ export type UserCreateWithoutBookmarksInput = {
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBookmarksInput = {
@@ -1643,6 +1739,7 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
   following?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowerInput
@@ -1654,6 +1751,7 @@ export type UserUncheckedCreateWithoutBookmarksInput = {
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBookmarksInput = {
@@ -1691,6 +1789,7 @@ export type UserUpdateWithoutBookmarksInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUpdateManyWithoutFollowerNestedInput
@@ -1702,6 +1801,7 @@ export type UserUpdateWithoutBookmarksInput = {
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBookmarksInput = {
@@ -1723,6 +1823,7 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUncheckedUpdateManyWithoutFollowerNestedInput
@@ -1734,6 +1835,7 @@ export type UserUncheckedUpdateWithoutBookmarksInput = {
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSharesInput = {
@@ -1755,6 +1857,7 @@ export type UserCreateWithoutSharesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -1766,6 +1869,7 @@ export type UserCreateWithoutSharesInput = {
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSharesInput = {
@@ -1787,6 +1891,7 @@ export type UserUncheckedCreateWithoutSharesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -1798,6 +1903,7 @@ export type UserUncheckedCreateWithoutSharesInput = {
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSharesInput = {
@@ -1835,6 +1941,7 @@ export type UserUpdateWithoutSharesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -1846,6 +1953,7 @@ export type UserUpdateWithoutSharesInput = {
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSharesInput = {
@@ -1867,6 +1975,7 @@ export type UserUncheckedUpdateWithoutSharesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -1878,6 +1987,7 @@ export type UserUncheckedUpdateWithoutSharesInput = {
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationParticipantsInput = {
@@ -1899,6 +2009,7 @@ export type UserCreateWithoutConversationParticipantsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
   following?: Prisma.FollowCreateNestedManyWithoutFollowerInput
@@ -1910,6 +2021,7 @@ export type UserCreateWithoutConversationParticipantsInput = {
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationParticipantsInput = {
@@ -1931,6 +2043,7 @@ export type UserUncheckedCreateWithoutConversationParticipantsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
   following?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowerInput
@@ -1942,6 +2055,7 @@ export type UserUncheckedCreateWithoutConversationParticipantsInput = {
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationParticipantsInput = {
@@ -1979,6 +2093,7 @@ export type UserUpdateWithoutConversationParticipantsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUpdateManyWithoutFollowerNestedInput
@@ -1990,6 +2105,7 @@ export type UserUpdateWithoutConversationParticipantsInput = {
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationParticipantsInput = {
@@ -2011,6 +2127,7 @@ export type UserUncheckedUpdateWithoutConversationParticipantsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUncheckedUpdateManyWithoutFollowerNestedInput
@@ -2022,6 +2139,7 @@ export type UserUncheckedUpdateWithoutConversationParticipantsInput = {
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesInput = {
@@ -2043,6 +2161,7 @@ export type UserCreateWithoutMessagesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -2054,6 +2173,7 @@ export type UserCreateWithoutMessagesInput = {
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesInput = {
@@ -2075,6 +2195,7 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -2086,6 +2207,7 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesInput = {
@@ -2123,6 +2245,7 @@ export type UserUpdateWithoutMessagesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -2134,6 +2257,7 @@ export type UserUpdateWithoutMessagesInput = {
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -2155,6 +2279,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -2166,6 +2291,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationReadsInput = {
@@ -2187,6 +2313,7 @@ export type UserCreateWithoutConversationReadsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   following?: Prisma.FollowCreateNestedManyWithoutFollowerInput
@@ -2198,6 +2325,7 @@ export type UserCreateWithoutConversationReadsInput = {
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationReadsInput = {
@@ -2219,6 +2347,7 @@ export type UserUncheckedCreateWithoutConversationReadsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   following?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowerInput
@@ -2230,6 +2359,7 @@ export type UserUncheckedCreateWithoutConversationReadsInput = {
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationReadsInput = {
@@ -2267,6 +2397,7 @@ export type UserUpdateWithoutConversationReadsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUpdateManyWithoutFollowerNestedInput
@@ -2278,6 +2409,7 @@ export type UserUpdateWithoutConversationReadsInput = {
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationReadsInput = {
@@ -2299,6 +2431,7 @@ export type UserUncheckedUpdateWithoutConversationReadsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   following?: Prisma.FollowUncheckedUpdateManyWithoutFollowerNestedInput
@@ -2310,6 +2443,7 @@ export type UserUncheckedUpdateWithoutConversationReadsInput = {
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutJobPostsInput = {
@@ -2331,6 +2465,7 @@ export type UserCreateWithoutJobPostsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -2342,6 +2477,7 @@ export type UserCreateWithoutJobPostsInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutJobPostsInput = {
@@ -2363,6 +2499,7 @@ export type UserUncheckedCreateWithoutJobPostsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -2374,6 +2511,7 @@ export type UserUncheckedCreateWithoutJobPostsInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutJobPostsInput = {
@@ -2411,6 +2549,7 @@ export type UserUpdateWithoutJobPostsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -2422,6 +2561,7 @@ export type UserUpdateWithoutJobPostsInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutJobPostsInput = {
@@ -2443,6 +2583,7 @@ export type UserUncheckedUpdateWithoutJobPostsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -2454,6 +2595,7 @@ export type UserUncheckedUpdateWithoutJobPostsInput = {
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
   actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutActionsInput = {
@@ -2475,6 +2617,7 @@ export type UserCreateWithoutActionsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
@@ -2486,6 +2629,7 @@ export type UserCreateWithoutActionsInput = {
   shares?: Prisma.ShareCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutActionsInput = {
@@ -2507,6 +2651,7 @@ export type UserUncheckedCreateWithoutActionsInput = {
   premiumExpiresAt?: Date | string | null
   premiumGraceEndsAt?: Date | string | null
   stripePriceId?: string | null
+  role?: $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
@@ -2518,6 +2663,7 @@ export type UserUncheckedCreateWithoutActionsInput = {
   shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
   jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
   settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+  actor?: Prisma.ActorUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutActionsInput = {
@@ -2555,6 +2701,7 @@ export type UserUpdateWithoutActionsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
@@ -2566,6 +2713,7 @@ export type UserUpdateWithoutActionsInput = {
   shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutActionsInput = {
@@ -2587,6 +2735,7 @@ export type UserUncheckedUpdateWithoutActionsInput = {
   premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
   conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
@@ -2596,6 +2745,159 @@ export type UserUncheckedUpdateWithoutActionsInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
+  jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
+  settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
+  actor?: Prisma.ActorUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutActorInput = {
+  id?: string
+  email: string
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  name?: string | null
+  avatar?: string | null
+  backgroundImage?: string | null
+  briefIntroduction?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userid?: string
+  isPremium?: boolean
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  premiumExpiresAt?: Date | string | null
+  premiumGraceEndsAt?: Date | string | null
+  stripePriceId?: string | null
+  role?: $Enums.UserRole
+  bookmarks?: Prisma.BookmarkCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
+  conversationReads?: Prisma.ConversationReadCreateNestedManyWithoutUserInput
+  following?: Prisma.FollowCreateNestedManyWithoutFollowerInput
+  followers?: Prisma.FollowCreateNestedManyWithoutFollowingInput
+  likes?: Prisma.LikeCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
+  shares?: Prisma.ShareCreateNestedManyWithoutUserInput
+  actions?: Prisma.UserActionCreateNestedManyWithoutUserInput
+  jobPosts?: Prisma.JobPostingCreateNestedManyWithoutAuthorInput
+  settings?: Prisma.UserSettingsCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutActorInput = {
+  id?: string
+  email: string
+  emailVerifiedAt?: Date | string | null
+  passwordHash?: string | null
+  name?: string | null
+  avatar?: string | null
+  backgroundImage?: string | null
+  briefIntroduction?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  userid?: string
+  isPremium?: boolean
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  subscriptionStatus?: $Enums.SubscriptionStatus
+  premiumExpiresAt?: Date | string | null
+  premiumGraceEndsAt?: Date | string | null
+  stripePriceId?: string | null
+  role?: $Enums.UserRole
+  bookmarks?: Prisma.BookmarkUncheckedCreateNestedManyWithoutUserInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  conversationReads?: Prisma.ConversationReadUncheckedCreateNestedManyWithoutUserInput
+  following?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowerInput
+  followers?: Prisma.FollowUncheckedCreateNestedManyWithoutFollowingInput
+  likes?: Prisma.LikeUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
+  shares?: Prisma.ShareUncheckedCreateNestedManyWithoutUserInput
+  actions?: Prisma.UserActionUncheckedCreateNestedManyWithoutUserInput
+  jobPosts?: Prisma.JobPostingUncheckedCreateNestedManyWithoutAuthorInput
+  settings?: Prisma.UserSettingsUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutActorInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutActorInput, Prisma.UserUncheckedCreateWithoutActorInput>
+}
+
+export type UserUpsertWithoutActorInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutActorInput, Prisma.UserUncheckedUpdateWithoutActorInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutActorInput, Prisma.UserUncheckedCreateWithoutActorInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutActorInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutActorInput, Prisma.UserUncheckedUpdateWithoutActorInput>
+}
+
+export type UserUpdateWithoutActorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  backgroundImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  briefIntroduction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userid?: Prisma.StringFieldUpdateOperationsInput | string
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  bookmarks?: Prisma.BookmarkUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
+  conversationReads?: Prisma.ConversationReadUpdateManyWithoutUserNestedInput
+  following?: Prisma.FollowUpdateManyWithoutFollowerNestedInput
+  followers?: Prisma.FollowUpdateManyWithoutFollowingNestedInput
+  likes?: Prisma.LikeUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
+  shares?: Prisma.ShareUpdateManyWithoutUserNestedInput
+  actions?: Prisma.UserActionUpdateManyWithoutUserNestedInput
+  jobPosts?: Prisma.JobPostingUpdateManyWithoutAuthorNestedInput
+  settings?: Prisma.UserSettingsUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutActorInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  backgroundImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  briefIntroduction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  userid?: Prisma.StringFieldUpdateOperationsInput | string
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+  premiumExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  premiumGraceEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  bookmarks?: Prisma.BookmarkUncheckedUpdateManyWithoutUserNestedInput
+  conversationParticipants?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  conversationReads?: Prisma.ConversationReadUncheckedUpdateManyWithoutUserNestedInput
+  following?: Prisma.FollowUncheckedUpdateManyWithoutFollowerNestedInput
+  followers?: Prisma.FollowUncheckedUpdateManyWithoutFollowingNestedInput
+  likes?: Prisma.LikeUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
+  shares?: Prisma.ShareUncheckedUpdateManyWithoutUserNestedInput
+  actions?: Prisma.UserActionUncheckedUpdateManyWithoutUserNestedInput
   jobPosts?: Prisma.JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   settings?: Prisma.UserSettingsUncheckedUpdateOneWithoutUserNestedInput
 }
@@ -2740,6 +3042,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   premiumExpiresAt?: boolean
   premiumGraceEndsAt?: boolean
   stripePriceId?: boolean
+  role?: boolean
   bookmarks?: boolean | Prisma.User$bookmarksArgs<ExtArgs>
   conversationParticipants?: boolean | Prisma.User$conversationParticipantsArgs<ExtArgs>
   conversationReads?: boolean | Prisma.User$conversationReadsArgs<ExtArgs>
@@ -2752,6 +3055,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   actions?: boolean | Prisma.User$actionsArgs<ExtArgs>
   jobPosts?: boolean | Prisma.User$jobPostsArgs<ExtArgs>
   settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
+  actor?: boolean | Prisma.User$actorArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2774,6 +3078,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   premiumExpiresAt?: boolean
   premiumGraceEndsAt?: boolean
   stripePriceId?: boolean
+  role?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2795,6 +3100,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   premiumExpiresAt?: boolean
   premiumGraceEndsAt?: boolean
   stripePriceId?: boolean
+  role?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -2816,9 +3122,10 @@ export type UserSelectScalar = {
   premiumExpiresAt?: boolean
   premiumGraceEndsAt?: boolean
   stripePriceId?: boolean
+  role?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerifiedAt" | "passwordHash" | "name" | "avatar" | "backgroundImage" | "briefIntroduction" | "createdAt" | "updatedAt" | "userid" | "isPremium" | "stripeCustomerId" | "stripeSubId" | "subscriptionStatus" | "premiumExpiresAt" | "premiumGraceEndsAt" | "stripePriceId", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerifiedAt" | "passwordHash" | "name" | "avatar" | "backgroundImage" | "briefIntroduction" | "createdAt" | "updatedAt" | "userid" | "isPremium" | "stripeCustomerId" | "stripeSubId" | "subscriptionStatus" | "premiumExpiresAt" | "premiumGraceEndsAt" | "stripePriceId" | "role", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bookmarks?: boolean | Prisma.User$bookmarksArgs<ExtArgs>
   conversationParticipants?: boolean | Prisma.User$conversationParticipantsArgs<ExtArgs>
@@ -2832,6 +3139,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   actions?: boolean | Prisma.User$actionsArgs<ExtArgs>
   jobPosts?: boolean | Prisma.User$jobPostsArgs<ExtArgs>
   settings?: boolean | Prisma.User$settingsArgs<ExtArgs>
+  actor?: boolean | Prisma.User$actorArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2852,6 +3160,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     actions: Prisma.$UserActionPayload<ExtArgs>[]
     jobPosts: Prisma.$JobPostingPayload<ExtArgs>[]
     settings: Prisma.$UserSettingsPayload<ExtArgs> | null
+    actor: Prisma.$ActorPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2872,6 +3181,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     premiumExpiresAt: Date | null
     premiumGraceEndsAt: Date | null
     stripePriceId: string | null
+    role: $Enums.UserRole
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -3278,6 +3588,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   actions<T extends Prisma.User$actionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$actionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   jobPosts<T extends Prisma.User$jobPostsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$jobPostsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JobPostingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   settings<T extends Prisma.User$settingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$settingsArgs<ExtArgs>>): Prisma.Prisma__UserSettingsClient<runtime.Types.Result.GetResult<Prisma.$UserSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  actor<T extends Prisma.User$actorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$actorArgs<ExtArgs>>): Prisma.Prisma__ActorClient<runtime.Types.Result.GetResult<Prisma.$ActorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3325,6 +3636,7 @@ export interface UserFieldRefs {
   readonly premiumExpiresAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly premiumGraceEndsAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly stripePriceId: Prisma.FieldRef<"User", 'String'>
+  readonly role: Prisma.FieldRef<"User", 'UserRole'>
 }
     
 
@@ -3993,6 +4305,25 @@ export type User$settingsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   include?: Prisma.UserSettingsInclude<ExtArgs> | null
   where?: Prisma.UserSettingsWhereInput
+}
+
+/**
+ * User.actor
+ */
+export type User$actorArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Actor
+   */
+  select?: Prisma.ActorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Actor
+   */
+  omit?: Prisma.ActorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActorInclude<ExtArgs> | null
+  where?: Prisma.ActorWhereInput
 }
 
 /**
