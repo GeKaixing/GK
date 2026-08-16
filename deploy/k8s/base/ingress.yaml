@@ -16,10 +16,3 @@ spec:
                 name: gkx-frontend
                 port:
                   number: 80
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: gkx-backend-api
-                port:
-                  number: 80

@@ -33,6 +33,7 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env
 .env.local
+.env.*
 # vercel
 .vercel
 
@@ -43,3 +44,7 @@ next-env.d.ts
 /lib/generated/prisma
 
 supabase/.temp/
+
+# local env files (real secrets — never commit)
+.env.production.local
+.env.development.local

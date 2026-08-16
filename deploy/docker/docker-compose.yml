@@ -19,47 +19,5 @@ services:
     ports:
       - "6379:6379"
 
-  backend-api:
-    build:
-      context: ../../
-      dockerfile: deploy/docker/backend.api.Dockerfile
-    container_name: gkx-backend-api
-    environment:
-      APP_NAME: gekaixing-api
-      APP_ENV: development
-      HTTP_ADDR: :8080
-      GRPC_ADDR: :9090
-      AUTH_SECRET: replace-me
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/gekaixing?sslmode=disable
-      REDIS_ADDR: redis:6379
-      REDIS_DB: 0
-      LOG_LEVEL: info
-    depends_on:
-      - postgres
-      - redis
-    ports:
-      - "8080:8080"
-
-  backend-grpc:
-    build:
-      context: ../../
-      dockerfile: deploy/docker/backend.grpc.Dockerfile
-    container_name: gkx-backend-grpc
-    environment:
-      APP_NAME: gekaixing-grpc
-      APP_ENV: development
-      HTTP_ADDR: :8080
-      GRPC_ADDR: :9090
-      AUTH_SECRET: replace-me
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/gekaixing?sslmode=disable
-      REDIS_ADDR: redis:6379
-      REDIS_DB: 0
-      LOG_LEVEL: info
-    depends_on:
-      - postgres
-      - redis
-    ports:
-      - "9090:9090"
-
 volumes:
   pg_data:

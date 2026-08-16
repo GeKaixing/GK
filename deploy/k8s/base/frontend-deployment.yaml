@@ -25,7 +25,7 @@ spec:
             - name: NEXTAUTH_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: gkx-backend-secret
+                  name: gkx-secret
                   key: AUTH_SECRET
           readinessProbe:
             httpGet:

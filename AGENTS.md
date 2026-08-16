@@ -1,20 +1,20 @@
 # AGENTS.md - Coding Guidelines for gekaixing
 
-This repository is now a hybrid architecture:
+This repository is a TypeScript-only stack:
 - Frontend/BFF: Next.js 16 + TypeScript + Tailwind CSS v4
-- Backend services: Go (Gin + Ent + gRPC)
-- Database: local PostgreSQL
-- Cache: Redis (go-redis)
 - Auth: Auth.js (JWT, unique user identifier: user.id)
-- Logging: Zap
-- Config: Viper
-- Infra: Docker + Kubernetes
+- Database: PostgreSQL via Prisma
+- Cache: Redis (Upstash REST)
+- Infra: Vercel (Node runtime)
+
+> **Architecture rule: TypeScript only.** Do not introduce other languages
+> (Go/Rust/etc.) — every deployer must only install the Node toolchain.
 
 ## Core Principles
 
 - Complete migrations in one pass on this branch; avoid compatibility half-states.
 - Do not reintroduce Supabase dependencies (auth, storage, realtime, query APIs).
-- Keep `user.id` as the canonical identity across Next.js, Go services, JWT claims, and DB relations.
+- Keep `user.id` as the canonical identity across JWT claims and DB relations.
 - Prefer explicit types, predictable errors, and testable boundaries.
 
 ## Tech Stack (Current)
@@ -34,25 +34,19 @@ This repository is now a hybrid architecture:
 - HS256 signing/verification for internal JWT helpers
 
 ### Data
-- PostgreSQL (local)
-- Prisma used by Next.js side
-- Ent used by Go backend side
+- PostgreSQL
+- Prisma (single source of truth)
 
-### Backend (Go)
-- Gin (HTTP)
-- gRPC (RPC)
-- go-redis (cache)
-- Zap (logging)
-- Viper (configuration)
+### Cache
+- Upstash Redis (REST)
 
 ### Infra
-- Docker images + docker-compose for local orchestration
-- Kubernetes manifests for deployment
+- Vercel (Node runtime, Fluid Compute)
+- docker-compose for local postgres + redis
 
 ## Commands
 
 ```bash
-# Frontend/BFF
 npm run dev
 npm run build
 npm run start
@@ -60,15 +54,10 @@ npm run lint
 npx tsc --noEmit
 npm run test
 
-# Prisma (Next.js side)
+# Prisma
 npx prisma generate
 npx prisma migrate dev
 npx prisma db push
-
-# Go backend
-cd backend-go && go test ./...
-cd backend-go && go run ./cmd/api
-cd backend-go && go run ./cmd/grpc
 ```
 
 ## Auth and Identity Rules
@@ -90,6 +79,9 @@ cd backend-go && go run ./cmd/grpc
 - Use `try/catch` for async boundaries.
 - Never swallow errors; log with context.
 - Prefer 400/401/403/404/409/500 with clear semantics.
+- Modules that read env at import time must not throw when the var is missing
+  (construct lazily) — Next.js evaluates imports during build-time page-data
+  collection, so a missing env var at module scope breaks the whole build.
 
 ## TypeScript Standards
 
@@ -98,18 +90,10 @@ cd backend-go && go run ./cmd/grpc
 - Explicit parameter and return types for exported functions.
 - Keep imports grouped: external, internal aliases, local.
 
-## Go Standards
-
-- Use context-aware APIs (`context.Context`) for IO operations.
-- Keep Gin handler layer thin; move business logic to internal services.
-- Ent schema is source of truth on Go side.
-- Add table-driven tests for service and transport logic.
-
 ## Database Conventions
 
 - PostgreSQL naming: snake_case for tables/columns.
 - Keep migration files deterministic and idempotent where possible.
-- For cross-stack changes (Prisma + Ent), update both schemas in same PR.
 
 ## Testing Requirements
 
@@ -117,7 +101,7 @@ cd backend-go && go run ./cmd/grpc
 - Minimum checks before finishing work:
   - `npx tsc --noEmit`
   - `npm run test`
-  - `cd backend-go && go test ./...`
+  - `npm run build` (verified locally before pushing)
 
 ## File Organization
 
@@ -127,16 +111,16 @@ components/             # UI components
 lib/                    # shared TS libs (auth, prisma, helpers)
 utils/                  # compatibility and utility helpers
 prisma/                 # Prisma schema and migrations
-backend-go/             # Go services (Gin, Ent, gRPC)
-deploy/                 # Docker/K8s manifests
+deploy/                 # docker-compose (local postgres + redis)
 ```
 
 ## Security and Config
 
-- Never commit real secrets.
-- Use `.env.local` / environment variables for local runtime.
+- Never commit real secrets (`.env.production.local` / `.env.development.local`
+  must NOT be tracked — add them to `.gitignore`).
+- Use environment variables for local runtime.
 - Required variables must be documented in `.env.example`.
-- If package download is blocked, prefer mainland mirrors (npm/go proxy) as fallback.
+- If package download is blocked, prefer mainland npm mirror as fallback.
 
 ## Migration Guardrails
 
