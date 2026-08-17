@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/auth-compat/server";
+import { createClient, getCurrentUserGeminiSettings } from "@/utils/auth-compat/server";
 
 interface GenerateAvatarBody {
   prompt?: string;
@@ -60,10 +60,8 @@ export async function POST(request: Request): Promise<Response> {
       return NextResponse.json({ error: "Unauthorized", success: false }, { status: 401 });
     }
 
-    const geminiApiKey =
-      typeof user.user_metadata?.gemini_api_key === "string"
-        ? user.user_metadata.gemini_api_key.trim()
-        : "";
+    const geminiSettings = await getCurrentUserGeminiSettings(user.id);
+    const geminiApiKey = geminiSettings.apiKey;
 
     if (!geminiApiKey) {
       return NextResponse.json(

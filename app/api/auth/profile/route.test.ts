@@ -94,7 +94,8 @@ describe("PATCH /api/auth/profile", () => {
     expect(queryRawMock).toHaveBeenCalledTimes(2);
     expect(payload.user?.id).toBe("user-1");
     expect(payload.user?.email).toBe("new@example.com");
-    expect(payload.user?.user_metadata?.gemini_api_key).toBe("AIza123");
+    expect(payload.user?.user_metadata?.has_gemini_key).toBe(true);
     expect(payload.user?.user_metadata?.gemini_model).toBe("gemini-2.5-flash");
+    expect(payload.user?.user_metadata?.gemini_api_key).toBeUndefined();
   });
 });

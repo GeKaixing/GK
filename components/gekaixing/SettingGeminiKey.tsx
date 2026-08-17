@@ -115,6 +115,7 @@ export default function SettingGeminiKey() {
   const [loading, setLoading] = useState(false);
   const [keyInput, setKeyInput] = useState("");
   const [savedKey, setSavedKey] = useState("");
+  const [hasConfiguredKey, setHasConfiguredKey] = useState(false);
   const [savedModel, setSavedModel] = useState(DEFAULT_GEMINI_MODEL);
   const [modelInput, setModelInput] = useState(DEFAULT_GEMINI_MODEL);
   const [savedUpdatedAt, setSavedUpdatedAt] = useState<string | null>(null);
@@ -128,10 +129,8 @@ export default function SettingGeminiKey() {
         data: { user },
       } = await supabase.auth.getUser();
 
-      const storedKey =
-        typeof user?.user_metadata?.gemini_api_key === "string"
-          ? user.user_metadata.gemini_api_key
-          : "";
+      const storedKey = "";
+      const configured = Boolean(user?.user_metadata?.has_gemini_key);
       const storedModel = normalizeGeminiModel(user?.user_metadata?.gemini_model);
       const storedUpdatedAt =
         typeof user?.user_metadata?.gemini_updated_at === "string"
@@ -139,6 +138,7 @@ export default function SettingGeminiKey() {
           : null;
 
       setSavedKey(storedKey);
+      setHasConfiguredKey(configured);
       setSavedModel(storedModel);
       setSavedUpdatedAt(storedUpdatedAt);
     };
@@ -158,10 +158,8 @@ export default function SettingGeminiKey() {
       return;
     }
 
-    const storedKey =
-      typeof user.user_metadata?.gemini_api_key === "string"
-        ? user.user_metadata.gemini_api_key
-        : "";
+    const storedKey = "";
+    const configured = Boolean(user.user_metadata?.has_gemini_key);
     const storedModel = normalizeGeminiModel(user.user_metadata?.gemini_model);
     const storedUpdatedAt =
       typeof user.user_metadata?.gemini_updated_at === "string"
@@ -169,6 +167,7 @@ export default function SettingGeminiKey() {
         : null;
 
     setSavedKey(storedKey);
+    setHasConfiguredKey(configured);
     setKeyInput(storedKey);
     setSavedModel(storedModel);
     setModelInput(storedModel);
@@ -211,10 +210,8 @@ export default function SettingGeminiKey() {
         return;
       }
 
-      const nextStoredKey =
-        typeof data.user?.user_metadata?.gemini_api_key === "string"
-          ? data.user.user_metadata.gemini_api_key
-          : "";
+      const nextStoredKey = "";
+      const nextHasGeminiKey = Boolean(data.user?.user_metadata?.has_gemini_key);
       const nextStoredModel = normalizeGeminiModel(data.user?.user_metadata?.gemini_model);
       const nextUpdatedAt =
         typeof data.user?.user_metadata?.gemini_updated_at === "string"
@@ -222,11 +219,12 @@ export default function SettingGeminiKey() {
           : null;
 
       setSavedKey(nextStoredKey);
+      setHasConfiguredKey(nextHasGeminiKey);
       setKeyInput(nextStoredKey);
       setSavedModel(nextStoredModel);
       setModelInput(nextStoredModel);
       setSavedUpdatedAt(nextUpdatedAt);
-      toast.success(nextStoredKey ? text.saved : text.cleared);
+      toast.success(nextHasGeminiKey ? text.saved : text.cleared);
       setOpen(false);
     } finally {
       setLoading(false);
@@ -247,9 +245,8 @@ export default function SettingGeminiKey() {
         <button type="button" className="w-full text-left">
           <SettingAccountLi
             icon={<KeyRound />}
-            text={`${text.keyLabel}${savedKey ? ` (${maskApiKey(savedKey, text.configured)})` : ""} · ${compactModelLabel}`}
-          />
-        </button>
+            text={`${text.keyLabel}${hasConfiguredKey ? ` (${text.configured})` : ""} · ${compactModelLabel}`}
+          />        </button>
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] w-[calc(100vw-1.5rem)] overflow-y-auto sm:max-w-lg">
         <DialogHeader className="space-y-2">

@@ -7,7 +7,7 @@ type CompatUserMetadata = {
   name?: string;
   avatar_url?: string;
   user_avatar?: string;
-  gemini_api_key?: string;
+  has_gemini_key?: boolean;
   gemini_model?: string;
   gemini_updated_at?: string;
 };
@@ -49,7 +49,7 @@ type GeminiSettingsRow = {
   updatedAt: Date | null;
 };
 
-async function getGeminiSettings(userId: string): Promise<GeminiSettingsRow | null> {
+export async function getGeminiSettings(userId: string): Promise<GeminiSettingsRow | null> {
   const rows = await prisma.$queryRaw<GeminiSettingsRow[]>`
     SELECT "geminiApiKey", "geminiModel", "updatedAt"
     FROM "UserSettings"
@@ -58,6 +58,19 @@ async function getGeminiSettings(userId: string): Promise<GeminiSettingsRow | nu
   `;
 
   return rows[0] ?? null;
+}
+
+export async function getCurrentUserGeminiSettings(userId: string): Promise<{
+  apiKey: string;
+  model: string | null;
+  updatedAt: Date | null;
+}> {
+  const settings = await getGeminiSettings(userId);
+  return {
+    apiKey: settings?.geminiApiKey?.trim() ?? "",
+    model: settings?.geminiModel ?? null,
+    updatedAt: settings?.updatedAt ?? null,
+  };
 }
 
 async function upsertGeminiSettings(
@@ -105,13 +118,14 @@ async function resolveCurrentUser(): Promise<CompatUser | null> {
   }
 
   const settings = await getGeminiSettings(userId);
+  const hasGeminiKey = typeof settings?.geminiApiKey === "string" && settings.geminiApiKey.trim().length > 0;
 
   return {
     id: dbUser.id,
     email: dbUser.email,
     user_metadata: {
       ...buildUserMetadata(dbUser.avatar, dbUser.name),
-      ...(settings?.geminiApiKey ? { gemini_api_key: settings.geminiApiKey } : {}),
+      ...(hasGeminiKey ? { has_gemini_key: true } : {}),
       ...(settings?.geminiModel ? { gemini_model: settings.geminiModel } : {}),
       ...(settings?.updatedAt ? { gemini_updated_at: settings.updatedAt.toISOString() } : {}),
     },
@@ -169,6 +183,8 @@ async function updateCurrentUser(payload: UpdateUserPayload): Promise<AuthResult
 
     await upsertGeminiSettings(currentUser.id, settingsUpdate);
     const refreshedSettings = await getGeminiSettings(currentUser.id);
+    const hasGeminiKey =
+      typeof refreshedSettings?.geminiApiKey === "string" && refreshedSettings.geminiApiKey.trim().length > 0;
 
     return {
       data: {
@@ -177,7 +193,7 @@ async function updateCurrentUser(payload: UpdateUserPayload): Promise<AuthResult
           email: updatedUser.email,
           user_metadata: {
             ...buildUserMetadata(updatedUser.avatar, updatedUser.name),
-            ...(refreshedSettings?.geminiApiKey ? { gemini_api_key: refreshedSettings.geminiApiKey } : {}),
+            ...(hasGeminiKey ? { has_gemini_key: true } : {}),
             ...(refreshedSettings?.geminiModel ? { gemini_model: refreshedSettings.geminiModel } : {}),
             ...(refreshedSettings?.updatedAt ? { gemini_updated_at: refreshedSettings.updatedAt.toISOString() } : {}),
           },

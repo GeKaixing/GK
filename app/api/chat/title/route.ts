@@ -1,7 +1,7 @@
 import { generateGeminiText } from "@/lib/gemini";
 import { getGeminiModelCandidates, normalizeGeminiModel, type GeminiModel } from "@/lib/gemini-model";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/utils/auth-compat/server";
+import { createClient, getCurrentUserGeminiSettings } from "@/utils/auth-compat/server";
 import { NextResponse } from "next/server";
 
 const DEFAULT_TITLE = "新对话";
@@ -86,11 +86,9 @@ export async function POST(req: Request): Promise<Response> {
       return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
-    const geminiApiKey =
-      typeof user.user_metadata?.gemini_api_key === "string"
-        ? user.user_metadata.gemini_api_key.trim()
-        : "";
-    const geminiModel = normalizeGeminiModel(user.user_metadata?.gemini_model);
+    const geminiSettings = await getCurrentUserGeminiSettings(user.id);
+    const geminiApiKey = geminiSettings.apiKey;
+    const geminiModel = normalizeGeminiModel(geminiSettings.model);
 
     const fallbackTitle = buildFallbackTitle(text);
     const aiTitle = await generateAiTitle(text, geminiApiKey, geminiModel);

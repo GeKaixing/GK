@@ -2,7 +2,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { NextResponse } from "next/server";
 
 import { getGeminiModelCandidates, normalizeGeminiModel } from "@/lib/gemini-model";
-import { createClient } from "@/utils/auth-compat/server";
+import { createClient, getCurrentUserGeminiSettings } from "@/utils/auth-compat/server";
 
 interface HotNewsItem {
   title: string;
@@ -162,19 +162,20 @@ export async function GET(request: Request): Promise<Response> {
         : "us";
 
     const supabase = await createClient();
-    let userGeminiApiKey = "";
+    let geminiApiKey = "";
     let geminiModel = normalizeGeminiModel(undefined);
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      userGeminiApiKey =
-        typeof user?.user_metadata?.gemini_api_key === "string" ? user.user_metadata.gemini_api_key.trim() : "";
-      geminiModel = normalizeGeminiModel(user?.user_metadata?.gemini_model);
+      if (user?.id) {
+        const geminiSettings = await getCurrentUserGeminiSettings(user.id);
+        geminiApiKey = geminiSettings.apiKey;
+        geminiModel = normalizeGeminiModel(geminiSettings.model);
+      }
     } catch {
-      userGeminiApiKey = "";
+      geminiApiKey = "";
     }
-    const geminiApiKey = userGeminiApiKey;
     const modelCandidates = getGeminiModelCandidates(geminiModel);
 
     if (!geminiApiKey) {
