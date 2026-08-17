@@ -2,14 +2,12 @@
   "name": "gekaixing",
   "version": "1.0.8",
   "private": true,
-  "engines": {
-    "node": "22.x"
-  },
+  "engines": { "node": "22.x" },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "node scripts/lint.mjs",
     "init:storage": "tsx scripts/init-storage.ts",
     "test": "vitest run",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook",
@@ -29,7 +27,6 @@
     "jose": "^6.2.9",
     "next": "^16.1.6",
     "next-auth": "^4.24.15",
-    "prisma": "^7.9.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
