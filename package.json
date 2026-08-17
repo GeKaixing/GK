@@ -2,6 +2,9 @@
   "name": "gekaixing",
   "version": "1.0.8",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
