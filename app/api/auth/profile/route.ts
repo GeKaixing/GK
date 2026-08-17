@@ -12,96 +12,23 @@ interface UpdateProfileBody {
   data?: Record<string, unknown>;
 }
 
-type GeminiSettingsRow = {
-  geminiApiKey: string | null;
-  geminiModel: string | null;
-  updatedAt: Date | null;
-};
-
 function buildMetadata(avatar: string | null, name: string | null) {
-  return {
-    ...(avatar ? { avatar_url: avatar, user_avatar: avatar } : {}),
-    ...(name ? { name } : {}),
-  };
+  return { ...(avatar ? { avatar_url: avatar, user_avatar: avatar } : {}), ...(name ? { name } : {}) };
 }
+
+type GeminiSettingsRow = { geminiApiKey: string | null; geminiModel: string | null; updatedAt: Date | null };
 
 async function getGeminiSettings(userId: string): Promise<GeminiSettingsRow | null> {
-  const rows = await prisma.$queryRaw<GeminiSettingsRow[]>`
-    SELECT "geminiApiKey", "geminiModel", "updatedAt"
-    FROM "UserSettings"
-    WHERE "userId" = ${userId}
-    LIMIT 1
-  `;
+  const rows = await prisma.$queryRaw<GeminiSettingsRow[]>`SELECT "geminiApiKey", "geminiModel", "updatedAt" FROM "UserSettings" WHERE "userId" = ${userId} LIMIT 1`;
   return rows[0] ?? null;
-}
-
-async function upsertGeminiSettings(userId: string, update: { geminiApiKey?: string | null; geminiModel?: string | null }) {
-  if (!Object.keys(update).length) return;
-
-  const existing = await getGeminiSettings(userId);
-  await prisma.$executeRaw`
-    INSERT INTO "UserSettings" ("userId", "geminiApiKey", "geminiModel", "updatedAt")
-    VALUES (${userId}, ${update.geminiApiKey ?? existing?.geminiApiKey ?? null}, ${update.geminiModel ?? existing?.geminiModel ?? null}, NOW())
-    ON CONFLICT ("userId") DO UPDATE SET
-      "geminiApiKey" = EXCLUDED."geminiApiKey",
-      "geminiModel" = EXCLUDED."geminiModel",
-      "updatedAt" = NOW()
-  `;
 }
 
 export async function PATCH(request: Request) {
   const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = session.user.id;
   const body = (await request.json()) as UpdateProfileBody;
-  const updateData: { email?: string; passwordHash?: string } = {};
-  const settingsUpdate: { geminiApiKey?: string | null; geminiModel?: string | null } = {};
-
-  if (typeof body.email === "string" && body.email.length) {
-    updateData.email = body.email;
-  }
-
-  if (typeof body.password === "string") {
-    if (body.password.length < 6) {
-      return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
-    }
-    updateData.passwordHash = await hash(body.password, 12);
-  }
-
-  if (body.data && typeof body.data === "object" && !Array.isArray(body.data)) {
-    if ("gemini_api_key" in body.data) {
-      const key = body.data.gemini_api_key;
-      settingsUpdate.geminiApiKey = typeof key === "string" && key.length ? key : null;
-    }
-    if ("gemini_model" in body.data) {
-      const model = body.data.gemini_model;
-      settingsUpdate.geminiModel = typeof model === "string" && model.length ? model : null;
-    }
-  }
-
-  const updated = await prisma.user.update({
-    where: { id: userId },
-    data: updateData,
-    select: { id: true, email: true, name: true, avatar: true },
-  });
-
-  await upsertGeminiSettings(userId, settingsUpdate);
+  const updated = await prisma.user.update({ where: { id: userId }, data: { ...(body.email ? { email: body.email } : {}), ...(body.password ? { passwordHash: await hash(body.password, 12) } : {}) }, select: { id:true,email:true,name:true,avatar:true } });
   const settings = await getGeminiSettings(userId);
-
-  return NextResponse.json({
-    user: {
-      id: updated.id,
-      email: updated.email,
-      user_metadata: {
-        ...buildMetadata(updated.avatar, updated.name),
-        ...(settings?.geminiApiKey ? { has_gemini_key: true } : {}),
-        ...(settings?.geminiModel ? { gemini_model: settings.geminiModel } : {}),
-        ...(settings?.updatedAt ? { gemini_updated_at: settings.updatedAt.toISOString() } : {}),
-      },
-    },
-  });
+  return NextResponse.json({ user: { id: updated.id, email: updated.email, user_metadata: { ...buildMetadata(updated.avatar, updated.name), ...(settings?.geminiApiKey ? { has_gemini_key:true } : {}), ...(settings?.geminiModel ? { gemini_model: settings.geminiModel } : {}), ...(settings?.updatedAt ? { gemini_updated_at: settings.updatedAt.toISOString() } : {}) } } });
 }
