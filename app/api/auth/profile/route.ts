@@ -12,23 +12,18 @@ interface UpdateProfileBody {
   data?: Record<string, unknown>;
 }
 
-function buildMetadata(avatar: string | null, name: string | null): Record<string, string> {
-  const base: Record<string, string> = {};
-  if (avatar) {
-    base.avatar_url = avatar;
-    base.user_avatar = avatar;
-  }
-  if (name) {
-    base.name = name;
-  }
-  return base;
-}
-
 type GeminiSettingsRow = {
   geminiApiKey: string | null;
   geminiModel: string | null;
   updatedAt: Date | null;
 };
+
+function buildMetadata(avatar: string | null, name: string | null) {
+  return {
+    ...(avatar ? { avatar_url: avatar, user_avatar: avatar } : {}),
+    ...(name ? { name } : {}),
+  };
+}
 
 async function getGeminiSettings(userId: string): Promise<GeminiSettingsRow | null> {
   const rows = await prisma.$queryRaw<GeminiSettingsRow[]>`
@@ -37,27 +32,17 @@ async function getGeminiSettings(userId: string): Promise<GeminiSettingsRow | nu
     WHERE "userId" = ${userId}
     LIMIT 1
   `;
-
   return rows[0] ?? null;
 }
 
-async function upsertGeminiSettings(
-  userId: string,
-  settingsUpdate: { geminiApiKey?: string | null; geminiModel?: string | null },
-): Promise<void> {
-  if (Object.keys(settingsUpdate).length === 0) {
-    return;
-  }
+async function upsertGeminiSettings(userId: string, update: { geminiApiKey?: string | null; geminiModel?: string | null }) {
+  if (!Object.keys(update).length) return;
 
   const existing = await getGeminiSettings(userId);
-  const nextKey = settingsUpdate.geminiApiKey ?? existing?.geminiApiKey ?? null;
-  const nextModel = settingsUpdate.geminiModel ?? existing?.geminiModel ?? null;
-
   await prisma.$executeRaw`
     INSERT INTO "UserSettings" ("userId", "geminiApiKey", "geminiModel", "updatedAt")
-    VALUES (${userId}, ${nextKey}, ${nextModel}, NOW())
-    ON CONFLICT ("userId")
-    DO UPDATE SET
+    VALUES (${userId}, ${update.geminiApiKey ?? existing?.geminiApiKey ?? null}, ${update.geminiModel ?? existing?.geminiModel ?? null}, NOW())
+    ON CONFLICT ("userId") DO UPDATE SET
       "geminiApiKey" = EXCLUDED."geminiApiKey",
       "geminiModel" = EXCLUDED."geminiModel",
       "updatedAt" = NOW()
@@ -67,21 +52,16 @@ async function upsertGeminiSettings(
 export async function PATCH(request: Request) {
   const session = await auth();
   const userId = session?.user?.id;
+
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = (await request.json()) as UpdateProfileBody;
-  const updateData: {
-    email?: string;
-    passwordHash?: string;
-  } = {};
-  const settingsUpdate: {
-    geminiApiKey?: string | null;
-    geminiModel?: string | null;
-  } = {};
+  const updateData: { email?: string; passwordHash?: string } = {};
+  const settingsUpdate: { geminiApiKey?: string | null; geminiModel?: string | null } = {};
 
-  if (typeof body.email === "string" && body.email.length > 0) {
+  if (typeof body.email === "string" && body.email.length) {
     updateData.email = body.email;
   }
 
@@ -95,23 +75,18 @@ export async function PATCH(request: Request) {
   if (body.data && typeof body.data === "object" && !Array.isArray(body.data)) {
     if ("gemini_api_key" in body.data) {
       const key = body.data.gemini_api_key;
-      settingsUpdate.geminiApiKey = typeof key === "string" && key.length > 0 ? key : null;
+      settingsUpdate.geminiApiKey = typeof key === "string" && key.length ? key : null;
     }
     if ("gemini_model" in body.data) {
       const model = body.data.gemini_model;
-      settingsUpdate.geminiModel = typeof model === "string" && model.length > 0 ? model : null;
+      settingsUpdate.geminiModel = typeof model === "string" && model.length ? model : null;
     }
   }
 
   const updated = await prisma.user.update({
     where: { id: userId },
     data: updateData,
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      avatar: true,
-    },
+    select: { id: true, email: true, name: true, avatar: true },
   });
 
   await upsertGeminiSettings(userId, settingsUpdate);
@@ -123,7 +98,7 @@ export async function PATCH(request: Request) {
       email: updated.email,
       user_metadata: {
         ...buildMetadata(updated.avatar, updated.name),
-        ...(settings?.geminiApiKey ? { gemini_api_key: settings.geminiApiKey } : {}),
+        ...(settings?.geminiApiKey ? { has_gemini_key: true } : {}),
         ...(settings?.geminiModel ? { gemini_model: settings.geminiModel } : {}),
         ...(settings?.updatedAt ? { gemini_updated_at: settings.updatedAt.toISOString() } : {}),
       },
