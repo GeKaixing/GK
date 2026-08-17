@@ -5,6 +5,14 @@ import { invalidateUserHomeFeed } from "@/lib/feed/service";
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/auth-compat/server";
 
+const publicAuthorSelect = {
+  id: true,
+  name: true,
+  avatar: true,
+  backgroundImage: true,
+  briefIntroduction: true,
+} as const;
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -174,7 +182,9 @@ export async function GET(request: Request) {
         include: {
           post: {
             include: {
-              author: true,
+              author: {
+                select: publicAuthorSelect,
+              },
               _count: {
                 select: { replies: true },
               },
