@@ -49,6 +49,63 @@ type GeminiSettingsRow = {
   updatedAt: Date | null;
 };
 
+/**
+ * Encryption helpers (AES-256-GCM) — lazy key read so imports don't throw at build time.
+ * Format: "enc:" + base64(iv || authTag || ciphertext)
+ */
+function getEncKeyOrNull(): Buffer | null {
+  const raw = process.env.GEMINI_KEY_ENC_SECRET ?? process.env.GEMINI_KEY_ENC_KEY ?? "";
+  if (!raw) return null;
+  try {
+    // allow raw base64 or raw text; prefer base64 decode if length matches 44 (32 bytes base64)
+    if (/^[A-Za-z0-9+/=]+$/.test(raw) && Buffer.from(raw, "base64").length === 32) {
+      return Buffer.from(raw, "base64");
+    }
+    // otherwise derive a 32-byte key from string using SHA-256
+    const { createHash } = require("node:crypto");
+    return createHash("sha256").update(String(raw)).digest();
+  } catch {
+    return null;
+  }
+}
+
+function encryptForStorage(plaintext: string): string {
+  const key = getEncKeyOrNull();
+  if (!key) return plaintext; // no key configured — preserve plaintext for backwards compat
+
+  const crypto = require("node:crypto");
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const ciphertext = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag();
+
+  const combined = Buffer.concat([iv, tag, ciphertext]);
+  return `enc:${combined.toString("base64")}`;
+}
+
+function decryptFromStorage(stored: string | null): string | null {
+  if (!stored) return null;
+  if (!stored.startsWith("enc:")) return stored; // plaintext or older value
+
+  const key = getEncKeyOrNull();
+  if (!key) return null; // cannot decrypt without key
+
+  try {
+    const crypto = require("node:crypto");
+    const payload = Buffer.from(stored.slice(4), "base64");
+    const iv = payload.slice(0, 12);
+    const tag = payload.slice(12, 28);
+    const ciphertext = payload.slice(28);
+    const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+    decipher.setAuthTag(tag);
+    const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+    return decrypted.toString("utf8");
+  } catch (error) {
+    // decryption failed — return null to avoid exposing corrupted data
+    return null;
+  }
+}
+
 export async function getGeminiSettings(userId: string): Promise<GeminiSettingsRow | null> {
   const rows = await prisma.$queryRaw<GeminiSettingsRow[]>`
     SELECT "geminiApiKey", "geminiModel", "updatedAt"
@@ -57,7 +114,15 @@ export async function getGeminiSettings(userId: string): Promise<GeminiSettingsR
     LIMIT 1
   `;
 
-  return rows[0] ?? null;
+  const row = rows[0] ?? null;
+  if (!row) return null;
+
+  const decrypted = decryptFromStorage(row.geminiApiKey);
+  return {
+    geminiApiKey: decrypted,
+    geminiModel: row.geminiModel,
+    updatedAt: row.updatedAt,
+  };
 }
 
 export async function getCurrentUserGeminiSettings(userId: string): Promise<{
@@ -82,7 +147,8 @@ async function upsertGeminiSettings(
   }
 
   const existing = await getGeminiSettings(userId);
-  const nextKey = settings.geminiApiKey ?? existing?.geminiApiKey ?? null;
+  const nextKeyPlain = settings.geminiApiKey ?? existing?.geminiApiKey ?? null;
+  const nextKey = nextKeyPlain ? encryptForStorage(nextKeyPlain) : null;
   const nextModel = settings.geminiModel ?? existing?.geminiModel ?? null;
 
   await prisma.$executeRaw`
