@@ -2,8 +2,9 @@ import { hash } from "bcryptjs";
 import { NextResponse } from "next/server";
 
 import { createVerificationToken, hashVerificationToken } from "@/lib/auth/email-verification";
-import { sendVerificationEmail } from "@/lib/auth/mailer";
 import { prisma } from "@/lib/prisma";
+import { enforceRateLimit } from "@/lib/security/rate-limit";
+import { sendVerificationEmail } from "@/lib/auth/mailer";
 
 interface SignupBody {
   email: string;
@@ -11,6 +12,11 @@ interface SignupBody {
   name?: string | null;
   avatar?: string | null;
 }
+
+const SIGNUP_RATE_LIMIT = {
+  limit: 5,
+  windowMs: 60 * 60 * 1000,
+};
 
 function getBaseUrl(): string {
   return (
@@ -36,6 +42,17 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { success: false, error: "Invalid email or password" },
         { status: 400 },
+      );
+    }
+
+    const rateLimit = await enforceRateLimit(request, "signup", email, SIGNUP_RATE_LIMIT);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { success: false, error: "Too many signup attempts. Please try again later." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+        },
       );
     }
 
