@@ -5,8 +5,8 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-function buildMetadata(avatar: string | null, name: string | null): Record<string, string> {
-  const base: Record<string, string> = {};
+function buildMetadata(avatar: string | null, name: string | null): Record<string, string | boolean> {
+  const base: Record<string, string | boolean> = {};
   if (avatar) {
     base.avatar_url = avatar;
     base.user_avatar = avatar;
@@ -56,6 +56,7 @@ export async function GET() {
   }
 
   const settings = await getGeminiSettings(userId);
+  const hasGeminiKey = typeof settings?.geminiApiKey === "string" && settings.geminiApiKey.trim().length > 0;
 
   return NextResponse.json({
     user: {
@@ -63,7 +64,7 @@ export async function GET() {
       email: user.email,
       user_metadata: {
         ...buildMetadata(user.avatar, user.name),
-        ...(settings?.geminiApiKey ? { gemini_api_key: settings.geminiApiKey } : {}),
+        ...(hasGeminiKey ? { has_gemini_key: true } : {}),
         ...(settings?.geminiModel ? { gemini_model: settings.geminiModel } : {}),
         ...(settings?.updatedAt ? { gemini_updated_at: settings.updatedAt.toISOString() } : {}),
       },

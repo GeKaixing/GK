@@ -21,12 +21,20 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@google/genai": "^1.47.0",
-    "next": "^16.1.6"
+    "@prisma/client": "^7.9.1",
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.9",
+    "next": "^16.1.6",
+    "next-auth": "^4.24.15",
+    "prisma": "^7.9.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "^16",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

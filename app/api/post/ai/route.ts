@@ -1,6 +1,6 @@
 import { generateGeminiText } from "@/lib/gemini";
 import { getGeminiModelCandidates, normalizeGeminiModel } from "@/lib/gemini-model";
-import { createClient } from "@/utils/auth-compat/server";
+import { createClient, getCurrentUserGeminiSettings } from "@/utils/auth-compat/server";
 import { NextResponse } from "next/server";
 
 interface GeneratePostBody {
@@ -127,11 +127,9 @@ export async function POST(request: Request): Promise<Response> {
       mode === "polish"
         ? buildPolishPromptText(content || prompt, locale)
         : buildGeneratePromptText(prompt, locale);
-    const geminiApiKey =
-      typeof user.user_metadata?.gemini_api_key === "string"
-        ? user.user_metadata.gemini_api_key.trim()
-        : "";
-    const geminiModel = normalizeGeminiModel(user.user_metadata?.gemini_model);
+    const geminiSettings = await getCurrentUserGeminiSettings(user.id);
+    const geminiApiKey = geminiSettings.apiKey;
+    const geminiModel = normalizeGeminiModel(geminiSettings.model);
     const modelCandidates = getGeminiModelCandidates(geminiModel);
 
     if (!geminiApiKey) {

@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { getGeminiModelCandidates, normalizeGeminiModel } from "@/lib/gemini-model";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/utils/auth-compat/server";
+import { createClient, getCurrentUserGeminiSettings } from "@/utils/auth-compat/server";
 import { NextRequest } from "next/server";
 
 const GKX_SYSTEM_PROMPT =
@@ -105,11 +105,9 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const geminiApiKey =
-      typeof user.user_metadata?.gemini_api_key === "string"
-        ? user.user_metadata.gemini_api_key.trim()
-        : "";
-    const geminiModel = normalizeGeminiModel(user.user_metadata?.gemini_model);
+    const geminiSettings = await getCurrentUserGeminiSettings(user.id);
+    const geminiApiKey = geminiSettings.apiKey;
+    const geminiModel = normalizeGeminiModel(geminiSettings.model);
     const modelCandidates = getGeminiModelCandidates(geminiModel);
 
     if (!geminiApiKey) {
